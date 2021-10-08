@@ -1,0 +1,83 @@
+---
+- name: 'Create and start the container.'
+  delegate_to: "{{ pve_node }}"
+  become: yes
+  block:
+
+  - name: 'Download template if it does not already exist.'
+    community.general.proxmox_template:
+      node: "{{ pve_node }}"
+      api_user: "{{ pve_api_username }}"
+      api_password: "{{ pve_api_password }}"
+      api_host: "{{ pve_node }}"
+      storage: 'local'
+      content_type: 'vztmpl'
+      template: "{{ pve_template }}"
+
+  - name: 'Ensure mountpoints exist on host.'
+    ansible.builtin.file:
+      path: "{{ pve_mount_item.node_path }}"
+      state: 'directory'
+      mode: "{{ pve_mount_item.perms | default('0755') }}"
+      owner: "{{ pve_mount_item.uid | default('1000') }}"
+      group: "{{ pve_mount_item.gid | default('1000') }}"
+    loop_control:
+      index_var: 'index'
+      loop_var: 'pve_mount_item'
+    loop: "{{ pve_mountpoints }}"
+
+  - name: 'Build mountpoints.'
+    ansible.builtin.set_fact:
+      pve_mountpoints_dict: "{{ pve_mountpoints_dict | combine({ 'mp' + ( index + 1 ) | string : pve_mount_item.node_path + ',mp=' + pve_mount_item.host_path }) }}"
+    loop_control:
+      index_var: 'index'
+      loop_var: 'pve_mountpoint_item'
+    loop: "{{ pve_mountpoints | default([]) }}"
+
+  - name: 'Create container.'
+    community.general.proxmox:
+      api_user: "{{ pve_api_username }}"
+      api_password: "{{ pve_api_password }}"
+      api_host: "{{ pve_node }}"
+      vmid: "{{ pve_vm_id }}"
+      node: "{{ pve_node }}"
+      cores: "{{ pve_cores }}"
+      cpus: 1
+      memory: "{{ pve_memory_size }}"
+      swap: "{{ pve_swap_size }}"
+      password: "{{ pve_root_password }}"
+      hostname: "{{ hostname }}"
+      mounts: "{{ pve_mountpoints_dict | to_json }}"
+      onboot: "{{ pve_onboot }}"
+      ostemplate: "{{ pve_template_path }}/{{ pve_template }}"
+      description: "{{ description | default(hostname) }}"
+      netif: '{"net0":"type=veth,name=eth0,ip=dhcp,bridge=vmbr0,firewall=1,hwaddr={{ pve_mac_address }}"}'
+      unprivileged: "{{ pve_unprivileged  }}"
+      disk: "local-lvm:{{ pve_rootfs_size }}"
+      features: "{{ pve_features }}"
+      state: 'present'
+      storage: 'local'
+      pubkey: "{{ pve_ssh_pub_key }}"
+      proxmox_default_behavior: 'no_defaults'
+      timeout: 600
+
+  - name: 'Append additional options to VM configuration.'
+    ansible.builtin.blockinfile:
+      path: "/etc/pve/lxc/{{ pve_vm_id }}.conf"
+      block: |
+        lxc.apparmor.profile: unconfined
+        lxc.apparmor.raw: mount,
+        lxc.cap.drop:
+        lxc.cgroup.devices.allow: a
+        lxc.mount.auto: proc:rw sys:rw
+        lxc.mount.entry: /dev/kmsg dev/kmsg none defaults,bind,create=file
+      unsafe_writes: yes
+
+  - name: 'Start container.'
+    community.general.proxmox:
+      vmid: "{{ pve_vm_id }}"
+      api_user: "{{ pve_api_username }}"
+      api_password: "{{ pve_api_password }}"
+      api_host: "{{ pve_node }}"
+      state: 'started'
+      proxmox_default_behavior: 'no_defaults'
