@@ -7,3 +7,4 @@ prompt:
         tertiary: 102
     emoji: 🦀
 pve_cluster_id: old_anchor
+pve_ip_address: 10.2.0.2

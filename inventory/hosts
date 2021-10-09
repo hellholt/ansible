@@ -40,15 +40,24 @@ all:
         ashford:
         beesbury:
         estermont:
-    pve_file_server:
-      hosts:
-        lefford:
-    pve_nfs_server:
-      hosts:
-        lefford:
-    k8s_nfs_server:
-      hosts:
-        lefford:
+    setup_groups:
+      children:
+        pve_file_servers:
+          hosts:
+            lefford:
+        pve_nfs_servers:
+          hosts:
+            lefford:
+        k8s_nfs_servers:
+          hosts:
+            lefford:
+        ssh_ca_servers:
+          hosts:
+            ball
+        pihole:
+          hosts:
+        unifi:
+          hosts:
     k8s:
       children:
         k8s_masters:

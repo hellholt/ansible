@@ -1,0 +1,9 @@
+---
+- name: 'Create hosts.'
+  ansible.builtin.include_role:
+    name: 'hellholt.proxmox'
+    tasks_from: 'create_lxc_container.yaml'
+
+- name: 'Setup hosts.'
+  ansible.builtin.include_role:
+    name: 'hellholt.setup_host'

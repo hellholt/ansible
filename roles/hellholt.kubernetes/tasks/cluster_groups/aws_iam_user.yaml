@@ -1,0 +1,80 @@
+---
+- name: 'AWS IAM user management.'
+  delegate_to: 'localhost'
+  block:
+
+    - name: 'Create an AWS IAM user for this cluster.'
+      community.aws.iam:
+        aws_access_key: "{{ k8s_aws_main_access_key }}"
+        aws_secret_key: "{{ k8s_aws_main_secret_key }}"
+        region: "{{ k8s_aws_region }}"
+        iam_type: 'user'
+        name: "{{ k8s_aws_iam_cluster_user }}"
+        state: 'present'
+        password: "{{ k8s_aws_iam_cluster_password }}"
+        update_password: 'on_create'
+        access_key_state: 'create'
+        key_count: 0
+
+    - name: 'Retrieve cluster data for this cluster.'
+      block:
+
+        - name: 'Lookup cluster data for this cluster.'
+          ansible.builtin.set_fact:
+            k8s_cluster_data: "{{ lookup('amazon.aws.aws_ssm', k8s_aws_iam_cluster_ssm_parameter_store_data_name, aws_access_key=k8s_aws_main_access_key, aws_secret_key=k8s_aws_main_secret_key) | from_json }}"
+
+      rescue:
+
+        - name: 'Set a safe default fact.'
+          ansible.builtin.set_fact:
+            k8s_cluster_data: {}
+
+    - name: 'Set facts for access key ID and secret access key.'
+      ansible.builtin.set_fact:
+        k8s_access_key_id: "{{ k8s_cluster_data.access_key_id | default('') }}"
+        k8s_secret_access_key: "{{ k8s_cluster_data.secret_access_key | default('') }}"
+
+    - name: 'Create a new access key ID and secret access key.'
+      when: 'not k8s_access_key_id or not k8s_secret_access_key'
+      block:
+
+        - name: 'Create and retrieve access key.'
+          ansible.builtin.command:
+            cmd: "aws iam create-access-key --user-name {{ k8s_aws_iam_cluster_user }}"
+          environment:
+            AWS_REGION: '{{ k8s_aws_region }}'
+            AWS_ACCESS_KEY_ID: '{{ k8s_aws_main_access_key }}'
+            AWS_SECRET_ACCESS_KEY: '{{ k8s_aws_main_secret_key }}'
+          register: 'k8s_access_key_command'
+
+        - name: 'Get access key ID and secret access key from command output.'
+          ansible.builtin.set_fact:
+            k8s_access_key_output: "{{ k8s_access_key_command.stdout | from_json }}"
+
+        - name: 'Set new access key ID and secret access key.'
+          ansible.builtin.set_fact:
+            k8s_new_access_key_id: "{{ k8s_access_key_output.AccessKey.AccessKeyId }}"
+            k8s_new_secret_access_key: "{{ k8s_access_key_output.AccessKey.SecretAccessKey }}"
+
+        - name: 'Set new cluster data.'
+          ansible.builtin.set_fact:
+            k8s_new_cluster_data:
+              access_key_id: "{{ k8s_new_access_key_id }}"
+              secret_access_key: "{{ k8s_new_secret_access_key }}"
+
+        - name: 'Rebuild host data.'
+          ansible.builtin.set_fact:
+            k8s_cluster_data: "{{ k8s_cluster_data | default({}) | combine(k8s_new_cluster_data) }}"
+
+        - name: 'Update access key ID and secret access key.'
+          community.aws.aws_ssm_parameter_store:
+            name: "{{ k8s_aws_iam_cluster_ssm_parameter_store_data_name }}"
+            description: "Cluster data for {{ k8s_cluster }}"
+            string_type: 'SecureString'
+            value: "{{ k8s_cluster_data | to_nice_json }}"
+
+        - name: 'Finally, set variables appropriately.'
+          ansible.builtin.set_fact:
+            k8s_access_key_id: "{{ k8s_new_access_key_id }}"
+            k8s_secret_access_key: "{{ k8s_new_secret_access_key }}"
+

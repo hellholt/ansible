@@ -15,7 +15,7 @@ sh_install_common_packages: yes
 sh_normal_user_name: null
 
 # Clean, simple hostname.
-sh_hostname: null
+sh_hostname: "{{ inventory_hostname | splitext | first | lower }}"
 
 # Local timezone.
 sh_local_timezone: 'America/New_York'
@@ -76,12 +76,13 @@ sh_setup_groups:
   - 'aws_iam_policy'
   - 'route53'
   - 'k8s'
-  - 'k8s_nfs_server'
-  - 'pve_file_server'
-  - 'pve_nfs_server'
-  - 'pve_node'
+  - 'k8s_nfs_servers'
+  - 'pve_file_servers'
+  - 'pve_nfs_servers'
+  - 'pve_nodes'
   - 'pihole'
   - 'unifi'
+  - 'ssh_ca_server'
 #  - 'dotfiles_root'
 #  - 'dotfiles'
 
@@ -97,6 +98,12 @@ sh_universal_setup_groups:
 # Name of IAM user for host.
 sh_aws_iam_host_user: "ndsh_{{ sh_hostname }}"
 sh_aws_iam_host_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
+
+# Prefix of SSM parameter store data for host.
+sh_aws_iam_host_ssm_parameter_store_data_prefix: null
+
+# Name of SSM parameter store data for host.
+sh_aws_iam_host_ssm_parameter_store_data_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ sh_hostname }}.host_data"
 
 # Parameter pattern for SSM parameters for which the SSM policy should permit access.
 sh_aws_ssm_policy_pattern: "{{ sh_hostname }}.*"

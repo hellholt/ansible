@@ -10,6 +10,9 @@ hostname: "{{ inventory_hostname | splitext | first | lower }}"
 # Just the name of the project as a whole.  This will be used in a few places.
 project_name: 'hellholt'
 
+# Calculated IPv4 address.  Doesn't always work, usually does.
+ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+
 # Data structure for my personal preferences.
 my:
   name:
@@ -58,9 +61,13 @@ my:
 #       password: <string>
 #
 
-# Name of IAM user for host.
+# Name and password of IAM user for host.
 host_aws_iam_user: "{{ project_name }}_host_{{ hostname }}"
 host_aws_iam_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
+
+# Name and password of IAM user for cluster.
+cluster_aws_iam_user_prefix: "{{ project_name }}_cluster_"
+cluster_aws_iam_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
 
 # The following sections are per-role variables.
 #
@@ -139,6 +146,9 @@ sh_aws_iam_host_password: "{{ host_aws_iam_password }}"
 # Parameter pattern for SSM parameters for which the SSM policy should permit access.
 sh_aws_ssm_policy_pattern: "{{ project_name }}.hosts.{{ sh_hostname }}.*"
 
+# Prefix of SSM parameter store data for host.
+sh_aws_iam_host_ssm_parameter_store_data_prefix: "{{ project_name }}.hosts."
+
 # Docker Hub credentials.
 sh_docker_hub_login: yes
 sh_docker_hub_username: "{{ vault.docker.hub.username }}"
@@ -190,3 +200,54 @@ sh_pihole_dns:
   - '208.67.222.222'
   - '208.67.220.220'
 sh_pihole_password: "{{ vault.easy_password }}"
+
+#########################
+# hellholt.kubernetes
+#########################
+
+# Set the k8s_hostname to the hostname.
+k8s_hostname: "{{ hostname }}"
+
+# All K8s hosts, regardless of role or cluster.
+k8s_hosts: "{{ groups['k8s'] }}"
+# All K8s masters, regardless of cluster.
+k8s_master_hosts: "{{ groups['k8s_masters'] }}"
+# All K8s nodes, regardless of cluster.
+k8s_node_hosts: "{{ groups['k8s_nodes'] }}"
+# All K8s hosts in this cluster.
+k8s_cluster_hosts: "{{ groups[k8s_cluster] }}"
+
+# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
+k8s_aws_region: "{{ vault.aws.defaults.region }}"
+k8s_aws_account_id: "{{ vault.aws.defaults.account_id }}"
+k8s_aws_main_access_key: "{{ vault.aws.profiles.main.key_id }}"
+k8s_aws_main_secret_key: "{{ vault.aws.profiles.main.secret_key }}"
+
+# Name and password of IAM user for cluster.
+k8s_aws_iam_cluster_user: "{{ cluster_aws_iam_user_prefix }}{{ k8s_cluster }}"
+k8s_aws_iam_cluster_password: "{{ cluster_aws_iam_password }}"
+
+# Pattern for which SSM parameters this cluster is permitted to access.
+k8s_aws_ssm_policy_pattern: "{{ project_name }}.clusters.{{ k8s_cluster }}.*"
+
+# Prefix of SSM parameter store data for cluster.
+k8s_aws_iam_cluster_ssm_parameter_store_data_prefix: "{{ project_name }}.clusters."
+
+# A private domain name.
+k8s_private_domain_name: "{{ my.domains.private }}"
+# A personal domain name.
+k8s_personal_domain_name: "{{ my.domains.personal }}"
+
+# A Route 53 "private" zone ID.
+k8s_route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
+# A Route 53 "personal" zone ID.
+k8s_route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
+
+# Prefix to NFS path exported to k8s clusters.
+k8s_nfs_prefix: "{{ sh_k8s_nfs_prefix }}"
+
+# Argo CD password.
+k8s_argocd_password: "{{ vault.easy_password }}"
+
+# The hostname of the K8s NFS server.
+k8s_nfs_server: 'lefford'

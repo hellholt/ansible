@@ -1,0 +1,57 @@
+---
+- name: 'Set a fact for the master node.'
+  ansible.builtin.set_fact:
+    k8s_master: "{{ k8s_node_hostname }}"
+  when: 'hostvars[k8s_node_hostname].k8s_role == "master" and hostvars[k8s_node_hostname].k8s_cluster == k8s_cluster'
+  loop: "{{ k8s_cluster_hosts }}"
+  loop_control:
+    index_var: 'k8s_index'
+    loop_var: 'k8s_node_hostname'
+
+- name: 'Some universal setup.'
+  remote_user: 'root'
+  block:
+
+    - name: 'Perform normal setup.'
+      ansible.builtin.setup:
+
+    - name: 'General setup.'
+      ansible.builtin.include_role:
+        name: 'hellholt.setup_host'
+
+    - name: 'Label nodes.'
+      delegate_to: "{{ k8s_master }}"
+      kubernetes.core.k8s:
+        kubeconfig: '~/.kube/config'
+        state: 'present'
+        definition:
+          apiVersion: 'v1'
+          kind: 'Node'
+          metadata:
+            name: "{{ k8s_hostname }}"
+            labels:
+              "pve_node": "{{ pve_node }}"
+              "k8s_cluster": "{{ k8s_cluster }}"
+              "k8s_role": "{{ k8s_role }}"
+              "k8s_master": "{{ k8s_master }}"
+
+- name: 'Add all hosts to a set of universal groups.'
+  ansible.builtin.group_by:
+    key: "{{ k8s_cluster_group }}"
+  loop: "{{ k8s_universal_cluster_groups }}"
+  loop_control:
+    index_var: 'k8s_index'
+    loop_var: 'k8s_cluster_group'
+
+- name: 'Set up cluster (but only on master).'
+  remote_user: 'root'
+  when: 'k8s_role == "master"'
+  block:
+
+    - name: 'Execute cluster group tasks.'
+      ansible.builtin.include_tasks: "tasks/cluster_groups/{{ k8s_cluster_group }}.yaml"
+      when: 'k8s_cluster_group in group_names'
+      loop: "{{ k8s_cluster_groups }}"
+      loop_control:
+        index_var: 'k8s_index'
+        loop_var: 'k8s_cluster_group'

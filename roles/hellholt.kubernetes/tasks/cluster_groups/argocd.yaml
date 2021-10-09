@@ -1,0 +1,114 @@
+---
+- name: 'Set some facts.'
+  ansible.builtin.set_fact:
+    k8s_argocd_private_fqdn: "argocd.{{ k8s_route53_private_fqdn }}"
+    k8s_argocd_personal_fqdn: "argocd.{{ k8s_route53_personal_fqdn }}"
+    k8s_argocdgrpc_private_fqdn: "argocd-grpc.{{ k8s_route53_private_fqdn }}"
+    k8s_argocdgrpc_personal_fqdn: "argocd-grpc.{{ k8s_route53_personal_fqdn }}"
+
+- name: 'Add Argo chart repository.'
+  kubernetes.core.helm_repository:
+    name: 'argo'
+    repo_url: 'https://argoproj.github.io/argo-helm'
+
+- name: 'Deploy Argo CD.'
+  kubernetes.core.helm:
+    name: 'argocd'
+    chart_ref: 'argo/argo-cd'
+    release_namespace: 'argocd'
+    create_namespace: yes
+    values:
+      secret:
+        createSecret: yes
+        argocdServerAdminPassword: "{{ k8s_argocd_password | password_hash('bcrypt') }}"
+      server:
+        service:
+          type: 'ClusterIP'
+        extraArgs:
+          - '--insecure'
+
+- name: 'Argo CD Server ingress.'
+  kubernetes.core.k8s:
+    kubeconfig: '~/.kube/config'
+    namespace: 'argocd'
+    definition:
+      apiVersion: 'networking.k8s.io/v1'
+      kind: 'Ingress'
+      metadata:
+        name: 'argocd-server'
+        annotations:
+          cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+      spec:
+        rules:
+          - host: "{{ k8s_argocd_personal_fqdn }}"
+            http:
+              paths:
+                - pathType: 'Prefix'
+                  path: '/'
+                  backend:
+                    service:
+                      name: 'argocd-server'
+                      port:
+                        number: 80
+          - host: "{{ k8s_argocd_private_fqdn }}"
+            http:
+              paths:
+                - pathType: 'Prefix'
+                  path: '/'
+                  backend:
+                    service:
+                      name: 'argocd-server'
+                      port:
+                        number: 80
+        tls:
+          - hosts:
+              - "{{ k8s_argocd_private_fqdn }}"
+              - "*.{{ k8s_argocd_private_fqdn }}"
+            secretName: "{{ k8s_argocd_private_fqdn }}-certificate"
+          - hosts:
+              - "{{ k8s_argocd_personal_fqdn }}"
+              - "*.{{ k8s_argocd_personal_fqdn }}"
+            secretName: "{{ k8s_argocd_personal_fqdn }}-certificate"
+
+- name: 'Argo CD Server gRPC ingress.'
+  kubernetes.core.k8s:
+    kubeconfig: '~/.kube/config'
+    namespace: 'argocd'
+    definition:
+      apiVersion: 'networking.k8s.io/v1'
+      kind: 'Ingress'
+      metadata:
+        name: 'argocd-serve-grpc'
+        annotations:
+          ingress.kubernetes.io/protocol: 'h2c'
+      spec:
+        rules:
+          - host: "{{ k8s_argocdgrpc_personal_fqdn }}"
+            http:
+              paths:
+                - pathType: 'Prefix'
+                  path: '/'
+                  backend:
+                    service:
+                      name: 'argocd-server'
+                      port:
+                        number: 80
+          - host: "{{ k8s_argocdgrpc_private_fqdn }}"
+            http:
+              paths:
+                - pathType: 'Prefix'
+                  path: '/'
+                  backend:
+                    service:
+                      name: 'argocd-server'
+                      port:
+                        number: 80
+        tls:
+          - hosts:
+              - "{{ k8s_argocdgrpc_personal_fqdn }}"
+              - "*.{{ k8s_argocdgrpc_personal_fqdn }}"
+            secretName: '{{ k8s_argocdgrpc_personal_fqdn }}-secret'
+          - hosts:
+              - "{{ k8s_argocdgrpc_private_fqdn }}"
+              - "*.{{ k8s_argocdgrpc_private_fqdn }}"
+            secretName: '{{ k8s_argocdgrpc_private_fqdn }}-secret'
