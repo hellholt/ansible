@@ -75,11 +75,11 @@ sh_setup_groups:
   - 'aws_iam_user'
   - 'aws_iam_policy'
   - 'route53'
+  - 'k8s'
 #  - 'dotfiles_root'
 #  - 'dotfiles'
 #  - 'route53'
 #  - 'docker'
-#  - 'k8s'
 
 # Some setup groups contain all hosts.
 sh_universal_setup_groups:
