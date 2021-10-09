@@ -182,7 +182,7 @@ sh_local_share_prefix: '/leo/local/hosts'
 # Hosts that exist on this Proxmox node (and can thus mount local shares).
 sh_local_share_hostnames: "{{ groups[pve_cluster_id] }}"
 
-sh_nfs_hostnames: "{{ groups['pve_hosts'] }}"
+sh_nfs_share_hosts: "{{ groups['pve_hosts'] }}"
 sh_node_nfs_prefix: '/leo/nfs/hosts'
 
 # Pi-Hole stuff.
