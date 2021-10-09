@@ -102,7 +102,7 @@ sh_enable_passwordless_sudo: yes
 sh_create_normal_user: yes
 
 # This can take a while and should be avoided when possible.
-sh_install_common_packages: no
+sh_install_common_packages: yes
 
 # A normal (i.e. non-root) username.
 sh_normal_user_name: "{{ my.name.lower }}"

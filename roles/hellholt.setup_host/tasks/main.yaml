@@ -3,6 +3,9 @@
   remote_user: 'root'
   block:
 
+  - name: 'Gather facts.'
+    ansible.builtin.setup:
+
   - name: 'Perform setup_common tasks.'
     ansible.builtin.include_tasks: 'setup_common.yaml'
 

@@ -81,3 +81,8 @@
       api_host: "{{ pve_node }}"
       state: 'started'
       proxmox_default_behavior: 'no_defaults'
+
+  - name: 'Wait for connectivity.'
+    delegate_to: "{{ pve_hostname }}"
+    remote_user: 'root'
+    ansible.builtin.wait_for_connection:

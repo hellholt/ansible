@@ -1,7 +1,7 @@
 ---
 - name: 'Set a fact for the user.'
   ansible.builtin.set_fact:
-    sh_user: "{{ ansible_env.SUDO_USER | default(ansible_env.USER, true) | default(ansible_user_id, true) }}"
+    sh_user: "{{ ansible_env.SUDO_USER | default(ansible_env.USER, true) | default(ansible_user_id, true) | default('root') }}"
   become: no
   when: 'sh_user is not defined'
 

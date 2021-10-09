@@ -18,9 +18,10 @@
     release_namespace: 'argocd'
     create_namespace: yes
     values:
-      secret:
-        createSecret: yes
-        argocdServerAdminPassword: "{{ k8s_argocd_password | password_hash('bcrypt') }}"
+      configs:
+        secret:
+          createSecret: yes
+          argocdServerAdminPassword: "{{ k8s_argocd_password | password_hash('bcrypt') }}"
       server:
         service:
           type: 'ClusterIP'
