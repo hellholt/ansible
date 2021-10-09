@@ -72,9 +72,9 @@ sh_ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_add
 # Setup Groups are special groups that have a defined setup task.
 sh_setup_groups:
   - 'docker'
-#  - 'aws_iam_user'
-#  - 'aws_iam_policy'
-#  - 'route53'
+  - 'aws_iam_user'
+  - 'aws_iam_policy'
+  - 'route53'
 #  - 'dotfiles_root'
 #  - 'dotfiles'
 #  - 'route53'
@@ -84,9 +84,9 @@ sh_setup_groups:
 # Some setup groups contain all hosts.
 sh_universal_setup_groups:
   - 'docker'
-#  - 'aws_iam_user'
-#  - 'aws_iam_policy'
-#  - 'route53'
+  - 'aws_iam_user'
+  - 'aws_iam_policy'
+  - 'route53'
 #  - 'dotfiles_root'
 #  - 'dotfiles'
 #  - 'route53'

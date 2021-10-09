@@ -95,7 +95,7 @@ sh_enable_passwordless_sudo: yes
 sh_create_normal_user: yes
 
 # This can take a while and should be avoided when possible.
-sc_install_common_packages: yes
+sh_install_common_packages: no
 
 # A normal (i.e. non-root) username.
 sh_normal_user_name: "{{ my.name.lower }}"
@@ -109,8 +109,8 @@ sh_local_timezone: "{{ my.local.timezone }}"
 # Account ID, access key, etc used to create policies, users, Route 53 records, etc.
 sh_aws_region: "{{ vault.aws.defaults.region }}"
 sh_aws_account_id: "{{ vault.aws.defaults.account_id }}"
-sh_aws_main_access_key: "{{ vault.aws.users.main.access_key_id }}"
-sh_aws_main_secret_key: "{{ vault.aws.users.main.secret_access_key }}"
+sh_aws_main_access_key: "{{ vault.aws.profiles.main.key_id }}"
+sh_aws_main_secret_key: "{{ vault.aws.profiles.main.secret_key }}"
 
 # I have three domain names I use for networks:
 # - "private", which resolves to LAN IP addresses (e.g. 192.168.x.x).

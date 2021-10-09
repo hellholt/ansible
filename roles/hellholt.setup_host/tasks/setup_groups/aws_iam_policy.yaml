@@ -1,0 +1,30 @@
+---
+- name: 'Create or update IAM policy for host.'
+  delegate_to: 'localhost'
+  community.aws.iam_policy:
+    aws_access_key: "{{ sh_aws_main_access_key }}"
+    aws_secret_key: "{{ sh_aws_main_secret_key }}"
+    region: "{{ sh_aws_region }}"
+    iam_type: 'user'
+    iam_name: "{{ sh_aws_iam_host_user }}"
+    policy_name: "{{ sh_aws_iam_host_user }}_policy"
+    state: 'present'
+    skip_duplicates: no
+    policy_json: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "SsmPolicyStatement",
+            "Effect": "Allow",
+            "Action": [
+              "ssm:GetParameterHistory",
+              "ssm:GetParametersByPath",
+              "ssm:GetParameters",
+              "ssm:GetParameter",
+              "ssm:PutParameter"
+            ],
+            "Resource": "arn:aws:ssm:*:{{ sh_aws_account_id }}:parameter/{{ sh_aws_ssm_policy_pattern }}"
+          }
+        ]
+      }

@@ -1,0 +1,14 @@
+---
+- name: 'Create an AWS IAM user for this host.'
+  delegate_to: 'localhost'
+  community.aws.iam:
+    aws_access_key: "{{ sh_aws_main_access_key }}"
+    aws_secret_key: "{{ sh_aws_main_secret_key }}"
+    region: "{{ sh_aws_region }}"
+    iam_type: 'user'
+    name: "{{ sh_aws_iam_host_user }}"
+    state: 'present'
+    password: "{{ sh_aws_iam_host_password }}"
+    update_password: 'on_create'
+    access_key_state: 'create'
+    key_count: 0
