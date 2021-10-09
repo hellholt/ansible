@@ -33,7 +33,7 @@
       - 'python3-venv'
       - 'rsync'
       - 'sudo'
-    update_cache: yes
+    cache_valid_time: "{{ 3600 * 24 }}"
   when: 'sh_host_uses_apt'
 
 - name: 'Install Homebrew packages.'

@@ -72,3 +72,8 @@
             description: "Host data for {{ sh_hostname }}"
             string_type: 'SecureString'
             value: "{{ sh_host_data | to_nice_json }}"
+
+        - name: 'Finally, set variables appropriately.'
+          ansible.builtin.set_fact:
+            sh_access_key_id: "{{ sh_new_access_key_id }}"
+            sh_secret_access_key: "{{ sh_new_secret_access_key }}"

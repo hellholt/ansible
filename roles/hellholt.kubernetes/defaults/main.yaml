@@ -51,9 +51,9 @@ k8s_private_domain_name: 'example.net'
 k8s_personal_domain_name: 'example.com'
 
 # A "private" FQDN.
-k8s_route53_private_fqdn: "{{ k8s_cluster }}.{{ k8s_private_domain_name }}"
+k8s_private_fqdn: "{{ k8s_cluster }}.{{ k8s_private_domain_name }}"
 # A "personal" FQDN.
-k8s_route53_personal_fqdn: "{{ k8s_cluster }}.{{ k8s_personal_domain_name }}"
+k8s_personal_fqdn: "{{ k8s_cluster }}.{{ k8s_personal_domain_name }}"
 
 # Prefix to NFS path exported to k8s clusters.
 k8s_nfs_prefix: null

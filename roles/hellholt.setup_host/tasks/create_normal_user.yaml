@@ -16,3 +16,9 @@
     append: yes
     groups: 'sudo'
     create_home: yes
+
+- name: 'Set SSH key for user account.'
+  ansible.posix.authorized_key:
+    user: "{{ sh_normal_user_name }}"
+    state: 'present'
+    key: "{{ admin_ssh_public_key }}"

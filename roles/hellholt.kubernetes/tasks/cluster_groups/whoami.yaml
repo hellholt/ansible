@@ -1,8 +1,8 @@
 ---
 - name: 'Set some facts.'
   ansible.builtin.set_fact:
-    k8s_service_private_fqdn: "whoami.{{ k8s_route53_private_fqdn }}"
-    k8s_service_personal_fqdn: "whoami.{{ k8s_route53_personal_fqdn }}"
+    k8s_service_private_fqdn: "whoami.{{ k8s_private_fqdn }}"
+    k8s_service_personal_fqdn: "whoami.{{ k8s_personal_fqdn }}"
 
 - name: 'Create the whoami namespace.'
   kubernetes.core.k8s:

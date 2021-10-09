@@ -1,10 +1,10 @@
 ---
 - name: 'Set some facts.'
   ansible.builtin.set_fact:
-    k8s_argocd_private_fqdn: "argocd.{{ k8s_route53_private_fqdn }}"
-    k8s_argocd_personal_fqdn: "argocd.{{ k8s_route53_personal_fqdn }}"
-    k8s_argocdgrpc_private_fqdn: "argocd-grpc.{{ k8s_route53_private_fqdn }}"
-    k8s_argocdgrpc_personal_fqdn: "argocd-grpc.{{ k8s_route53_personal_fqdn }}"
+    k8s_argocd_private_fqdn: "argocd.{{ k8s_private_fqdn }}"
+    k8s_argocd_personal_fqdn: "argocd.{{ k8s_personal_fqdn }}"
+    k8s_argocdgrpc_private_fqdn: "argocd-grpc.{{ k8s_private_fqdn }}"
+    k8s_argocdgrpc_personal_fqdn: "argocd-grpc.{{ k8s_personal_fqdn }}"
 
 - name: 'Add Argo chart repository.'
   kubernetes.core.helm_repository:

@@ -45,7 +45,7 @@
           solvers:
           - selector:
               dnsZones:
-                - "{{ k8s_route53_personal_fqdn }}"
+                - "{{ k8s_personal_fqdn }}"
             dns01:
               route53:
                 region: "{{ k8s_aws_region }}"
@@ -56,7 +56,7 @@
                   key: 'key'
           - selector:
               dnsZones:
-                - "{{ k8s_route53_private_fqdn }}"
+                - "{{ k8s_private_fqdn }}"
             dns01:
               route53:
                 region: "{{ k8s_aws_region}}"

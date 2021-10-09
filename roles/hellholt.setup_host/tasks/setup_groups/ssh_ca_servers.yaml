@@ -1,1 +1,127 @@
 ---
+- name: 'Retrieve signing certificate data for this host.'
+  block:
+
+    - name: 'Lookup signing certificate data for this host.'
+      ansible.builtin.set_fact:
+        sh_ssh_host_cert_signing_key_data: "{{ lookup('amazon.aws.aws_ssm', sh_aws_iam_host_ssm_parameter_store_host_cert_signing_key_name, aws_access_key=sh_access_key_id, aws_secret_key=sh_secret_access_key) }}"
+        sh_ssh_user_cert_signing_key_data: "{{ lookup('amazon.aws.aws_ssm', sh_aws_iam_host_ssm_parameter_store_user_cert_signing_key_name, aws_access_key=sh_access_key_id, aws_secret_key=sh_secret_access_key) }}"
+
+  rescue:
+
+    - name: 'Set a safe default fact.'
+      ansible.builtin.set_fact:
+        sh_ssh_host_cert_signing_key_data: ''
+        sh_ssh_user_cert_signing_key_data: ''
+
+- name: 'Create new host cert signing key.'
+  when: 'not sh_ssh_host_cert_signing_key_data'
+  block:
+
+    - name: 'Generate new host cert signing key.'
+      community.crypto.openssh_keypair:
+        path: "{{ sh_ssh_host_cert_signing_key_path }}"
+        comment: "host-cert-signing-key.{{ sh_user_at_hostname }}"
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+        regenerate: 'full_idempotence'
+        size: 4096
+        type: 'rsa'
+
+    - name: 'Slurp host cert signing key.'
+      ansible.builtin.slurp:
+        src: "{{ sh_ssh_host_cert_signing_key_path }}"
+      register: 'sh_ssh_host_cert_signing_key_slurp'
+
+    - name: 'Set a fact for the host cert signing key data.'
+      ansible.builtin.set_fact:
+        sh_new_ssh_host_cert_signing_key_data: "{{ sh_ssh_host_cert_signing_key_slurp | b64decode }}"
+
+    - name: 'Update host cert signing key data.'
+      community.aws.aws_ssm_parameter_store:
+        name: "{{ sh_aws_iam_host_ssm_parameter_store_host_cert_signing_key_name }}"
+        description: "Host cert signing key for {{ sh_hostname }}"
+        string_type: 'SecureString'
+        value: "{{ sh_new_ssh_host_cert_signing_key_data }}"
+
+    - name: 'Finally, set variable.'
+      ansible.builtin.set_fact:
+        sh_ssh_host_cert_signing_key_data: "{{ sh_new_ssh_host_cert_signing_key_data }}"
+
+- name: 'Create new user cert signing key.'
+  when: 'not sh_ssh_user_cert_signing_key_data'
+  block:
+
+    - name: 'Generate new user cert signing key.'
+      community.crypto.openssh_keypair:
+        path: "{{ sh_ssh_user_cert_signing_key_path }}"
+        comment: "user-cert-signing-key.{{ sh_user_at_hostname }}"
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+        regenerate: 'full_idempotence'
+        size: 4096
+        type: 'rsa'
+
+    - name: 'Slurp user cert signing key.'
+      ansible.builtin.slurp:
+        src: "{{ sh_ssh_user_cert_signing_key_path }}"
+      register: 'sh_ssh_user_cert_signing_key_slurp'
+
+    - name: 'Set a fact for the user cert signing key data.'
+      ansible.builtin.set_fact:
+        sh_new_ssh_user_cert_signing_key_data: "{{ sh_ssh_user_cert_signing_key_slurp | b64decode }}"
+
+    - name: 'Update user cert signing key data.'
+      community.aws.aws_ssm_parameter_store:
+        name: "{{ sh_aws_iam_host_ssm_parameter_store_user_cert_signing_key_name }}"
+        description: "User cert signing key for {{ sh_hostname }}"
+        string_type: 'SecureString'
+        value: "{{ sh_new_ssh_user_cert_signing_key_data }}"
+
+    - name: 'Finally, set variable.'
+      ansible.builtin.set_fact:
+        sh_ssh_user_cert_signing_key_data: "{{ sh_new_ssh_user_cert_signing_key_data }}"
+
+- name: 'Persist the host signing cert file.'
+  ansible.builtin.copy:
+    content: "{{ sh_ssh_host_cert_signing_key_data }}"
+    dest: "{{ sh_ssh_host_cert_signing_key_path }}"
+    owner: 'root'
+    group: 'root'
+    mode: 0600
+
+- name: 'Persist the user signing cert file.'
+  ansible.builtin.copy:
+    content: "{{ sh_ssh_host_cert_signing_key_data }}"
+    dest: "{{ sh_ssh_host_cert_signing_key_path }}"
+    owner: 'root'
+    group: 'root'
+    mode: 0600
+
+- name: 'Generate new host certificate.'
+  community.crypto.openssh_cert:
+    type: 'host'
+    signing_key: "{{ sh_ssh_host_cert_signing_key_path }}"
+    public_key: "{{ sh_ssh_public_key_path }}"
+    path: "{{ sh_ssh_host_cert_path }}"
+    valid_from: 'always'
+    valid_to: 'forever'
+    principals:
+      - "{{ sh_hostname }}"
+      - "{{ sh_private_fqdn }}"
+      - "{{ sh_personal_fqdn }}"
+
+- name: 'Generate new user certificate.'
+  community.crypto.openssh_cert:
+    type: 'user'
+    signing_key: "{{ sh_ssh_user_cert_signing_key_path }}"
+    public_key: "{{ sh_ssh_public_key_path }}"
+    path: "{{ sh_ssh_user_cert_path }}"
+    valid_from: 'always'
+    valid_to: 'forever'
+    principals:
+      - "{{ sh_hostname }}"
+      - "{{ sh_private_fqdn }}"
+      - "{{ sh_personal_fqdn }}"

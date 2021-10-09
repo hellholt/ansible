@@ -47,9 +47,9 @@ sh_route53_private_zone_id: null
 sh_route53_personal_zone_id: null
 
 # A "private" FQDN.
-sh_route53_private_fqdn: "{{ sh_hostname }}.{{ sh_private_domain_name }}"
+sh_private_fqdn: "{{ sh_hostname }}.{{ sh_private_domain_name }}"
 # A "personal" FQDN.
-sh_route53_personal_fqdn: "{{ sh_hostname }}.{{ sh_personal_domain_name }}"
+sh_personal_fqdn: "{{ sh_hostname }}.{{ sh_personal_domain_name }}"
 
 # The domain for host email addresses.
 # If the host cron, etc sends me an email, it comes from <hostname>@<email-domain>
@@ -104,6 +104,23 @@ sh_aws_iam_host_ssm_parameter_store_data_prefix: null
 
 # Name of SSM parameter store data for host.
 sh_aws_iam_host_ssm_parameter_store_data_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ sh_hostname }}.host_data"
+
+# Name of SSM parameter store host cert signing key data for host.
+sh_aws_iam_host_ssm_parameter_store_host_cert_signing_key_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ sh_hostname }}.ssh_host_cert_signing_key"
+
+# Name of SSM parameter store user cert signing key data for host.
+sh_aws_iam_host_ssm_parameter_store_user_cert_signing_key_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ sh_hostname }}.ssh_user_cert_signing_key"
+
+# Host certificate signing key path.
+sh_ssh_host_cert_signing_key_path: '~/.ssh/host_signing_key'
+# User certificate signing key path.
+sh_ssh_user_cert_signing_key_path: '~/.ssh/user_signing_key'
+
+# Host certificate path.
+sh_ssh_host_cert_path: '~/.ssh/host_cert'
+
+# User certificate path.
+sh_ssh_user_cert_path: '~/.ssh/user_cert'
 
 # Parameter pattern for SSM parameters for which the SSM policy should permit access.
 sh_aws_ssm_policy_pattern: "{{ sh_hostname }}.*"
