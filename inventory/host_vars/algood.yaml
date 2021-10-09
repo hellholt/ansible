@@ -13,10 +13,3 @@ pve_vm_id: '100'
 pve_cores: 2
 pve_memory_size: 2048
 pve_rootfs_size: 16
-ndsh_host_roles:
-  - 'aws_iam_user'
-  - 'aws_iam_policy'
-  - 'route53'
-#   - 'dotfiles_root'
-#   - 'dotfiles'
-  - 'ssh_cert_server'

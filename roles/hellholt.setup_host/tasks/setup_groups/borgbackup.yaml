@@ -1,0 +1,46 @@
+---
+- name: 'Setup Borg backups.'
+  remote_user: 'root'
+  block:
+
+  - name: 'Install BorgBackup packages.'
+    ansible.builtin.pip:
+      name:
+        - 'borgbackup'
+        - 'borgmatic'
+
+  - name: 'Set up Borg backups.'
+    ansible.builtin.include_role:
+      name: 'm3nu.ansible_role_borgbackup'
+    vars:
+      borg_username: "{{ sh_borg_username }}"
+      borg_repository: "{{ sh_borg_repository }}"
+      borgmatic_cron_hour: "{{ sh_borg_cron_hour }}"
+      borgmatic_cron_minute: "{{ sh_borg_cron_minute }}"
+      borgmatic_cron_checks_day: "{{ sh_borg_cron_checks_day }}"
+      borgmatic_cron_checks_hour: "{{ sh_borg_cron_checks_hour }}"
+      borgmatic_cron_checks_minute: "{{ sh_borg_cron_checks_minute }}"
+      borg_source_directories: "{{ sh_borg_source_directories }}"
+      borg_encryption_passphrase: "{{ sh_borg_passphrase }}"
+      borg_remote_path: "{{ sh_borg_remote_path }}"
+      ssh_key_path: "{{ sh_borg_private_ssh_key_path }}"
+
+  - name: 'Read SSH public key.'
+    ansible.builtin.set_fact:
+      sh_ssh_public_key: "{{ lookup('file', sh_borg_public_ssh_key_path) }}"
+
+  - name: 'Copy SSH key to server.'
+    delegate_to: "{{ sh_borg_server }}"
+    remote_user: "{{ sh_normal_user_name }}"
+    become: yes
+    ansible.posix.authorized_key:
+      user: "{{ sh_normal_user_name }}"
+      key: "{{ sh_ssh_public_key }}"
+      state: 'present'
+
+  - name: 'Init the Borg backup.'
+    ansible.builtin.shell: 'borgmatic init --encryption repokey-blake2 && touch ~/.borg_repo_init'
+    args:
+      chdir: '~'
+      executable: '/bin/bash'
+      creates: '~/.borg_repo_init'

@@ -7,7 +7,7 @@ prompt:
         tertiary: 58
     emoji: ☀️
 pve_cluster_id: rain_house
-ndsh_host_roles:
+sh_host_roles:
   - 'aws_iam_user'
   - 'aws_iam_policy'
   - 'route53'

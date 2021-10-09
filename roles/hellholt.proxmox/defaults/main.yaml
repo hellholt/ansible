@@ -53,3 +53,9 @@ pve_features: 'mount=nfs,keyctl=1,nesting=1'
 
 # Where templates are stored.
 pve_template_path: 'local:vztmpl'
+
+# Description.
+pve_description: null
+
+# Hostname.
+pve_hostname: null

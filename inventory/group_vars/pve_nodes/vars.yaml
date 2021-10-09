@@ -1,9 +1,2 @@
 ansible_ssh_user: 'root'
 pve_role: 'node'
-ndsh_host_roles:
-  - 'aws_iam_user'
-  - 'aws_iam_policy'
-  - 'route53'
-#   - 'dotfiles_root'
-#   - 'dotfiles'
-  - 'proxmox_node'

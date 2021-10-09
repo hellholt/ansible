@@ -1,0 +1,8 @@
+---
+- name: 'Add all hosts to a set of universal groups.'
+  ansible.builtin.group_by:
+    key: "{{ sh_setup_group }}"
+  loop: "{{ sh_universal_setup_groups }}"
+  loop_control:
+    index_var: 'sh_index'
+    loop_var: 'sh_setup_group'

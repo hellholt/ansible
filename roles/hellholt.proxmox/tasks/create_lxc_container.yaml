@@ -46,11 +46,11 @@
       memory: "{{ pve_memory_size }}"
       swap: "{{ pve_swap_size }}"
       password: "{{ pve_root_password }}"
-      hostname: "{{ hostname }}"
+      hostname: "{{ pve_hostname }}"
       mounts: "{{ pve_mountpoints_dict | to_json }}"
       onboot: "{{ pve_onboot }}"
       ostemplate: "{{ pve_template_path }}/{{ pve_template }}"
-      description: "{{ description | default(hostname) }}"
+      description: "{{ pve_description | default(pve_hostname) }}"
       netif: '{"net0":"type=veth,name=eth0,ip=dhcp,bridge=vmbr0,firewall=1,hwaddr={{ pve_mac_address }}"}'
       unprivileged: "{{ pve_unprivileged  }}"
       disk: "local-lvm:{{ pve_rootfs_size }}"

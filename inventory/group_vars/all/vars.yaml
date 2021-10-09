@@ -7,5 +7,186 @@ admin_ssh_public_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDQ57vLQqOxs70+02+u6
 # A clean, consistent version of the hostname.
 hostname: "{{ inventory_hostname | splitext | first | lower }}"
 
+# Just the name of the project as a whole.  This will be used in a few places.
+project_name: 'hellholt'
+
+# Data structure for my personal preferences.
+my:
+  name:
+    lower: 'nathan'
+  local:
+    timezone: 'America/New_York'
+  domains:
+    private: 'hellholt.net'
+    personal: 'bitterbridge.net'
+    public: 'darkdell.net'
+  backup:
+    repo:
+      server: 'uller'
+      path: '/volume1/Borg'
+      passphrase: "{{ vault.easy_password }}"
+
+# Data structure of the vault.
+# vault:
+#   easy_password: <string>
+#   proxmox:
+#     nodes:
+#       ryswell:
+#         api:
+#           username: <string>
+#           password: <string>
+#   aws:
+#     defaults:
+#       region: 'us-east-1'
+#       account_id: <account_id>
+#       output: 'json'
+#     profiles:
+#       main:
+#         key_id: <string>
+#         secret_key: <string>
+#       route53:
+#         key_id: <string>
+#         secret_key: <string>
+#     route53:
+#       zone_ids:
+#         personal: <string>
+#         public: <string>
+#         private: <string>
+#   docker:
+#     hub:
+#       username: <string>
+#       password: <string>
+#
+
+# Name of IAM user for host.
+host_aws_iam_user: "{{ project_name }}_host_{{ hostname }}"
+host_aws_iam_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
+
+# The following sections are per-role variables.
+#
+# My general approach is to have role-specific variables, namespaced, so that I
+# can scope and control them accordingly.  I then set reasonable defaults for
+# the general case below.
+
+#########################
+# hellholt.proxmox
+#########################
+
 # By default, use Ubuntu 21.04 as our template.
 pve_template: 'ubuntu-21.04-standard_21.04-1_amd64.tar.gz'
+
+# Set the pve_hostname to the hostname.
+pve_hostname: "{{ hostname }}"
+
+# Set the pve_description to the description.
+pve_description: "{{ description }}"
+
+#########################
+# hellholt.setup_host
+#########################
+
+# Explicitly set the hostname instead of e.g. "debian", "nug-dougs-macbook-pro," etc.
+sh_set_hostname: yes
+
+# Some potential security risk, depending on what you run on the host.
+sh_enable_passwordless_sudo: yes
+
+# Create a non-root user.
+sh_create_normal_user: yes
+
+# This can take a while and should be avoided when possible.
+sc_install_common_packages: yes
+
+# A normal (i.e. non-root) username.
+sh_normal_user_name: "{{ my.name.lower }}"
+
+# Set the sh_hostname to the hostname.
+sh_hostname: "{{ hostname }}"
+
+# My local timezone.
+sh_local_timezone: "{{ my.local.timezone }}"
+
+# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
+sh_aws_region: "{{ vault.aws.defaults.region }}"
+sh_aws_account_id: "{{ vault.aws.defaults.account_id }}"
+sh_aws_main_access_key: "{{ vault.aws.users.main.access_key_id }}"
+sh_aws_main_secret_key: "{{ vault.aws.users.main.secret_access_key }}"
+
+# I have three domain names I use for networks:
+# - "private", which resolves to LAN IP addresses (e.g. 192.168.x.x).
+# - "personal", which resolves to my home IP address (e.g. 69.420.x.x).
+# - "public", which is hosted in the cloud and hosts my blog, etc.
+#
+# Some FQDNs are used only internally, some only externally, some both,
+# and some neither.  They're easy to calculate and populate.
+#
+# In this context, I don't really use my "public" domain name.
+
+# A private domain name.
+sh_private_domain_name: "{{ my.domains.private }}"
+# A personal domain name.
+sh_personal_domain_name: "{{ my.domains.personal }}"
+
+# A Route 53 "private" zone ID.
+sh_route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
+# A Route 53 "personal" zone ID.
+sh_route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
+
+# Name of IAM user for host.
+sh_aws_iam_host_user: "{{ host_aws_iam_user }}"
+sh_aws_iam_host_password: "{{ host_aws_iam_password }}"
+
+# Parameter pattern for SSM parameters for which the SSM policy should permit access.
+sh_aws_ssm_policy_pattern: "{{ project_name }}.hosts.{{ sh_hostname }}.*"
+
+# Docker Hub credentials.
+sh_docker_hub_login: yes
+sh_docker_hub_username: "{{ vault.docker.hub.username }}"
+sh_docker_hub_password: "{{ vault.docker.hub.password }}"
+
+# Borg stuff.
+sh_borg_username: "{{ sh_normal_user_name }}"
+sh_borg_server: "{{ my.backup.repo.server }}"
+sh_borg_repo_path: "{{ my.backup.repo.path }}"
+sh_borg_repository: "{{ sh_borg_username }}@{{ sh_borg_server }}:{{ sh_borg_repo_path }}/{{ sh_hostname }}"
+sh_borg_cron_hour: "{{ 6 | random(seed=sh_hostname) }}"
+sh_borg_cron_minute: "{{ 59 | random(seed=sh_hostname) }}"
+sh_borg_cron_checks_day: "{{ 28 | random(seed=sh_hostname) }}"
+sh_borg_cron_checks_hour: "{{ range(7, 24) | random(seed=sh_hostname) }}"
+sh_borg_cron_checks_minute: "{{ 59 | random(seed=sh_hostname) }}"
+sh_borg_source_directories: "{{ borg_source_directories }}"
+sh_borg_passphrase: "{{ my.backup.repo.passphrase }}"
+sh_borg_remote_path: '/usr/local/bin/borg'
+sh_borg_private_ssh_key_path: '~/.ssh/id_rsa'
+sh_borg_public_ssh_key_path: "{{ sh_borg_private_ssh_key_path }}.pub"
+
+# Kubernetes stuff.
+# The cluster name, e.g. "my-happy-cluster"
+sh_k8s_cluster: "{{ k8s_cluster }}"
+# The cluster role ('master' or 'node')
+sh_k8s_role: "{{ k8s_role }}"
+# All K8s hosts, regardless of role.
+sh_k8s_hostnames: "{{ groups['k8s'] }}"
+# All K8s masters.
+sh_k8s_master_hostnames: "{{ groups['k8s_masters'] }}"
+# All K8s nodes.
+sh_k8s_node_hostnames: "{{ groups['k8s_nodes'] }}"
+# Prefix to NFS path exported to k8s clusters.
+sh_k8s_nfs_prefix: '/leo/nfs/k8s_clusters'
+
+# NFS mount options:
+sh_nfs_mount_options: 'rw,async,no_subtree_check,no_wdelay,crossmnt,insecure,no_root_squash,insecure_locks,sec=sys'
+
+# Prefix to FS path mounted to hosts.
+sh_local_share_prefix: '/leo/local/hosts'
+# Hosts that exist on this Proxmox node (and can thus mount local shares).
+sh_local_share_hostnames: "{{ groups[pve_cluster_id] }}"
+
+sh_nfs_hostnames: "{{ groups['pve_hosts'] }}"
+sh_node_nfs_prefix: '/leo/nfs/hosts'
+
+# Pi-Hole stuff.
+sh_pihole_dns:
+  - '208.67.222.222'
+  - '208.67.220.220'
+sh_pihole_password: null

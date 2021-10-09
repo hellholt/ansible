@@ -1,0 +1,15 @@
+---
+- name: 'Run host-specific setup.'
+  remote_user: 'root'
+  block:
+
+  - name: 'Perform setup_common tasks.'
+    ansible.builtin.include_tasks: 'setup_common.yaml'
+
+  - name: 'Execute tasks for each setup group.'
+    ansible.builtin.include_tasks: "tasks/setup_groups/{{ sh_setup_group }}.yaml"
+    when: 'sh_setup_group in group_names'
+    loop: "{{ sh_setup_groups }}"
+    loop_control:
+      index_var: 'sh_index'
+      loop_var: 'sh_setup_group'

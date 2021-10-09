@@ -14,19 +14,7 @@ Each individual host is given the name of a major house from _A Song of Ice and 
 
 Although this repository does contain a vault, its contents are limited in number and restricted to essential information.
 
-The structure of the vault is as follows:
-
-```yaml
-vault:
-  proxmox:
-    nodes:
-      ryswell:
-        api:
-          username: <string>
-          password: <string>
-      ...
-
-```
+The structure of the vault is described in [inventory/group_vars/all/vars.yaml](./inventory/group_vars/all/vars.yaml).
 
 ### Bash Scripts
 
