@@ -38,7 +38,7 @@
         name: 'letsencrypt-prod'
       spec:
         acme:
-          email: "letsencrypt@{{ k8s_route53_private_domain_name }}"
+          email: "letsencrypt@{{ k8s_private_domain_name }}"
           server: 'https://acme-v02.api.letsencrypt.org/directory'
           privateKeySecretRef:
             name: 'letsencrypt-prod-private-key'
@@ -61,7 +61,7 @@
               route53:
                 region: "{{ k8s_aws_region}}"
                 hostedZoneID: "{{ k8s_route53_private_zone_id }}"
-                accessKeyID: "{{ k8s_aws_master_access_key }}"
+                accessKeyID: "{{ k8s_aws_main_access_key }}"
                 secretAccessKeySecretRef:
                   name: 'route53-secret-key'
                   key: 'key'
