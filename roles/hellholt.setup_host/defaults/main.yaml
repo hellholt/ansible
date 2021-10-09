@@ -80,6 +80,8 @@ sh_setup_groups:
   - 'pve_file_server'
   - 'pve_nfs_server'
   - 'pve_node'
+  - 'pihole'
+  - 'unifi'
 #  - 'dotfiles_root'
 #  - 'dotfiles'
 
