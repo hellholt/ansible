@@ -7,12 +7,3 @@ prompt:
         tertiary: 58
     emoji: ☀️
 pve_cluster_id: rain_house
-sh_host_roles:
-  - 'aws_iam_user'
-  - 'aws_iam_policy'
-  - 'route53'
-#   - 'dotfiles_root'
-#   - 'dotfiles'
-  - 'proxmox_local_file_server'
-  - 'proxmox_nfs_server'
-  - 'k8s_nfs_server'

@@ -1,0 +1,46 @@
+---
+- name: 'Set facts as empty lists.'
+  ansible.builtin.set_fact:
+    sh_hostnames: []
+    sh_paths: []
+    sh_ip_addresses: []
+    sh_nfs_exports: []
+
+- name: 'Build some basic facts.'
+  ansible.builtin.set_fact:
+    sh_hostnames: "{{ sh_hostnames + [ sh_k8s_host_name ] }}"
+    sh_paths: "{{ sh_paths + [ sh_k8s_nfs_prefix + '/' + hostvars[sh_k8s_host_name].k8s_cluster ] }}"
+    sh_ip_addresses: "{{ sh_ip_addresses + [ hostvars[sh_k8s_host_name].pve_ip_address ] }}"
+  loop: "{{ groups['k8s'] }}"
+  loop_control:
+    index_var: 'sh_index'
+    loop_var: 'sh_k8s_host_name'
+
+- name: 'Build list of NFS exports for Kubernetes clusters.'
+  ansible.builtin.set_fact:
+    sh_nfs_exports: "{{ sh_nfs_exports + [ sh_paths[sh_index] + ' ' + sh_ip_addresses[sh_index] + '/32(' + sh_nfs_mount_options + ')' ] }}"
+  loop: "{{ sh_hostnames }}"
+  loop_control:
+    index_var: 'sh_index'
+    loop_var: 'sh_k8s_host_name'
+
+- name: 'Ensure presence of relevant ZFS volumes for Kubernetes clusters.'
+  community.general.zfs:
+    name: "{{ sh_k8s_nfs_prefix | regex_replace('^\\/', '') }}/{{ hostvars[sh_k8s_host_name].k8s_cluster }}"
+    state: 'present'
+  loop: "{{ sh_k8s_master_hostnames }}"
+  loop_control:
+    index_var: 'sh_index'
+    loop_var: 'sh_k8s_host_name'
+
+- name: 'Export mountpoints for Kubernetes clusters.'
+  ansible.builtin.blockinfile:
+    path: '/etc/exports'
+    block: "{{ sh_nfs_exports | join('\n') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (k8s_nfs_server)"
+  register: 'sh_nfs_exports_block'
+
+- name: 'Export exports.'
+  ansible.builtin.command:
+    cmd: 'exportfs -ra'
+  when: 'sh_nfs_exports_block.changed'

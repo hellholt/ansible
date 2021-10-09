@@ -40,6 +40,15 @@ all:
         ashford:
         beesbury:
         estermont:
+    proxmox_local_file_server:
+      hosts:
+        lefford:
+    proxmox_nfs_server:
+      hosts:
+        lefford:
+    k8s_nfs_server:
+      hosts:
+        lefford:
     k8s:
       children:
         k8s_masters:
