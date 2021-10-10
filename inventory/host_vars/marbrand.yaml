@@ -6,3 +6,6 @@ prompt:
         secondary: 172
         tertiary: 52
     emoji: 🔥
+web:
+  protocol: 'http'
+  port: 8080

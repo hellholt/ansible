@@ -8,3 +8,9 @@ prompt:
     emoji: ☀️
 pve_cluster_id: rain_house
 pve_ip_address: 10.3.0.2
+web:
+  protocol: 'https'
+  port: 443
+  additional_backends:
+    - name: 'pbs'
+      url: 'https://pbs.lefford.hellholt.net:8007/'

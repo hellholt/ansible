@@ -29,6 +29,3 @@
 
 - name: 'Set setup groups.'
   ansible.builtin.include_tasks: 'set_setup_groups.yaml'
-
-- name: 'Configure Git.'
-  ansible.builtin.include_tasks: 'configure_git.yaml'

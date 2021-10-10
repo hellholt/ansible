@@ -40,22 +40,28 @@ all:
         ashford:
         beesbury:
         estermont:
+    miscellaneous:
+      hosts:
+        wensington:
     setup_groups:
       children:
+        k8s_nfs_servers:
+          hosts:
+            lefford:
+        pihole:
+          hosts:
         pve_file_servers:
           hosts:
             lefford:
         pve_nfs_servers:
           hosts:
             lefford:
-        k8s_nfs_servers:
-          hosts:
-            lefford:
         ssh_ca_servers:
           hosts:
             ball
-        pihole:
+        traefik:
           hosts:
+            algood:
         unifi:
           hosts:
     k8s:
@@ -76,26 +82,28 @@ all:
             marsh:
             norrey:
             norridge:
-        karhold:
-          hosts:
-            karstark:
-            kellington:
-            kettleblack:
-        longtable:
-          hosts:
-            liddle:
-            lightfoot:
-            lipps:
-        mistwood:
-          hosts:
-            manderly:
-            manwoody:
-            marsh:
-        ninestars:
-          hosts:
-            norcross:
-            norrey:
-            norridge:
+        k8s_clusters:
+          children:
+            karhold:
+              hosts:
+                karstark:
+                kellington:
+                kettleblack:
+            longtable:
+              hosts:
+                liddle:
+                lightfoot:
+                lipps:
+            mistwood:
+              hosts:
+                manderly:
+                manwoody:
+                marsh:
+            ninestars:
+              hosts:
+                norcross:
+                norrey:
+                norridge:
     windows:
       hosts:
         # Workshop PC

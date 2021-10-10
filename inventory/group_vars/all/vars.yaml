@@ -13,6 +13,11 @@ project_name: 'hellholt'
 # Calculated IPv4 address.  Doesn't always work, usually does.
 ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
 
+# Default web options for reverse proxy.
+web:
+  protocol: 'https'
+  port: 443
+
 # Data structure for my personal preferences.
 my:
   name:
@@ -31,11 +36,6 @@ my:
       server: 'uller'
       path: '/volume1/Borg'
       passphrase: "{{ vault.easy_password }}"
-  gitconfig:
-    core.editor: 'nano'
-    user.name: 'Nathan Douglas'
-    user.email: 'github@darkdell.net'
-    pull.rebase: 'true'
 
 # Data structure of the vault.
 # vault:
@@ -77,6 +77,13 @@ host_aws_iam_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_l
 cluster_aws_iam_user_prefix: "{{ project_name }}_cluster_"
 cluster_aws_iam_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
 
+# Some crap that appears to be too cumbersome to do automatically.
+k8s_cluster_names:
+  - 'karhold'
+  - 'longtable'
+  - 'mistwood'
+  - 'ninestars'
+
 # The following sections are per-role variables.
 #
 # My general approach is to have role-specific variables, namespaced, so that I
@@ -110,7 +117,7 @@ sh_enable_passwordless_sudo: yes
 sh_create_normal_user: yes
 
 # This can take a while and should be avoided when possible.
-sh_install_common_packages: yes
+sh_install_common_packages: no
 
 # A normal (i.e. non-root) username.
 sh_normal_user_name: "{{ my.name.lower }}"
@@ -218,6 +225,9 @@ sh_gitconfig: "{{ my.gitconfig }}"
 # Dotfiles repository.
 sh_dotfiles_repo: 'https://github.com/hellholt/dotfiles.git'
 
+# Some crap that appears to be too cumbersome to do automatically.
+sh_k8s_cluster_names: "{{ k8s_cluster_names }}"
+
 #########################
 # hellholt.kubernetes
 #########################
@@ -263,8 +273,8 @@ k8s_route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
 # Prefix to NFS path exported to k8s clusters.
 k8s_nfs_prefix: "{{ sh_k8s_nfs_prefix }}"
 
-# Argo CD password.
-k8s_argocd_password: "{{ vault.easy_password }}"
+# Easy password.
+k8s_easy_password: "{{ vault.easy_password }}"
 
 # The hostname of the K8s NFS server.
 k8s_nfs_server: 'lefford'

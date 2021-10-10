@@ -1,5 +1,5 @@
 description: |
-  Proxmox LXC Container - Pi-Hole
+  Proxmox LXC Container - Traefik Cluster-wide Proxy
 prompt:
     colors:
         primary: 184

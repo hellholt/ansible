@@ -18,9 +18,6 @@ k8s_cluster_hosts: []
 # The IP address of this host.
 k8s_ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
 
-# Argo CD stuff.
-k8s_argocd_password: null
-
 # Account ID, access key, etc used to create policies, users, Route 53 records, etc.
 k8s_aws_region: 'us-east-1'
 k8s_aws_account_id: null
@@ -70,6 +67,7 @@ k8s_cluster_groups:
   - 'traefik'                     # Install and setup Traefik as Ingress Controller.
   - 'argocd'                      # Install ArgoCD as GitOps controller.
   - 'whoami'                      # Install Whoami as test service.
+  - 'prometheus'                  # Install Kube-Prometheus-Stack for monitoring and reporting.
   - 'aws_iam_user'                # Create an AWS IAM user for the cluster.
   - 'aws_iam_policy'              # Allow retrieval of secrets from AWS SSM Parameter Store.
   - 'external_secrets'            # Allow secrets to persist past cluster lifetimes.
@@ -86,9 +84,13 @@ k8s_universal_cluster_groups:
   - 'traefik'
   - 'argocd'
   - 'whoami'
+  - 'prometheus'
   - 'aws_iam_user'
   - 'aws_iam_policy'
   - 'external_secrets'
 
 # The hostname of the K8s NFS server.
 k8s_nfs_server: null
+
+# An easy password for accessing some services.
+k8s_easy_password: null

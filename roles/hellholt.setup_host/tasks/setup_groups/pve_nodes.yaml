@@ -29,6 +29,14 @@
     cmd: 'swapoff -a'
   changed_when: no
 
+- name: 'Redirect port 443 to port 8006 for the PVE admin interface.'
+  ansible.builtin.command:
+    cmd: |
+      /sbin/iptables -F
+      /sbin/iptables -t nat -F
+      /sbin/iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8006
+  changed_when: no
+
 - name: 'Modprobe kernel modules.'
   community.general.modprobe:
     name: "{{ sh_module_name }}"

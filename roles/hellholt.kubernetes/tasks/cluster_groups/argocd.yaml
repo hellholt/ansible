@@ -21,7 +21,7 @@
       configs:
         secret:
           createSecret: yes
-          argocdServerAdminPassword: "{{ k8s_argocd_password | password_hash('bcrypt') }}"
+          argocdServerAdminPassword: "{{ k8s_easy_password | password_hash('bcrypt') }}"
       server:
         service:
           type: 'ClusterIP'

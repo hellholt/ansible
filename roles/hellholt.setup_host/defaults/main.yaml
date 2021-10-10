@@ -46,6 +46,13 @@ sh_route53_private_zone_id: null
 # A Route 53 "personal" zone ID.
 sh_route53_personal_zone_id: null
 
+# LetsEncrypt private domain resolver name.
+sh_letsencrypt_private_domain_resolver_name: "{{ sh_private_domain_name | splitext | first }}"
+# LetsEncrypt personal domain resolver name.
+sh_letsencrypt_personal_domain_resolver_name: "{{ sh_personal_domain_name | splitext | first }}"
+# LetsEncrypt email address.
+sh_letsencrypt_email: "letsencrypt@{{ sh_private_domain_name }}"
+
 # A "private" FQDN.
 sh_private_fqdn: "{{ sh_hostname }}.{{ sh_private_domain_name }}"
 # A "personal" FQDN.
@@ -83,6 +90,7 @@ sh_setup_groups:
   - 'pihole'
   - 'unifi'
   - 'ssh_ca_server'
+  - 'traefik'
   - 'motd'
   - 'bash_prompt'
   - 'dotfiles'
@@ -158,6 +166,8 @@ sh_k8s_hostnames: []
 sh_k8s_master_hostnames: []
 # All K8s nodes.
 sh_k8s_node_hostnames: []
+# All K8s clusteres.
+sh_k8s_cluster_names: []
 # Prefix to NFS path exported to k8s clusters.
 sh_k8s_nfs_prefix: null
 
