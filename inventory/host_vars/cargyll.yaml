@@ -1,6 +1,5 @@
-
 description: |-
-    Proxmox LXC Container - Currently Unused
+  Proxmox LXC Container - Currently Unused
 prompt:
   colors:
     primary: 124
