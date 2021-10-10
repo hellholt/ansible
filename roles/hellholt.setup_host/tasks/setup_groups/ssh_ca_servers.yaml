@@ -36,10 +36,13 @@
 
     - name: 'Set a fact for the host cert signing key data.'
       ansible.builtin.set_fact:
-        sh_new_ssh_host_cert_signing_key_data: "{{ sh_ssh_host_cert_signing_key_slurp | b64decode }}"
+        sh_new_ssh_host_cert_signing_key_data: "{{ sh_ssh_host_cert_signing_key_slurp['content'] | b64decode }}"
 
     - name: 'Update host cert signing key data.'
       community.aws.aws_ssm_parameter_store:
+        region: "{{ sh_aws_region }}"
+        aws_access_key: "{{ sh_aws_main_access_key }}"
+        aws_secret_key: "{{ sh_aws_main_secret_key }}"
         name: "{{ sh_aws_iam_host_ssm_parameter_store_host_cert_signing_key_name }}"
         description: "Host cert signing key for {{ sh_hostname }}"
         string_type: 'SecureString'
@@ -71,10 +74,13 @@
 
     - name: 'Set a fact for the user cert signing key data.'
       ansible.builtin.set_fact:
-        sh_new_ssh_user_cert_signing_key_data: "{{ sh_ssh_user_cert_signing_key_slurp | b64decode }}"
+        sh_new_ssh_user_cert_signing_key_data: "{{ sh_ssh_user_cert_signing_key_slurp['content'] | b64decode }}"
 
     - name: 'Update user cert signing key data.'
       community.aws.aws_ssm_parameter_store:
+        region: "{{ sh_aws_region }}"
+        aws_access_key: "{{ sh_aws_main_access_key }}"
+        aws_secret_key: "{{ sh_aws_main_secret_key }}"
         name: "{{ sh_aws_iam_host_ssm_parameter_store_user_cert_signing_key_name }}"
         description: "User cert signing key for {{ sh_hostname }}"
         string_type: 'SecureString'
