@@ -2,9 +2,9 @@ description: |-
   Synology DS2415+ NAS
 prompt:
   colors:
-      primary: 124
-      secondary: 11
-      tertiary: 136
+    primary: 124
+    secondary: 11
+    tertiary: 136
   emoji: 🔥
 web:
   protocol: 'https'
