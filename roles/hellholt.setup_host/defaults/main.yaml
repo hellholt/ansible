@@ -64,7 +64,7 @@ sh_personal_fqdn: "{{ sh_hostname }}.{{ sh_personal_domain_name }}"
 sh_host_email_domain: "{{ sh_private_domain_name }}"
 
 sh_ssh_private_key_path: '~/.ssh/id_rsa'
-sh_ssh_public_key_path: "{{ ssh_private_key_path }}.pub"
+sh_ssh_public_key_path: "{{ sh_ssh_private_key_path }}.pub"
 
 # Should only be used when there are errors indicating that Pip should be updated.
 sh_reinstall_pip: no
@@ -89,7 +89,8 @@ sh_setup_groups:
   - 'pve_nodes'
   - 'pihole'
   - 'unifi'
-  - 'ssh_ca_server'
+  - 'ssh_ca_servers'
+  - 'ssh_certs'
   - 'traefik'
   - 'motd'
   - 'bash_prompt'
@@ -104,6 +105,7 @@ sh_universal_setup_groups:
   - 'motd'
   - 'bash_prompt'
   - 'dotfiles'
+  - 'ssh_certs'
 
 # Name of IAM user for host.
 sh_aws_iam_host_user: "ndsh_{{ sh_hostname }}"

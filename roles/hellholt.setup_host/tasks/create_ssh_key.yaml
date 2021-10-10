@@ -1,11 +1,24 @@
 ---
-- name: 'Create an SSH key if one does not already exist.'
+- name: 'Create an SSH key for root.'
   community.crypto.openssh_keypair:
     path: "{{ sh_ssh_private_key_path }}"
-    comment: "{{ sh_user_at_hostname }}"
-    owner: "{{ sh_user }}"
-    group: "{{ sh_group }}"
-    mode: '0600'
+    comment: "root@{{ sh_hostname }}"
+    owner: 'root'
+    group: 'root'
+    mode: 0600
     regenerate: 'full_idempotence'
     size: 4096
     type: 'rsa'
+
+- name: 'Create an SSH key for the normal user.'
+  become: yes
+  become_user: "{{ sh_normal_user_name }}"
+  community.crypto.openssh_keypair:
+    path: "{{ sh_ssh_private_key_path }}"
+    comment: "{{ sh_normal_user_name }}@{{ sh_hostname }}"
+    owner: "{{ sh_normal_user_name }}"
+    mode: 0600
+    regenerate: 'full_idempotence'
+    size: 4096
+    type: 'rsa'
+
