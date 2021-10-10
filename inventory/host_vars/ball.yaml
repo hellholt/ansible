@@ -1,5 +1,5 @@
 description: |
-  Proxmox LXC Container - UniFi Controller
+  Proxmox LXC Container - SSH Certificate Authority
 prompt:
     colors:
         primary: 160
@@ -13,4 +13,3 @@ pve_vm_id: '101'
 pve_cores: 2
 pve_memory_size: 2048
 pve_rootfs_size: 16
-pve_ostemplate: 'ubuntu-18.04-standard_18.04.1-1_amd64.tar.gz'

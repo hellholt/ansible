@@ -17,6 +17,9 @@ ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addres
 my:
   name:
     lower: 'nathan'
+    full: 'Nathan Douglas'
+  email:
+    github: 'github@darkdell.net'
   local:
     timezone: 'America/New_York'
   domains:
@@ -28,6 +31,11 @@ my:
       server: 'uller'
       path: '/volume1/Borg'
       passphrase: "{{ vault.easy_password }}"
+  gitconfig:
+    core.editor: 'nano'
+    user.name: 'Nathan Douglas'
+    user.email: 'github@darkdell.net'
+    pull.rebase: 'true'
 
 # Data structure of the vault.
 # vault:
@@ -200,6 +208,15 @@ sh_pihole_dns:
   - '208.67.222.222'
   - '208.67.220.220'
 sh_pihole_password: "{{ vault.easy_password }}"
+
+# MOTD base URL, from which MOTD text files can be retrieved.
+sh_motd_base_url: 'https://raw.githubusercontent.com/ndouglas/asoiaf-noble-house-images/master/utf8/40'
+
+# Git config.
+sh_gitconfig: "{{ my.gitconfig }}"
+
+# Dotfiles repository.
+sh_dotfiles_repo: 'https://github.com/hellholt/dotfiles.git'
 
 #########################
 # hellholt.kubernetes

@@ -83,8 +83,9 @@ sh_setup_groups:
   - 'pihole'
   - 'unifi'
   - 'ssh_ca_server'
-#  - 'dotfiles_root'
-#  - 'dotfiles'
+  - 'motd'
+  - 'bash_prompt'
+  - 'dotfiles'
 
 # Some setup groups contain all hosts.
 sh_universal_setup_groups:
@@ -92,8 +93,9 @@ sh_universal_setup_groups:
   - 'aws_iam_user'
   - 'aws_iam_policy'
   - 'route53'
-#  - 'dotfiles_root'
-#  - 'dotfiles'
+  - 'motd'
+  - 'bash_prompt'
+  - 'dotfiles'
 
 # Name of IAM user for host.
 sh_aws_iam_host_user: "ndsh_{{ sh_hostname }}"
@@ -176,3 +178,11 @@ sh_pihole_dns:
   - '208.67.220.220'
 sh_pihole_password: null
 
+# MOTD base URL, from which MOTD text files can be retrieved.
+sh_motd_base_url: null
+
+# Git configuration.
+sh_gitconfig: {}
+
+# Dotfiles repository.
+sh_dotfiles_repo: null

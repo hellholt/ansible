@@ -1,6 +1,5 @@
 ---
 - name: 'Allow release-info to change for APT repositories.'
-  become: yes
   ansible.builtin.command: 'apt-get update -y --allow-releaseinfo-change'
   args:
     warn: no
@@ -8,7 +7,6 @@
   changed_when: no
 
 - name: 'Install Apt packages.'
-  become: yes
   ansible.builtin.apt:
     name:
       - 'apt-file'
@@ -33,6 +31,7 @@
       - 'python3-venv'
       - 'rsync'
       - 'sudo'
+      - 'yadm'
     cache_valid_time: "{{ 3600 * 24 }}"
   when: 'sh_host_uses_apt'
 
@@ -56,12 +55,12 @@
       - 'jq'
       - 'parallel'
       - "python@{{ sh_package_versions.python }}"
+      - 'yadm'
       - 'yq'
     update_homebrew: no
   when: 'sh_host_uses_homebrew'
 
 - name: 'Make sure pip is at the latest version.'
-  become: yes
   ansible.builtin.pip:
     name: 'pip'
     state: 'forcereinstall'
@@ -69,7 +68,6 @@
   when: 'sh_reinstall_pip'
 
 - name: 'Install Pip packages.'
-  become: yes
   ansible.builtin.pip:
     name:
       - 'ansible'

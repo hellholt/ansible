@@ -19,3 +19,7 @@ The structure of the vault is described in [inventory/group_vars/all/vars.yaml](
 ### Bash Scripts
 
 I mostly use Bash for the actual day-to-day CLI stuff.  For these scripts, see the [bash repo](https://github.com/hellholt/bash).
+
+### Dotfiles
+
+This installs the (newer, simplified) version of my [dotfiles](https://github.com/hellholt/dotfiles), which I now administer with [YADM](https://yadm.io/).

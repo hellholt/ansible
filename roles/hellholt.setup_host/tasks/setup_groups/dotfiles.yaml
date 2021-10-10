@@ -1,0 +1,12 @@
+---
+- name: 'YADM bootstrap (root).'
+  ansible.builtin.command:
+    cmd: "yadm clone --bootstrap {{ sh_dotfiles_repo }}"
+    creates: '~/.local/share/yadm/repo.git'
+
+- name: 'YADM bootstrap (normal user).'
+  become: yes
+  become_user: "{{ sh_normal_user_name }}"
+  ansible.builtin.command:
+    cmd: "yadm clone --bootstrap {{ sh_dotfiles_repo }}"
+    creates: '~/.local/share/yadm/repo.git'
