@@ -65,6 +65,8 @@ sh_host_email_domain: "{{ sh_private_domain_name }}"
 
 sh_ssh_private_key_path: '~/.ssh/id_rsa'
 sh_ssh_public_key_path: "{{ sh_ssh_private_key_path }}.pub"
+sh_ssh_host_public_key_path: '/etc/ssh/ssh_host_rsa_key.pub'
+sh_ssh_host_cert_path: '/etc/ssh/ssh_host_rsa_key-cert.pub'
 
 # Should only be used when there are errors indicating that Pip should be updated.
 sh_reinstall_pip: no
@@ -128,11 +130,11 @@ sh_ssh_host_cert_signing_key_path: '~/.ssh/host_signing_key'
 # User certificate signing key path.
 sh_ssh_user_cert_signing_key_path: '~/.ssh/user_signing_key'
 
-# Host certificate path.
-sh_ssh_host_cert_path: '~/.ssh/host_cert'
-
 # User certificate path.
-sh_ssh_user_cert_path: '~/.ssh/user_cert'
+sh_ssh_user_cert_path: '~/.ssh/id_rsa-cert.pub'
+
+# User certificate authority public key path.
+sh_ssh_user_ca_path: '/etc/ssh/user_ca.pub'
 
 # Parameter pattern for SSM parameters for which the SSM policy should permit access.
 sh_aws_ssm_policy_pattern: "{{ sh_hostname }}.*"

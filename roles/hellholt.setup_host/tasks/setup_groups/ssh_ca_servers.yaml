@@ -105,29 +105,3 @@
     owner: 'root'
     group: 'root'
     mode: 0600
-
-- name: 'Generate new host certificate.'
-  community.crypto.openssh_cert:
-    type: 'host'
-    signing_key: "{{ sh_ssh_host_cert_signing_key_path }}"
-    public_key: "{{ sh_ssh_public_key_path }}"
-    path: "{{ sh_ssh_host_cert_path }}"
-    valid_from: 'always'
-    valid_to: 'forever'
-    principals:
-      - "{{ sh_hostname }}"
-      - "{{ sh_private_fqdn }}"
-      - "{{ sh_personal_fqdn }}"
-
-- name: 'Generate new user certificate.'
-  community.crypto.openssh_cert:
-    type: 'user'
-    signing_key: "{{ sh_ssh_user_cert_signing_key_path }}"
-    public_key: "{{ sh_ssh_public_key_path }}"
-    path: "{{ sh_ssh_user_cert_path }}"
-    valid_from: 'always'
-    valid_to: 'forever'
-    principals:
-      - "{{ sh_hostname }}"
-      - "{{ sh_private_fqdn }}"
-      - "{{ sh_personal_fqdn }}"

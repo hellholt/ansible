@@ -1,0 +1,205 @@
+---
+- name: 'Retrieve user and host certificates for both users.'
+  delegate_to: "{{ groups['ssh_ca_servers'][0] }}"
+  block:
+
+    - name: 'Slurp host cert signing key.'
+      ansible.builtin.slurp:
+        src: "{{ sh_ssh_host_cert_signing_key_path }}.pub"
+      register: 'sh_ssh_host_cert_signing_key_slurp'
+
+    - name: 'Set a fact for the host cert signing key data.'
+      ansible.builtin.set_fact:
+        sh_ssh_host_cert_signing_key_data: "{{ sh_ssh_host_cert_signing_key_slurp['content'] | b64decode }}"
+
+    - name: 'Slurp user cert signing key.'
+      ansible.builtin.slurp:
+        src: "{{ sh_ssh_user_cert_signing_key_path }}.pub"
+      register: 'sh_ssh_user_cert_signing_key_slurp'
+
+    - name: 'Set a fact for the user cert signing key data.'
+      ansible.builtin.set_fact:
+        sh_ssh_user_cert_signing_key_data: "{{ sh_ssh_user_cert_signing_key_slurp['content'] | b64decode }}"
+
+- name: 'Ensure that the user and host cert signing keys are trusted.'
+  ansible.posix.authorized_key:
+    user: "{{ sh_key_user }}"
+    state: 'present'
+    key: "{{ sh_ssh_user_cert_signing_key_data }}"
+  loop:
+    - 'root'
+    - "{{ sh_normal_user_name }}"
+  loop_control:
+    index_var: 'sh_index'
+    loop_var: 'sh_key_user'
+
+- name: 'Ensure that the host cert signing key is trusted.'
+  become: yes
+  become_user: "{{ sh_key_user }}"
+  ansible.builtin.known_hosts:
+    name: "*.{{ sh_private_domain_name }}"
+    key: "@cert-authority *.{{ sh_private_domain_name }} {{ sh_ssh_host_cert_signing_key_data }}"
+    state: 'present'
+  loop:
+    - 'root'
+    - "{{ sh_normal_user_name }}"
+  loop_control:
+    index_var: 'sh_index'
+    loop_var: 'sh_key_user'
+
+- name: 'Slurp the public SSH key.'
+  ansible.builtin.slurp:
+    src: "{{ sh_ssh_public_key_path }}"
+  register: 'sh_ssh_root_public_key_slurp'
+
+- name: 'Slurp the normal user public SSH key.'
+  become: yes
+  become_user: "{{ sh_normal_user_name }}"
+  ansible.builtin.slurp:
+    src: "{{ sh_ssh_public_key_path }}"
+  register: 'sh_ssh_user_public_key_slurp'
+
+- name: 'Slurp the host public key.'
+  ansible.builtin.slurp:
+    src: "{{ sh_ssh_host_public_key_path }}"
+  register: 'sh_ssh_host_public_key_slurp'
+
+- name: 'Create user certificates for both users.'
+  delegate_to: "{{ groups['ssh_ca_servers'][0] }}"
+  remote_user: 'root'
+  block:
+
+    - name: "Create temporary directory."
+      ansible.builtin.tempfile:
+        state: 'directory'
+      register: 'sh_ssh_file_temporary_directory'
+      changed_when: no
+
+    - name: 'Put the root public key.'
+      ansible.builtin.copy:
+        content: "{{ sh_ssh_root_public_key_slurp['content'] | b64decode }}"
+        dest: "{{ sh_ssh_file_temporary_directory.path }}/root.pub"
+
+    - name: 'Put the user public key.'
+      ansible.builtin.copy:
+        content: "{{ sh_ssh_user_public_key_slurp['content'] | b64decode }}"
+        dest: "{{ sh_ssh_file_temporary_directory.path }}/user.pub"
+
+    - name: 'Put the host public key.'
+      ansible.builtin.copy:
+        content: "{{ sh_ssh_host_public_key_slurp['content'] | b64decode }}"
+        dest: "{{ sh_ssh_file_temporary_directory.path }}/host.pub"
+
+    - name: 'Generate host certificate.'
+      community.crypto.openssh_cert:
+        type: 'host'
+        signing_key: "{{ sh_ssh_host_cert_signing_key_path }}"
+        public_key: "{{ sh_ssh_file_temporary_directory.path }}/host.pub"
+        path: "{{ sh_ssh_file_temporary_directory.path }}/host_cert"
+        valid_from: 'always'
+        valid_to: 'forever'
+
+    - name: 'Generate root certificate.'
+      community.crypto.openssh_cert:
+        type: 'user'
+        signing_key: "{{ sh_ssh_user_cert_signing_key_path }}"
+        public_key: "{{ sh_ssh_file_temporary_directory.path }}/root.pub"
+        path: "{{ sh_ssh_file_temporary_directory.path }}/root_cert"
+        valid_from: 'always'
+        valid_to: 'forever'
+        principals:
+          - 'root'
+
+    - name: 'Generate user certificate.'
+      community.crypto.openssh_cert:
+        type: 'user'
+        signing_key: "{{ sh_ssh_user_cert_signing_key_path }}"
+        public_key: "{{ sh_ssh_file_temporary_directory.path }}/user.pub"
+        path: "{{ sh_ssh_file_temporary_directory.path }}/user_cert"
+        valid_from: 'always'
+        valid_to: 'forever'
+        principals:
+          - "{{ sh_normal_user_name }}"
+
+    - name: 'Slurp the host certificate.'
+      ansible.builtin.slurp:
+        src: "{{ sh_ssh_file_temporary_directory.path }}/host_cert"
+      register: 'sh_ssh_host_cert_slurp'
+
+    - name: 'Slurp the root certificate.'
+      ansible.builtin.slurp:
+        src: "{{ sh_ssh_file_temporary_directory.path }}/root_cert"
+      register: 'sh_ssh_root_cert_slurp'
+
+    - name: 'Slurp the user certificate.'
+      ansible.builtin.slurp:
+        src: "{{ sh_ssh_file_temporary_directory.path }}/user_cert"
+      register: 'sh_ssh_user_cert_slurp'
+
+- name: 'Create the certificates locally.'
+  block:
+
+    - name: 'Write out the host certificate.'
+      ansible.builtin.copy:
+        content: "{{ sh_ssh_host_cert_slurp['content'] | b64decode }}"
+        dest: "{{ sh_ssh_host_cert_path }}"
+        owner: 'root'
+        mode: 0600
+
+    - name: 'Write out the user certificate authority key.'
+      ansible.builtin.copy:
+        content: "{{ sh_ssh_user_cert_signing_key_data }}"
+        dest: "{{ sh_ssh_user_ca_path }}"
+        owner: 'root'
+        mode: 0600
+
+    - name: 'Use the host certificate.'
+      ansible.builtin.lineinfile:
+        path: '/etc/ssh/sshd_config'
+        regexp: '^HostCertificate'
+        line: "HostCertificate {{ sh_ssh_host_cert_path }}"
+      register: 'sh_ssh_host_cert_line'
+
+    - name: 'Trust the user certificate.'
+      ansible.builtin.lineinfile:
+        path: '/etc/ssh/sshd_config'
+        regexp: '^TrustedUserCAKeys'
+        line: "TrustedUserCAKeys {{ sh_ssh_user_ca_path }}"
+      register: 'sh_ssh_user_ca_line'
+
+    - name: 'Restart sshd if the host cert is new.'
+      ansible.builtin.service:
+        name: 'sshd'
+        state: 'restarted'
+      when: 'sh_ssh_host_cert_line.changed or sh_ssh_user_ca_line.changed'
+
+    - name: 'Write out the root certificate.'
+      ansible.builtin.copy:
+        content: "{{ sh_ssh_root_cert_slurp['content'] | b64decode }}"
+        dest: "{{ sh_ssh_user_cert_path }}"
+        owner: 'root'
+        mode: 0600
+
+    - name: 'Write out the user certificate.'
+      become: yes
+      become_user: "{{ sh_normal_user_name }}"
+      ansible.builtin.copy:
+        content: "{{ sh_ssh_user_cert_slurp['content'] | b64decode }}"
+        dest: "{{ sh_ssh_user_cert_path }}"
+        owner: "{{ sh_normal_user_name }}"
+        mode: 0600
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
