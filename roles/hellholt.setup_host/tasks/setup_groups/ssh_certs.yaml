@@ -21,18 +21,6 @@
       ansible.builtin.set_fact:
         sh_ssh_user_cert_signing_key_data: "{{ sh_ssh_user_cert_signing_key_slurp['content'] | b64decode }}"
 
-- name: 'Ensure that the user and host cert signing keys are trusted.'
-  ansible.posix.authorized_key:
-    user: "{{ sh_key_user }}"
-    state: 'present'
-    key: "{{ sh_ssh_user_cert_signing_key_data }}"
-  loop:
-    - 'root'
-    - "{{ sh_normal_user_name }}"
-  loop_control:
-    index_var: 'sh_index'
-    loop_var: 'sh_key_user'
-
 - name: 'Ensure that the host cert signing key is trusted.'
   become: yes
   become_user: "{{ sh_key_user }}"
