@@ -105,3 +105,19 @@
     owner: 'root'
     group: 'root'
     mode: 0600
+
+- name: 'Slurp host cert signing key.'
+  ansible.builtin.slurp:
+    src: "{{ sh_ssh_host_cert_signing_key_path }}.pub"
+  register: 'sh_ssh_host_cert_signing_pub_key_slurp'
+
+- name: 'Set a fact for the host cert signing key data.'
+  ansible.builtin.set_fact:
+    sh_ssh_host_cert_signing_pub_key_data: "{{ sh_ssh_host_cert_signing_pub_key_slurp['content'] | b64decode }}"
+
+- name: 'Ensure that the host cert signing key is trusted.'
+  delegate_to: 'localhost'
+  ansible.builtin.known_hosts:
+    name: "*.{{ sh_private_domain_name }}"
+    key: "@cert-authority *.{{ sh_private_domain_name }} {{ sh_ssh_host_cert_signing_pub_key_data }}"
+    state: 'present'

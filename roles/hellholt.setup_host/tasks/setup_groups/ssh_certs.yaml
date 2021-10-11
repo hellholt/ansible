@@ -6,27 +6,27 @@
     - name: 'Slurp host cert signing key.'
       ansible.builtin.slurp:
         src: "{{ sh_ssh_host_cert_signing_key_path }}.pub"
-      register: 'sh_ssh_host_cert_signing_key_slurp'
+      register: 'sh_ssh_host_cert_signing_pub_key_slurp'
 
     - name: 'Set a fact for the host cert signing key data.'
       ansible.builtin.set_fact:
-        sh_ssh_host_cert_signing_key_data: "{{ sh_ssh_host_cert_signing_key_slurp['content'] | b64decode }}"
+        sh_ssh_host_cert_signing_pub_key_data: "{{ sh_ssh_host_cert_signing_pub_key_slurp['content'] | b64decode }}"
 
     - name: 'Slurp user cert signing key.'
       ansible.builtin.slurp:
         src: "{{ sh_ssh_user_cert_signing_key_path }}.pub"
-      register: 'sh_ssh_user_cert_signing_key_slurp'
+      register: 'sh_ssh_user_cert_signing_pub_key_slurp'
 
     - name: 'Set a fact for the user cert signing key data.'
       ansible.builtin.set_fact:
-        sh_ssh_user_cert_signing_key_data: "{{ sh_ssh_user_cert_signing_key_slurp['content'] | b64decode }}"
+        sh_ssh_user_cert_signing_pub_key_data: "{{ sh_ssh_user_cert_signing_pub_key_slurp['content'] | b64decode }}"
 
 - name: 'Ensure that the host cert signing key is trusted.'
   become: yes
   become_user: "{{ sh_key_user }}"
   ansible.builtin.known_hosts:
     name: "*.{{ sh_private_domain_name }}"
-    key: "@cert-authority *.{{ sh_private_domain_name }} {{ sh_ssh_host_cert_signing_key_data }}"
+    key: "@cert-authority *.{{ sh_private_domain_name }} {{ sh_ssh_host_cert_signing_pub_key_data }}"
     state: 'present'
   loop:
     - 'root'
@@ -136,7 +136,7 @@
 
     - name: 'Write out the user certificate authority key.'
       ansible.builtin.copy:
-        content: "{{ sh_ssh_user_cert_signing_key_data }}"
+        content: "{{ sh_ssh_user_cert_signing_pub_key_data }}"
         dest: "{{ sh_ssh_user_ca_path }}"
         owner: 'root'
         mode: 0600
@@ -176,18 +176,3 @@
         dest: "{{ sh_ssh_user_cert_path }}"
         owner: "{{ sh_normal_user_name }}"
         mode: 0600
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
