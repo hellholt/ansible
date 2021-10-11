@@ -14,7 +14,7 @@ http:
               - '*.{{ sh_backend_hostname_personal_fqdn }}'
 {% for sh_additional_backend in sh_backend_additional_backends %}
     {{ sh_backend_hostname }}_{{ sh_additional_backend.name }}:
-      rule: "Host(`{{ sh_additional_backend.name }}.{{ sh_backend_hostname_personal_fqdn }}`)"
+      rule: "HostRegexp(`{{ sh_additional_backend.name }}.{{ sh_backend_hostname_personal_fqdn }}`, `{subdomain}.{{ sh_additional_backend.name }}.{{ sh_backend_hostname_personal_fqdn }}`)"
       entryPoints:
         - 'websecure'
       service: '{{ sh_backend_hostname }}_{{ sh_additional_backend.name }}'

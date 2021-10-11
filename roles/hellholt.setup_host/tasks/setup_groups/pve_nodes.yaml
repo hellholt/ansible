@@ -30,7 +30,7 @@
   changed_when: no
 
 - name: 'Redirect port 443 to port 8006 for the PVE admin interface.'
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: |
       /sbin/iptables -F
       /sbin/iptables -t nat -F
@@ -53,6 +53,7 @@
   loop:
     - 'deb http://ftp.us.debian.org/debian buster main contrib'
     - 'deb http://ftp.us.debian.org/debian buster-updates main contrib'
+    - 'deb http://ftp.us.debian.org/debian buster-backports main'
     - 'deb http://security.debian.org buster/updates main contrib'
   loop_control:
     loop_var: 'sh_repository_line'
