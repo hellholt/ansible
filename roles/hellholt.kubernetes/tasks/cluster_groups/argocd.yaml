@@ -5,6 +5,7 @@
     k8s_argocd_personal_fqdn: "argocd.{{ k8s_personal_fqdn }}"
     k8s_argocdgrpc_private_fqdn: "argocd-grpc.{{ k8s_private_fqdn }}"
     k8s_argocdgrpc_personal_fqdn: "argocd-grpc.{{ k8s_personal_fqdn }}"
+    k8s_argocd_cluster_apps_repo: "https://github.com/hellholt/{{ k8s_cluster }}.git"
 
 - name: 'Add Argo chart repository.'
   kubernetes.core.helm_repository:
@@ -22,11 +23,69 @@
         secret:
           createSecret: yes
           argocdServerAdminPassword: "{{ k8s_easy_password | password_hash('bcrypt') }}"
+        repositories:
+          - type: 'git'
+            url: "{{ k8s_argocd_cluster_apps_repo }}"
       server:
         service:
           type: 'ClusterIP'
         extraArgs:
           - '--insecure'
+
+- name: 'Create cluster application.'
+  kubernetes.core.k8s:
+    namespace: 'argocd'
+    kubeconfig: '~/.kube/config'
+    definition:
+      apiVersion: 'argoproj.io/v1alpha1'
+      kind: 'Application'
+      metadata:
+        name: "{{ k8s_cluster }}"
+        namespace: 'argocd'
+        finalizers:
+          - 'resources-finalizer.argocd.argoproj.io'
+      spec:
+        destination:
+          server: 'https://kubernetes.default.svc'
+          namespace: 'argocd'
+        project: 'default'
+        source:
+          repoURL: "{{ k8s_argocd_cluster_apps_repo }}"
+          targetRevision: 'HEAD'
+          path: 'argocd'
+          helm:
+            releaseName: "{{ k8s_cluster }}"
+            values: |
+              spec:
+                clusterFQDNs:
+                  private: "{{ k8s_private_fqdn }}"
+                  personal: "{{ k8s_personal_fqdn }}"
+                domains:
+                  private: "{{ k8s_private_domain_name }}"
+                  personal: "{{ k8s_personal_domain_name }}"
+                destination:
+                  clusterName: "{{ k8s_cluster }}"
+                  server: 'https://kubernetes.default.svc'
+                source:
+                  repoURL: "{{ k8s_argocd_cluster_apps_repo }}"
+                  repoPath: 'argocd'
+                  targetRevision: 'HEAD'
+        syncPolicy:
+          automated:
+            prune: yes
+            selfHeal: yes
+            allowEmpty: yes
+          syncOptions:
+            - Validate=false
+            - CreateNamespace=true
+            - PrunePropagationPolicy=foreground
+            - PruneLast=true
+          retry:
+            limit: 5
+            backoff:
+              duration: 5s
+              factor: 2
+              maxDuration: 3m
 
 - name: 'Argo CD Server ingress.'
   kubernetes.core.k8s:
