@@ -15,5 +15,5 @@
         name: 'hellholt.setup_host'
         tasks_from: 'setup_groups/k8s.yaml'
 
-    - name: 'Retrieve the config.'
-      ansible.builtin.include_tasks: 'cluster_groups/get_config.yaml'
+    - name: 'Execute cluster group tasks.'
+      ansible.builtin.include_tasks: 'redeploy_cluster.yaml'
