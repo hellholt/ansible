@@ -81,6 +81,7 @@
       api_host: "{{ pve_node }}"
       state: 'started'
       proxmox_default_behavior: 'no_defaults'
+      timeout: 600
 
   - name: 'Wait for connectivity.'
     delegate_to: "{{ pve_hostname }}"

@@ -12,6 +12,7 @@
       state: 'stopped'
       force: yes
       proxmox_default_behavior: 'no_defaults'
+      timeout: 600
     ignore_errors: yes
 
   - name: 'Destroy the container.'
@@ -23,3 +24,4 @@
       state: 'absent'
       force: yes
       proxmox_default_behavior: 'no_defaults'
+      timeout: 600

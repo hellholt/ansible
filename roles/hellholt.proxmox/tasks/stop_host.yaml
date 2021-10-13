@@ -9,3 +9,4 @@
     state: 'stopped'
     force: yes
     proxmox_default_behavior: 'no_defaults'
+    timeout: 600
