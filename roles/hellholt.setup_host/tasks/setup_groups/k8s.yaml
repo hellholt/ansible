@@ -40,7 +40,7 @@
     kubernetes_pod_network:
       cni: 'weave'
       cidr: '192.168.0.0/16'
-    kubernetes_version: '1.20'
+    kubernetes_version: '1.22'
     kubernetes_role: "{{ sh_k8s_role }}"
     kubernetes_ignore_preflight_errors: 'all'
     kubernetes_join_command_extra_opts: "--ignore-preflight-errors={{ kubernetes_ignore_preflight_errors }}"
