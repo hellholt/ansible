@@ -69,6 +69,7 @@ k8s_cluster_groups:
   - 'whoami'                      # Install Whoami as test service.
   - 'prometheus'                  # Install Kube-Prometheus-Stack for monitoring and reporting.
   - 'aws_iam_user'                # Create an AWS IAM user for the cluster.
+  - 'aws_s3_bucket'               # Create an S3 bucket for the cluster.
   - 'aws_iam_policy'              # Allow retrieval of secrets from AWS SSM Parameter Store.
   - 'external_secrets'            # Allow secrets to persist past cluster lifetimes.
 
@@ -86,6 +87,7 @@ k8s_universal_cluster_groups:
   - 'whoami'
   - 'prometheus'
   - 'aws_iam_user'
+  - 'aws_s3_bucket'
   - 'aws_iam_policy'
   - 'external_secrets'
 
@@ -94,3 +96,6 @@ k8s_nfs_server: null
 
 # An easy password for accessing some services.
 k8s_easy_password: null
+
+# S3 bucket for this cluster.
+k8s_s3_bucket_name: "clusters.{{ k8s_hostname }}"

@@ -1,12 +1,24 @@
 ---
+- name: 'Set YADM facts.'
+  ansible.builtin.set_fact:
+    sh_yadm_repo_paths_by_os:
+      Debian: '~/.yadm/repo.git'
+      Ubuntu: '~/.local/share/yadm/repo.git'
+      MacOSX: '~/.local/share/yadm/repo.git'
+      default: '~/.yadm/repo.git'
+
+- name: 'Set more YADM facts.'
+  ansible.builtin.set_fact:
+    sh_yadm_repo_path: "{{ sh_yadm_repo_paths_by_os[ansible_distribution] | default(ansible_distribution['default']) }}"
+
 - name: 'YADM bootstrap (root).'
   ansible.builtin.command:
     cmd: "yadm clone --bootstrap {{ sh_dotfiles_repo }}"
-    creates: '~/.local/share/yadm/repo.git'
+    creates: "{{ sh_yadm_repo_path }}"
 
 - name: 'YADM bootstrap (normal user).'
   become: yes
   become_user: "{{ sh_normal_user_name }}"
   ansible.builtin.command:
     cmd: "yadm clone --bootstrap {{ sh_dotfiles_repo }}"
-    creates: '~/.local/share/yadm/repo.git'
+    creates: "{{ sh_yadm_repo_path }}"

@@ -25,6 +25,15 @@
               "ssm:PutParameter"
             ],
             "Resource": "arn:aws:ssm:*:{{ sh_aws_account_id }}:parameter/{{ sh_aws_ssm_policy_pattern }}"
+          },
+          {
+            "Sid": "S3BucketPolicyStatement",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+              "arn:aws:s3:::{{ sh_s3_bucket_name }}",
+              "arn:aws:s3:::{{ sh_s3_bucket_name }}/*"
+            ]
           }
         ]
       }

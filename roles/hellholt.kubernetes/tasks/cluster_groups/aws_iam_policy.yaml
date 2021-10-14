@@ -1,5 +1,5 @@
 ---
-- name: 'Create or update IAM SSM policy for cluster.'
+- name: 'Create or update IAM policy for cluster.'
   delegate_to: 'localhost'
   community.aws.iam_policy:
     aws_access_key: "{{ k8s_aws_main_access_key }}"
@@ -25,6 +25,15 @@
               "ssm:PutParameter"
             ],
             "Resource": "arn:aws:ssm:*:{{ k8s_aws_account_id }}:parameter/{{ k8s_aws_ssm_policy_pattern }}"
+          },
+          {
+            "Sid": "S3BucketPolicyStatement",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+              "arn:aws:s3:::{{ k8s_s3_bucket_name }}",
+              "arn:aws:s3:::{{ k8s_s3_bucket_name }}/*"
+            ]
           }
         ]
       }

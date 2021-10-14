@@ -1,0 +1,9 @@
+---
+- name: 'Create S3 bucket.'
+  amazon.aws.s3_bucket:
+    aws_access_key: "{{ k8s_aws_main_access_key }}"
+    aws_secret_key: "{{ k8s_aws_main_secret_key }}"
+    region: "{{ k8s_aws_region }}"
+    name: "{{ k8s_s3_bucket_name }}"
+    state: 'present'
+    versioning: no

@@ -82,6 +82,7 @@ sh_ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_add
 sh_setup_groups:
   - 'docker'
   - 'aws_iam_user'
+  - 'aws_s3_bucket'
   - 'aws_iam_policy'
   - 'route53'
   - 'k8s'
@@ -93,7 +94,7 @@ sh_setup_groups:
   - 'unifi'
   - 'ssh_ca_servers'
   - 'ssh_certs'
-  - 'traefik'
+  - 'traefik_site_proxy'
   - 'motd'
   - 'bash_prompt'
   - 'dotfiles'
@@ -102,6 +103,7 @@ sh_setup_groups:
 sh_universal_setup_groups:
   - 'docker'
   - 'aws_iam_user'
+  - 'aws_s3_bucket'
   - 'aws_iam_policy'
   - 'route53'
   - 'motd'
@@ -200,3 +202,7 @@ sh_gitconfig: {}
 
 # Dotfiles repository.
 sh_dotfiles_repo: null
+
+# S3 bucket for this host.
+sh_s3_bucket_name: "hosts.{{ sh_hostname }}"
+

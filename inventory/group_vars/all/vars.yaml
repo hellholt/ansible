@@ -117,7 +117,7 @@ sh_enable_passwordless_sudo: yes
 sh_create_normal_user: yes
 
 # This can take a while and should be avoided when possible.
-sh_install_common_packages: no
+sh_install_common_packages: yes
 
 # A normal (i.e. non-root) username.
 sh_normal_user_name: "{{ my.name.lower }}"
@@ -196,8 +196,8 @@ sh_k8s_hostnames: "{{ groups['k8s'] }}"
 sh_k8s_master_hostnames: "{{ groups['k8s_masters'] }}"
 # All K8s nodes.
 sh_k8s_node_hostnames: "{{ groups['k8s_nodes'] }}"
-# Prefix to NFS path exported to k8s clusters.
-sh_k8s_nfs_prefix: '/leo/nfs/k8s_clusters'
+# Prefix to NFS path exported to clusters.
+sh_k8s_nfs_prefix: '/leo/nfs/clusters'
 
 # NFS mount options:
 sh_nfs_mount_options: 'rw,async,no_subtree_check,no_wdelay,crossmnt,insecure,no_root_squash,insecure_locks,sec=sys'
@@ -227,6 +227,9 @@ sh_dotfiles_repo: 'https://github.com/hellholt/dotfiles.git'
 
 # Some crap that appears to be too cumbersome to do automatically.
 sh_k8s_cluster_names: "{{ k8s_cluster_names }}"
+
+# S3 bucket for this host.
+sh_s3_bucket_name: "{{ project_name }}.hosts.{{ sh_hostname }}"
 
 #########################
 # hellholt.kubernetes
@@ -278,3 +281,6 @@ k8s_easy_password: "{{ vault.easy_password }}"
 
 # The hostname of the K8s NFS server.
 k8s_nfs_server: 'lefford'
+
+# S3 bucket for this cluster.
+k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_hostname }}"

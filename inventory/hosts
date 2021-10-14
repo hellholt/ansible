@@ -59,7 +59,7 @@ all:
         ssh_ca_servers:
           hosts:
             ball
-        traefik:
+        traefik_site_proxy:
           hosts:
             algood:
         unifi:
