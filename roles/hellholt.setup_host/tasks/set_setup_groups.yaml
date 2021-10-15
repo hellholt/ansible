@@ -6,3 +6,8 @@
   loop_control:
     index_var: 'sh_index'
     loop_var: 'sh_setup_group'
+
+- name: 'Add host to the traefik_local_proxy group unless it is in traefik_site_proxy.'
+  ansible.builtin.group_by:
+    key: 'traefik_local_proxy'
+  when: '"traefik_site_proxy" not in group_names'

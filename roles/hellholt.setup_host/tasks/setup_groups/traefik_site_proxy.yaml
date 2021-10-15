@@ -1,7 +1,7 @@
 ---
 - name: 'Create the Traefik configuration directory.'
   ansible.builtin.file:
-    path: '~/traefik/conf.d/'
+    path: '/mnt/host/traefik/conf.d/'
     state: 'directory'
     mode: '0600'
 

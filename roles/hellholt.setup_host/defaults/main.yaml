@@ -94,6 +94,7 @@ sh_setup_groups:
   - 'unifi'
   - 'ssh_ca_servers'
   - 'ssh_certs'
+  - 'traefik_local_proxy'
   - 'traefik_site_proxy'
   - 'motd'
   - 'bash_prompt'

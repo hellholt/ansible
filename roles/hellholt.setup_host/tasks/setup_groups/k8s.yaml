@@ -52,3 +52,33 @@
       kubernetesVersion: "{{ kubernetes_version_kubeadm }}"
     kubernetes_config_kubelet_configuration:
       cgroupDriver: 'systemd'
+
+- name: 'Create the Traefik configuration directory.'
+  ansible.builtin.file:
+    path: '/mnt/host/traefik/conf.d/'
+    state: 'directory'
+    mode: '0600'
+
+- name: 'Create the configuration for this proxy.'
+  ansible.builtin.copy:
+    dest: "~/traefik/conf.d/{{ k8s_cluster }}.yaml"
+    content: |
+      http:
+        routers:
+          {{ k8s_cluster }}:
+            rule: "HostRegexp(`{{ k8s_cluster }}.{{ sh_private_domain_name }}`, `{subdomain}.{{ k8s_cluster }}.{{ sh_private_domain_name }}`)"
+            entryPoints:
+              - 'websecure'
+            service: '{{ k8s_cluster }}'
+            priority: 10
+            tls:
+              certResolver: '{{ sh_letsencrypt_private_domain_resolver_name }}'
+              domains:
+                - main: '{{ k8s_cluster }}.{{ sh_private_domain_name }}'
+                  sans:
+                    - '*.{{ k8s_cluster }}.{{ sh_private_domain_name }}'
+        services:
+          {{ k8s_cluster }}:
+            loadBalancer:
+              servers:
+                - url: 'http://127.0.0.1:32080/'
