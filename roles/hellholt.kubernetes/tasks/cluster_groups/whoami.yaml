@@ -6,6 +6,7 @@
 
 - name: 'Create the whoami namespace.'
   kubernetes.core.k8s:
+    kubeconfig: '~/.kube/config'
     name: 'whoami'
     api_version: 'v1'
     kind: 'Namespace'

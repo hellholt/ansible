@@ -21,6 +21,7 @@
       --api.dashboard=false
       --serversTransport.insecureskipverify=true
       --providers.docker=true
+      --providers.docker.exposedByDefault=false
       --providers.file=true
       --providers.file.directory='/etc/traefik/conf.d'
       --providers.file.watch=true

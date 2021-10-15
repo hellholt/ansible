@@ -1,6 +1,7 @@
 ---
 - name: 'Create the local-storage namespace.'
   kubernetes.core.k8s:
+    kubeconfig: '~/.kube/config'
     name: 'local-storage'
     api_version: 'v1'
     kind: 'Namespace'

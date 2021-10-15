@@ -1,4 +1,8 @@
 ---
+- name: 'Set K8s cluster FQDN facts.'
+  ansible.builtin.set_fact:
+    sh_k8s_private_fqdn: "{{ k8s_cluster }}.{{ sh_private_domain_name }}"
+
 - name: 'Install K8s custom service.'
   remote_user: 'root'
   block:
@@ -40,7 +44,7 @@
     kubernetes_pod_network:
       cni: 'weave'
       cidr: '192.168.0.0/16'
-    kubernetes_version: '1.22'
+    kubernetes_version: "{{ sh_kubernetes_version }}"
     kubernetes_role: "{{ sh_k8s_role }}"
     kubernetes_ignore_preflight_errors: 'all'
     kubernetes_join_command_extra_opts: "--ignore-preflight-errors={{ kubernetes_ignore_preflight_errors }}"
@@ -61,12 +65,12 @@
 
 - name: 'Create the configuration for this proxy.'
   ansible.builtin.copy:
-    dest: '/mnt/host/traefik/conf.d/{{ k8s_cluster }}.yaml"
+    dest: "/mnt/host/traefik/conf.d/{{ k8s_cluster }}.yaml"
     content: |
       http:
         routers:
           {{ k8s_cluster }}:
-            rule: "HostRegexp(`{{ k8s_cluster }}.{{ sh_private_domain_name }}`, `{subdomain}.{{ k8s_cluster }}.{{ sh_private_domain_name }}`)"
+            rule: "HostRegexp(`{{ sh_k8s_private_fqdn }}`, `{subdomain}.{{ sh_k8s_private_fqdn }}`)"
             entryPoints:
               - 'websecure'
             service: '{{ k8s_cluster }}'
@@ -74,11 +78,11 @@
             tls:
               certResolver: '{{ sh_letsencrypt_private_domain_resolver_name }}'
               domains:
-                - main: '{{ k8s_cluster }}.{{ sh_private_domain_name }}'
+                - main: '{{ sh_k8s_private_fqdn }}'
                   sans:
-                    - '*.{{ k8s_cluster }}.{{ sh_private_domain_name }}'
+                    - '*.{{ sh_k8s_private_fqdn }}'
         services:
           {{ k8s_cluster }}:
             loadBalancer:
               servers:
-                - url: 'http://127.0.0.1:32080/'
+                - url: 'http://{{ sh_k8s_private_fqdn }}:32080/'

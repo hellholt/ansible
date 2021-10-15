@@ -207,3 +207,5 @@ sh_dotfiles_repo: null
 # S3 bucket for this host.
 sh_s3_bucket_name: "hosts.{{ sh_hostname }}"
 
+# Kubernetes version.
+sh_kubernetes_version: '1.22'

@@ -231,6 +231,9 @@ sh_k8s_cluster_names: "{{ k8s_cluster_names }}"
 # S3 bucket for this host.
 sh_s3_bucket_name: "{{ project_name }}.hosts.{{ sh_hostname }}"
 
+# Kubernetes version.
+sh_kubernetes_version: '1.20'
+
 #########################
 # hellholt.kubernetes
 #########################
