@@ -11,7 +11,7 @@
     dest: '~/traefik/conf.d/{{ sh_backend_hostname }}.yaml'
   vars:
     sh_backend_hostname_personal_fqdn: "{{ sh_backend_hostname }}.{{ sh_personal_domain_name }}"
-    sh_backend_hostname_server_url: "https://{{ sh_backend_hostname }}.{{ sh_private_domain_name }}:32443/"
+    sh_backend_hostname_server_url: "https://{{ sh_backend_hostname }}.{{ sh_private_domain_name }}:443/"
     sh_backend_additional_backends: []
   loop: "{{ sh_k8s_cluster_names }}"
   loop_control:
