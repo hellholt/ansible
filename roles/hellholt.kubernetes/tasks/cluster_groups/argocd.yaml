@@ -96,8 +96,7 @@
       kind: 'Ingress'
       metadata:
         name: 'argocd-server'
-        annotations:
-          cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+        annotations: {}
       spec:
         rules:
           - host: "{{ k8s_argocd_personal_fqdn }}"
@@ -120,15 +119,6 @@
                       name: 'argocd-server'
                       port:
                         number: 80
-        tls:
-          - hosts:
-              - "{{ k8s_argocd_private_fqdn }}"
-              - "*.{{ k8s_argocd_private_fqdn }}"
-            secretName: "{{ k8s_argocd_private_fqdn }}-certificate"
-          - hosts:
-              - "{{ k8s_argocd_personal_fqdn }}"
-              - "*.{{ k8s_argocd_personal_fqdn }}"
-            secretName: "{{ k8s_argocd_personal_fqdn }}-certificate"
 
 - name: 'Argo CD Server gRPC ingress.'
   kubernetes.core.k8s:
@@ -163,12 +153,3 @@
                       name: 'argocd-server'
                       port:
                         number: 80
-        tls:
-          - hosts:
-              - "{{ k8s_argocdgrpc_personal_fqdn }}"
-              - "*.{{ k8s_argocdgrpc_personal_fqdn }}"
-            secretName: '{{ k8s_argocdgrpc_personal_fqdn }}-secret'
-          - hosts:
-              - "{{ k8s_argocdgrpc_private_fqdn }}"
-              - "*.{{ k8s_argocdgrpc_private_fqdn }}"
-            secretName: '{{ k8s_argocdgrpc_private_fqdn }}-secret'

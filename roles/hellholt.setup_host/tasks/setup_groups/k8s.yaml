@@ -61,7 +61,7 @@
 
 - name: 'Create the configuration for this proxy.'
   ansible.builtin.copy:
-    dest: "~/traefik/conf.d/{{ k8s_cluster }}.yaml"
+    dest: '/mnt/host/traefik/conf.d/{{ k8s_cluster }}.yaml"
     content: |
       http:
         routers:

@@ -61,8 +61,7 @@
       metadata:
         name: 'whoami'
         namespace: 'whoami'
-        annotations:
-          cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+        annotations: {}
       spec:
         rules:
         - host: "{{ k8s_service_private_fqdn }}"
@@ -85,12 +84,3 @@
                   name: 'whoami'
                   port:
                     number: 80
-        tls:
-          - hosts:
-              - "{{ k8s_service_private_fqdn }}"
-              - "*.{{ k8s_service_private_fqdn }}"
-            secretName: "{{ k8s_service_private_fqdn }}-certificate"
-          - hosts:
-              - "{{ k8s_service_personal_fqdn }}"
-              - "*.{{ k8s_service_personal_fqdn }}"
-            secretName: "{{ k8s_service_personal_fqdn }}-certificate"

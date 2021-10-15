@@ -25,8 +25,7 @@
         ingress:
           enabled: yes
           ingressClassName: 'traefik'
-          annotations:
-            cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+          annotations: {}
           labels: {}
           hosts:
             - "{{ k8s_grafana_private_fqdn }}"
@@ -34,20 +33,12 @@
           paths:
             - '/'
           pathType: 'Prefix'
-          tls:
-            - secretName: "{{ k8s_grafana_private_fqdn }}-certificate"
-              hosts:
-                - "{{ k8s_grafana_private_fqdn }}"
-            - secretName: "{{ k8s_grafana_personal_fqdn }}-certificate"
-              hosts:
-                - "{{ k8s_grafana_personal_fqdn }}"
       prometheus:
         enabled: yes
         ingress:
           enabled: yes
           ingressClassName: 'traefik'
-          annotations:
-            cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+          annotations: {}
           labels: {}
           hosts:
             - "{{ k8s_prometheus_private_fqdn }}"
@@ -55,13 +46,6 @@
           paths:
             - '/'
           pathType: 'Prefix'
-          tls:
-            - secretName: "{{ k8s_prometheus_private_fqdn }}-certificate"
-              hosts:
-                - "{{ k8s_prometheus_private_fqdn }}"
-            - secretName: "{{ k8s_prometheus_personal_fqdn }}-certificate"
-              hosts:
-                - "{{ k8s_prometheus_personal_fqdn }}"
         serviceMonitor:
           interval: ""
           selfMonitor: yes
