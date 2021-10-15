@@ -70,7 +70,7 @@
       http:
         routers:
           {{ k8s_cluster }}:
-            rule: "HostRegexp(`{{ sh_k8s_private_fqdn }}`, `{subdomain}.{{ sh_k8s_private_fqdn }}`)"
+            rule: "HostRegexp(`{{ sh_k8s_private_fqdn }}`, `{subdomain}.{{ sh_k8s_private_fqdn }}`, `{{ sh_k8s_personal_fqdn }}`, `{subdomain}.{{ sh_k8s_personal_fqdn }}`)"
             entryPoints:
               - 'websecure'
             service: '{{ k8s_cluster }}'
