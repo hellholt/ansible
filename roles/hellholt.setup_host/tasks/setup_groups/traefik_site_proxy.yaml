@@ -7,7 +7,7 @@
 
 - name: 'Populate cluster backend information.'
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/traefik_backend.yaml.j2"
+    src: "{{ role_path }}/templates/traefik_site_proxy_backend.yaml.j2"
     dest: '~/traefik/conf.d/{{ sh_backend_hostname }}.yaml'
   vars:
     sh_backend_hostname_personal_fqdn: "{{ sh_backend_hostname }}.{{ sh_personal_domain_name }}"
@@ -21,7 +21,7 @@
 
 - name: 'Populate host backend information.'
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/traefik_backend.yaml.j2"
+    src: "{{ role_path }}/templates/traefik_site_proxy_backend.yaml.j2"
     dest: '~/traefik/conf.d/{{ sh_backend_hostname }}.yaml'
   vars:
     sh_backend_hostname_personal_fqdn: "{{ sh_backend_hostname }}.{{ sh_personal_domain_name }}"
@@ -62,10 +62,6 @@
       --entryPoints.web.forwardedHeaders.insecure
       --entryPoints.websecure
       --entryPoints.websecure.address=':443'
-      --certificatesResolvers.{{ sh_letsencrypt_private_domain_resolver_name }}.acme.email="{{ sh_letsencrypt_email }}"
-      --certificatesResolvers.{{ sh_letsencrypt_private_domain_resolver_name }}.acme.storage='/etc/traefik/letsencrypt.json'
-      --certificatesResolvers.{{ sh_letsencrypt_private_domain_resolver_name }}.acme.dnsChallenge
-      --certificatesResolvers.{{ sh_letsencrypt_private_domain_resolver_name }}.acme.dnsChallenge.provider='route53'
       --certificatesResolvers.{{ sh_letsencrypt_personal_domain_resolver_name }}.acme.email="{{ sh_letsencrypt_email }}"
       --certificatesResolvers.{{ sh_letsencrypt_personal_domain_resolver_name }}.acme.storage='/etc/traefik/letsencrypt.json'
       --certificatesResolvers.{{ sh_letsencrypt_personal_domain_resolver_name }}.acme.dnsChallenge
