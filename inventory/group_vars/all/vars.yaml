@@ -103,6 +103,9 @@ pve_hostname: "{{ hostname }}"
 # Set the pve_description to the description.
 pve_description: "{{ description }}"
 
+# An ample mount, local storage for all LXC containers.
+pve_default_mount: 'local-lvm:64,mp=/mnt/host,backup=1,size=64G'
+
 #########################
 # hellholt.setup_host
 #########################
@@ -287,3 +290,6 @@ k8s_nfs_server: 'lefford'
 
 # S3 bucket for this cluster.
 k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_hostname }}"
+
+# GitHub token.
+k8s_github_token: "{{ vault.github.tokens[k8s_cluster] }}"

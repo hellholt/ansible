@@ -20,12 +20,43 @@
     values:
       classes:
       - name: 'local-storage'
-        hostDir: '/mnt/host'
+        hostDir: '/mnt/host/k8s'
         volumeMode: 'Filesystem'
         fsType: 'ext4'
         namePattern: "*"
         blockCleanerCommand:
           - "/scripts/quick_reset.sh"
         storageClass:
-          reclaimPolicy: Delete
+          reclaimPolicy: 'Delete'
           isDefaultClass: no
+
+- name: 'Create local storage volume.'
+  kubernetes.core.k8s:
+    namespace: 'local-storage'
+    kubeconfig: '~/.kube/config'
+    definition:
+      apiVersion: 'v1'
+      kind: 'PersistentVolume'
+      metadata:
+        name: "{{ k8s_node_hostname }}-local-storage-pv"
+      spec:
+        capacity:
+          storage: '64Gi'
+        accessModes:
+          - 'ReadWriteOnce'
+        persistentVolumeReclaimPolicy: 'Delete'
+        storageClassName: 'local-storage'
+        local:
+          path: '/mnt/host/k8s'
+        nodeAffinity:
+          required:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: 'kubernetes.io/hostname'
+                operator: 'In'
+                values:
+                - "{{ k8s_node_hostname }}"
+  loop: "{{ groups[k8s_cluster] }}"
+  loop_control:
+    index_var: 'k8s_index'
+    loop_var: 'k8s_node_hostname'

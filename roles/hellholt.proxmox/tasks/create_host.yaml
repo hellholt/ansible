@@ -28,7 +28,7 @@
 
   - name: 'Build mountpoints.'
     ansible.builtin.set_fact:
-      pve_mountpoints_dict: "{{ pve_mountpoints_dict | combine({ 'mp' + ( index + 1 ) | string : pve_mount_item.node_path + ',mp=' + pve_mount_item.host_path }) }}"
+      pve_mountpoints_dict: "{{ pve_mountpoints_dict | combine({ 'mp' + ( index + 1 ) | string : pve_mountpoint_item.node_path + ',mp=' + pve_mountpoint_item.host_path }) }}"
     loop_control:
       index_var: 'index'
       loop_var: 'pve_mountpoint_item'

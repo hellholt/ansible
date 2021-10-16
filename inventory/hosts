@@ -50,6 +50,10 @@ all:
             lefford:
         pihole:
           hosts:
+        plex_media_servers:
+          hosts:
+            fenn:
+            harlton:
         pve_file_servers:
           hosts:
             lefford:

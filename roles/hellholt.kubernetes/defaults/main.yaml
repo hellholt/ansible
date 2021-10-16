@@ -97,3 +97,6 @@ k8s_easy_password: null
 
 # S3 bucket for this cluster.
 k8s_s3_bucket_name: "clusters.{{ k8s_hostname }}"
+
+# A GitHub token for this cluster.
+k8s_github_token: null

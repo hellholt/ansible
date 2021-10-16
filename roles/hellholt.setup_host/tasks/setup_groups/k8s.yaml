@@ -2,6 +2,7 @@
 - name: 'Set K8s cluster FQDN facts.'
   ansible.builtin.set_fact:
     sh_k8s_private_fqdn: "{{ k8s_cluster }}.{{ sh_private_domain_name }}"
+    sh_k8s_personal_fqdn: "{{ k8s_cluster }}.{{ sh_personal_domain_name }}"
 
 - name: 'Install K8s custom service.'
   remote_user: 'root'
@@ -27,6 +28,12 @@
         daemon_reload: yes
         state: 'started'
         enabled: yes
+
+- name: 'Create the host local storage directory.'
+  ansible.builtin.file:
+    path: '/mnt/host/k8s'
+    state: 'directory'
+    mode: '0777'
 
 - name: 'Install Kubernetes.'
   ansible.builtin.include_role:
@@ -59,7 +66,7 @@
 
 - name: 'Create the Traefik configuration directory.'
   ansible.builtin.file:
-    path: '/mnt/host/traefik/conf.d/'
+    path: '/mnt/host/traefik/conf.d'
     state: 'directory'
     mode: '0600'
 

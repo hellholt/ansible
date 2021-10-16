@@ -57,6 +57,8 @@
             releaseName: "{{ k8s_cluster }}"
             values: |
               spec:
+                easyPassword: "{{ k8s_easy_password }}"
+                githubToken: "{{ k8s_github_token }}"
                 clusterFQDNs:
                   private: "{{ k8s_private_fqdn }}"
                   personal: "{{ k8s_personal_fqdn }}"

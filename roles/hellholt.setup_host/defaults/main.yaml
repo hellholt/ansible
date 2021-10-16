@@ -87,6 +87,7 @@ sh_setup_groups:
   - 'route53'
   - 'k8s'
   - 'k8s_nfs_servers'
+  - 'plex_media_servers'
   - 'pve_file_servers'
   - 'pve_nfs_servers'
   - 'pve_nodes'
