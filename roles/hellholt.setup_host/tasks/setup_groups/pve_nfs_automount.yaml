@@ -1,0 +1,33 @@
+---
+- name: 'Install NFS automount custom service.'
+  remote_user: 'root'
+  block:
+
+    - name: 'Create NFS automount custom service.'
+      ansible.builtin.copy:
+        dest: "/etc/systemd/system/mnt-nfs.mount"
+        content: |
+          [Unit]
+          Description=Mount NFS Share
+
+          [Mount]
+          What={{ sh_nfs_server }}:{{ sh_node_nfs_prefix + '/' + sh_hostname }}
+          Where=/mnt/nfs
+          Type=nfs
+          Options=defaults
+          TimeoutSec=10
+
+          [Install]
+          WantedBy=multi-user.target
+          WantedBy=docker.target
+        mode: 0644
+        owner: 'root'
+        group: 'root'
+
+    - name: 'Start K8s custom service.'
+      ansible.builtin.systemd:
+        name: 'mnt-nfs.mount'
+        daemon_reload: yes
+        state: 'started'
+        enabled: yes
+

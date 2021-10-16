@@ -39,9 +39,7 @@
     image: 'traefik:2.2'
     restart_policy: 'unless-stopped'
     recreate: yes
-    ports:
-      - '80:80'
-      - '443:443'
+    network_mode: 'host'
     volumes:
       - "/mnt/host/traefik:/etc/traefik"
       - '/var/run/docker.sock:/var/run/docker.sock'

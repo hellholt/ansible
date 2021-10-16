@@ -11,16 +11,16 @@
     image: 'traefik:2.2'
     restart_policy: 'unless-stopped'
     recreate: yes
-    ports:
-      - '80:80'
-      - '443:443'
+    network_mode: 'host'
     volumes:
       - "/mnt/host/traefik:/etc/traefik"
       - '/var/run/docker.sock:/var/run/docker.sock'
     command: |
+      --log.level=DEBUG
       --api.dashboard=false
       --serversTransport.insecureskipverify=true
       --providers.docker=true
+      --providers.docker.watch=true
       --providers.docker.exposedByDefault=false
       --providers.file=true
       --providers.file.directory='/etc/traefik/conf.d'

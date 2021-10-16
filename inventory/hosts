@@ -45,27 +45,30 @@ all:
         wensington:
     setup_groups:
       children:
-        k8s_nfs_servers:
+        k8s_nfs:
           hosts:
             lefford:
         pihole:
           hosts:
-        plex_media_servers:
+        plex:
           hosts:
             fenn:
             harlton:
-        pve_file_servers:
+        pve_file:
           hosts:
             lefford:
-        pve_nfs_servers:
+        pve_nfs:
           hosts:
             lefford:
-        ssh_ca_servers:
+        ssh_ca:
           hosts:
             ball
         traefik_site_proxy:
           hosts:
             algood:
+        tubesync:
+          hosts:
+            cafferen:
         unifi:
           hosts:
     k8s:

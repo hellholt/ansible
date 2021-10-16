@@ -87,3 +87,4 @@
     delegate_to: "{{ pve_hostname }}"
     remote_user: 'root'
     ansible.builtin.wait_for_connection:
+

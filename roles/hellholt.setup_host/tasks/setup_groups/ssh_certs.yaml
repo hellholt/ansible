@@ -1,6 +1,6 @@
 ---
 - name: 'Retrieve user and host certificates for both users.'
-  delegate_to: "{{ groups['ssh_ca_servers'][0] }}"
+  delegate_to: "{{ groups['ssh_ca'][0] }}"
   block:
 
     - name: 'Slurp host cert signing key.'
@@ -53,7 +53,7 @@
   register: 'sh_ssh_host_public_key_slurp'
 
 - name: 'Create user certificates for both users.'
-  delegate_to: "{{ groups['ssh_ca_servers'][0] }}"
+  delegate_to: "{{ groups['ssh_ca'][0] }}"
   remote_user: 'root'
   block:
 

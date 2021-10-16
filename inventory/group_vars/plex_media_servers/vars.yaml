@@ -1,6 +1,6 @@
 pve_mountpoints:
-  - node_path: "{{ sh_local_share_prefix }}/{{ sh_hostname }}/plex"
-    host_path: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
+  - node_path: "{{ local_share_prefix }}/{{ hostname }}/plex"
+    host_path: "{{ plex_media_server_directory }}"
     perms: '0755'
     uid: 998
     gid: 998

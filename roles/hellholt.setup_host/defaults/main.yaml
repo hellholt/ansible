@@ -81,22 +81,24 @@ sh_ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_add
 # Setup Groups are special groups that have a defined setup task.
 sh_setup_groups:
   - 'docker'
+  - 'pve_nfs_automount'
   - 'aws_iam_user'
   - 'aws_s3_bucket'
   - 'aws_iam_policy'
   - 'route53'
   - 'k8s'
-  - 'k8s_nfs_servers'
-  - 'plex_media_servers'
-  - 'pve_file_servers'
-  - 'pve_nfs_servers'
+  - 'k8s_nfs'
+  - 'plex'
+  - 'pve_file'
+  - 'pve_nfs'
   - 'pve_nodes'
   - 'pihole'
   - 'unifi'
-  - 'ssh_ca_servers'
+  - 'ssh_ca'
   - 'ssh_certs'
   - 'traefik_local_proxy'
   - 'traefik_site_proxy'
+  - 'tubesync'
   - 'motd'
   - 'bash_prompt'
   - 'dotfiles'
@@ -112,6 +114,10 @@ sh_universal_setup_groups:
   - 'bash_prompt'
   - 'dotfiles'
   - 'ssh_certs'
+
+# Some setup groups contain all PVE hosts.
+sh_pve_universal_setup_groups:
+  - 'pve_nfs_automount'
 
 # Name of IAM user for host.
 sh_aws_iam_host_user: "ndsh_{{ sh_hostname }}"
@@ -210,3 +216,9 @@ sh_s3_bucket_name: "hosts.{{ sh_hostname }}"
 
 # Kubernetes version.
 sh_kubernetes_version: '1.22'
+
+# Plex Media Server directory.
+sh_plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
+
+# Destination for saving YouTube video downloads.
+sh_nfs_youtube_path: null

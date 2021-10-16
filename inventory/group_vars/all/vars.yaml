@@ -84,6 +84,12 @@ k8s_cluster_names:
   - 'mistwood'
   - 'ninestars'
 
+# Plex Media Server directory.
+plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
+
+# Local share prefix on Lefford.
+local_share_prefix: '/leo/local/hosts'
+
 # The following sections are per-role variables.
 #
 # My general approach is to have role-specific variables, namespaced, so that I
@@ -120,7 +126,7 @@ sh_enable_passwordless_sudo: yes
 sh_create_normal_user: yes
 
 # This can take a while and should be avoided when possible.
-sh_install_common_packages: yes
+sh_install_common_packages: no
 
 # A normal (i.e. non-root) username.
 sh_normal_user_name: "{{ my.name.lower }}"
@@ -206,7 +212,7 @@ sh_k8s_nfs_prefix: '/leo/nfs/clusters'
 sh_nfs_mount_options: 'rw,async,no_subtree_check,no_wdelay,crossmnt,insecure,no_root_squash,insecure_locks,sec=sys'
 
 # Prefix to FS path mounted to hosts.
-sh_local_share_prefix: '/leo/local/hosts'
+sh_local_share_prefix: "{{ local_share_prefix }}"
 # Hosts that exist on this Proxmox node (and can thus mount local shares).
 sh_local_share_hostnames: "{{ groups[pve_cluster_id] }}"
 
@@ -236,6 +242,15 @@ sh_s3_bucket_name: "{{ project_name }}.hosts.{{ sh_hostname }}"
 
 # Kubernetes version.
 sh_kubernetes_version: '1.20'
+
+# Plex Media Server directory.
+sh_plex_media_server_directory: "{{ plex_media_server_directory }}"
+
+# NFS server.
+sh_nfs_server: "{{ groups['pve_nfs'][0] }}"
+
+# YouTube NFS share.
+sh_nfs_youtube_path: '/leo/media/youtube'
 
 #########################
 # hellholt.kubernetes
@@ -286,7 +301,7 @@ k8s_nfs_prefix: "{{ sh_k8s_nfs_prefix }}"
 k8s_easy_password: "{{ vault.easy_password }}"
 
 # The hostname of the K8s NFS server.
-k8s_nfs_server: 'lefford'
+k8s_nfs_server: "{{ groups['k8s_nfs'][0] }}"
 
 # S3 bucket for this cluster.
 k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_hostname }}"

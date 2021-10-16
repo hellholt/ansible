@@ -1,0 +1,64 @@
+---
+- name: 'Install libxslt.'
+  ansible.builtin.apt:
+    name: 'libxslt1.1'
+  when: 'sh_host_uses_apt'
+
+- name: 'Add the Plex apt signing key.'
+  ansible.builtin.apt_key:
+    url: 'https://downloads.plex.tv/plex-keys/PlexSign.key'
+    state: 'present'
+
+- name: 'Add APT repository for Plex.'
+  ansible.builtin.apt_repository:
+    repo: 'deb https://downloads.plex.tv/repo/deb public main'
+    state: 'present'
+  when: 'sh_host_uses_apt'
+
+- name: 'Install Plex Media Server.'
+  ansible.builtin.apt:
+    name:
+      - 'plexmediaserver'
+    state: 'latest'
+    update_cache: yes
+  when: 'sh_host_uses_apt'
+  notify: 'Restart Plex Media Server.'
+
+- name: 'Force all notified handlers to run at this point.'
+  ansible.builtin.meta: 'flush_handlers'
+
+- name: 'Create the scanners/series directory.'
+  ansible.builtin.file:
+    path: "{{ plex_media_server_directory }}/Scanners/Series"
+    state: 'directory'
+    mode: '0755'
+    owner: 998
+    group: 998
+
+- name: 'Install Absolute Series Scanner.'
+  ansible.builtin.get_url:
+    url: 'https://raw.githubusercontent.com/ZeroQI/Absolute-Series-Scanner/master/Scanners/Series/Absolute%20Series%20Scanner.py'
+    dest: "{{ plex_media_server_directory }}/Scanners/Series/Absolute Series Scanner.py"
+  notify: 'Restart Plex Media Server.'
+
+- name: 'Install YouTube Agent.'
+  ansible.builtin.git:
+    repo: 'https://github.com/ZeroQI/YouTube-Agent.bundle.git'
+    dest: "{{ plex_media_server_directory }}/Plug-ins/YouTube-Agent.bundle"
+    update: no
+  notify: 'Restart Plex Media Server.'
+
+- name: 'Install YouTube-DL Agent.'
+  ansible.builtin.git:
+    repo: 'https://github.com/JordyAlkema/Youtube-DL-Agent.bundle.git'
+    dest: "{{ plex_media_server_directory }}/Plug-ins/Youtube-DL-Agent.bundle"
+    update: no
+  notify: 'Restart Plex Media Server.'
+
+- name: 'Force all notified handlers to run at this point.'
+  ansible.builtin.meta: 'flush_handlers'
+
+- name: 'Start Plex Media Server.'
+  ansible.builtin.service:
+    name: 'plexmediaserver'
+    state: 'started'
