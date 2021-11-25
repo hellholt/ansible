@@ -1,0 +1,22 @@
+---
+- name: 'Set up Komga.'
+  community.docker.docker_container:
+    name: 'komga'
+    image: 'gotson/komga'
+    state: 'started'
+    restart: yes
+    network_mode: 'host'
+    volumes:
+      - '/mnt/host/komga:/config'
+      - '/mnt/comics:/data'
+      - '/etc/timezone:/etc/timezone'
+    user: '1000:1000'
+    restart_policy: 'unless-stopped'
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.komga.rule: "HostRegexp(`komga.{{ sh_personal_fqdn }}`, `{subdomain}.komga.{{ sh_personal_fqdn }}`, `komga.{{ sh_private_fqdn }}`, `{subdomain}.komga.{{ sh_private_fqdn }}`)"
+      traefik.http.routers.komga.tls: 'true'
+      traefik.http.routers.komga.service: 'komga'
+      traefik.http.services.komga.loadbalancer.server.port: '8080'
+      traefik.http.services.komga.loadbalancer.server.scheme: 'http'
+    container_default_behavior: 'no_defaults'

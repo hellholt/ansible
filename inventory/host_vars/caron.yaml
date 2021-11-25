@@ -1,5 +1,5 @@
 description: |-
-  Proxmox LXC Container - Gitea
+  Proxmox LXC Container - Komga
 prompt:
   colors:
     primary: 11
@@ -9,9 +9,8 @@ prompt:
 pve_host_index: 2
 pve_ip_address: 10.3.0.102
 pve_mac_address: de:fe:c8:03:00:66
-pve_mounts:
-  - guest_path: /home/git
-    host_path: /leo/caron/home_git
-    name: Git
-pve_ostemplate: debian-10-turnkey-gitea_16.1-1_amd64.tar.gz
+pve_mountpoints:
+  - host_path: '/mnt/comics'
+    node_path: '/leo/media/comics'
+    name: 'Comics'
 pve_vm_id: '102'

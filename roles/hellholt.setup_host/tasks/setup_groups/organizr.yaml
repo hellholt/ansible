@@ -1,0 +1,39 @@
+---
+- name: 'Set fact for directories to create and change ownership.'
+  ansible.builtin.set_fact:
+    sh_app_paths:
+    - '/mnt/host/organizr'
+
+- name: 'Change file permissions.'
+  ansible.builtin.file:
+    path: "{{ sh_filepath }}"
+    owner: '1000'
+    group: '1000'
+    mode: '0755'
+    state: 'directory'
+  loop: "{{ sh_app_paths }}"
+  loop_control:
+    loop_var: 'sh_filepath'
+
+- name: 'Set up Organizr.'
+  community.docker.docker_container:
+    name: 'organizr'
+    image: 'organizr/organizr:latest'
+    state: 'started'
+    restart: yes
+    volumes:
+      - '/mnt/host/organizr:/config'
+    env:
+      PUID: '1000'
+      PGID: '1000'
+      TZ: 'America/New_York'
+    restart_policy: 'unless-stopped'
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.organizr.rule: "HostRegexp(`organizr.{{ sh_personal_fqdn }}`, `{subdomain}.organizr.{{ sh_personal_fqdn }}`, `organizr.{{ sh_private_fqdn }}`, `{subdomain}.organizr.{{ sh_private_fqdn }}`)"
+      traefik.http.routers.organizr.tls: 'true'
+      traefik.http.routers.organizr.service: 'organizr'
+      traefik.http.services.organizr.loadbalancer.server.port: '80'
+      traefik.http.services.organizr.loadbalancer.server.scheme: 'http'
+      traefik.docker.network: 'host'
+    container_default_behavior: 'no_defaults'

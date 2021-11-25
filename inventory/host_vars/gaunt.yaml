@@ -1,5 +1,5 @@
 description: |-
-  Proxmox LXC Container - Currently Unused
+  Proxmox LXC Container - Plunking
 prompt:
   colors:
     primary: 210
@@ -10,3 +10,7 @@ pve_host_index: 6
 pve_ip_address: 10.3.0.106
 pve_mac_address: de:fe:c8:03:00:6a
 pve_vm_id: '106'
+pve_mountpoints:
+  - host_path: '/mnt/plunking'
+    node_path: '/leo/media/plunking'
+    name: 'Plunking'

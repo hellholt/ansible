@@ -1,5 +1,5 @@
 description: |-
-  Proxmox LXC Container - Gitea
+  Proxmox LXC Container - Podcast Server
 prompt:
   colors:
     primary: 28
@@ -10,3 +10,7 @@ pve_host_index: 4
 pve_ip_address: 10.3.0.104
 pve_mac_address: de:fe:c8:03:00:68
 pve_vm_id: '104'
+pve_mountpoints:
+  - host_path: '/mnt/podcasts'
+    node_path: '/leo/media/podcasts'
+    name: 'Podcasts'

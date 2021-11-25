@@ -1,5 +1,5 @@
 description: |-
-  Proxmox LXC Container - Currently Unused
+  Proxmox LXC Container - TubeSync
 prompt:
   colors:
     primary: 28

@@ -16,7 +16,7 @@
       - "/mnt/host/traefik:/etc/traefik"
       - '/var/run/docker.sock:/var/run/docker.sock'
     command: |
-      --log.level=DEBUG
+      --log.level=WARN
       --api.dashboard=false
       --serversTransport.insecureskipverify=true
       --providers.docker=true
@@ -35,6 +35,7 @@
       --entryPoints.web.forwardedHeaders.insecure
       --entryPoints.websecure
       --entryPoints.websecure.address=':443'
+      --entryPoints.websecure.http.tls.certResolver={{ sh_letsencrypt_private_domain_resolver_name }}
       --certificatesResolvers.{{ sh_letsencrypt_private_domain_resolver_name }}.acme.email="{{ sh_letsencrypt_email }}"
       --certificatesResolvers.{{ sh_letsencrypt_private_domain_resolver_name }}.acme.storage='/etc/traefik/letsencrypt.json'
       --certificatesResolvers.{{ sh_letsencrypt_private_domain_resolver_name }}.acme.dnsChallenge

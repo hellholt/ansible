@@ -126,7 +126,7 @@ sh_enable_passwordless_sudo: yes
 sh_create_normal_user: yes
 
 # This can take a while and should be avoided when possible.
-sh_install_common_packages: no
+sh_install_common_packages: yes
 
 # A normal (i.e. non-root) username.
 sh_normal_user_name: "{{ my.name.lower }}"
@@ -226,7 +226,7 @@ sh_pihole_dns:
 sh_pihole_password: "{{ vault.easy_password }}"
 
 # MOTD base URL, from which MOTD text files can be retrieved.
-sh_motd_base_url: 'https://raw.githubusercontent.com/hellholt/asoiaf-noble-house-images/main/utf8/40'
+sh_motd_base_url: 'https://raw.githubusercontent.com/hellholt/asoiaf-noble-house-images/main/ansi2/64'
 
 # Git config.
 sh_gitconfig: "{{ my.gitconfig }}"
@@ -304,7 +304,7 @@ k8s_easy_password: "{{ vault.easy_password }}"
 k8s_nfs_server: "{{ groups['k8s_nfs'][0] }}"
 
 # S3 bucket for this cluster.
-k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_hostname }}"
+k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_cluster }}"
 
 # GitHub token.
-k8s_github_token: "{{ vault.github.tokens[k8s_cluster] }}"
+k8s_github_token: "{{ vault.github.tokens.clusters[k8s_cluster] }}"

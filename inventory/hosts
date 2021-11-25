@@ -45,15 +45,30 @@ all:
         wensington:
     setup_groups:
       children:
+        books:
+          hosts:
+            donniger:
+        comics:
+          hosts:
+            caron:
         k8s_nfs:
           hosts:
             lefford:
+        organizr:
+          hosts:
+            dalt:
         pihole:
           hosts:
         plex:
           hosts:
             fenn:
             harlton:
+        plunking:
+          hosts:
+            gaunt:
+        podcasts:
+          hosts:
+            estren:
         pve_file:
           hosts:
             lefford:
@@ -191,7 +206,7 @@ all:
             prester:
             quagg:
             reed:
-            shadrich:
+            shawney:
             tudbury:
             upcliff:
             varner:
