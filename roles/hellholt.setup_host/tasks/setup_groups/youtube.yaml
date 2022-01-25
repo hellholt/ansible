@@ -1,0 +1,39 @@
+---
+- name: 'Create NFS automount custom service.'
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/mnt-youtube.mount"
+    content: |
+      [Unit]
+      Description=Mount YouTube NFS Share
+
+      [Mount]
+      What={{ sh_nfs_server }}:{{ sh_nfs_youtube_path }}
+      Where=/mnt/youtube
+      Type=nfs
+      Options=defaults
+      TimeoutSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+      WantedBy=docker.target
+    mode: 0644
+    owner: 'root'
+    group: 'root'
+
+- name: 'Start NFS automount custom service.'
+  ansible.builtin.systemd:
+    name: 'mnt-youtube.mount'
+    daemon_reload: yes
+    state: 'started'
+    enabled: yes
+
+- name: 'Install yt-dlp.'
+  ansible.builtin.pip:
+    name: 'yt-dlp'
+
+- name: 'Set up YouTube cron job.'
+  ansible.builtin.cron:
+    name: 'download-new-videos'
+    special_time: 'weekly'
+    job: |
+      /bin/bash -lc 'yt_download_new /mnt/youtube'

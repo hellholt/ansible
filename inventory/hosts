@@ -45,27 +45,14 @@ all:
         wensington:
     setup_groups:
       children:
-        books:
-          hosts:
-            donniger:
-        comics:
-          hosts:
-            caron:
         k8s_nfs:
           hosts:
             lefford:
-        organizr:
-          hosts:
-            dalt:
         pihole:
           hosts:
         plex:
           hosts:
             fenn:
-            harlton:
-        plunking:
-          hosts:
-            gaunt:
         podcasts:
           hosts:
             estren:
@@ -77,15 +64,15 @@ all:
             lefford:
         ssh_ca:
           hosts:
-            ball
+            ball:
         traefik_site_proxy:
           hosts:
             algood:
-        tubesync:
-          hosts:
-            cafferen:
         unifi:
           hosts:
+        youtube:
+          hosts:
+            cafferen:
     k8s:
       children:
         k8s_masters:
@@ -132,26 +119,26 @@ all:
         # langward:
         # John's PC
         # spicer:
-        # VR Machine
+        # VR PC
         # velaryon:
     pve_hosts:
       children:
         grey_garden:
           hosts:
-            algood:
-            ball:
-            cafferen:
-            dalt:
-            egen:
-            farman:
-            gardener:
-            haigh:
-            inchfield:
-            jast:
-            karstark:
-            liddle:
-            manderly:
-            norcross:
+            algood:       # Traefik Site Proxy
+            ball:         # Certificate Authority
+            cafferen:     # Pi-Hole?
+            dalt:         # Organizr [delet this]
+            egen:         #
+            farman:       # ????
+            gardener:     # ????
+            haigh:        # ????
+            inchfield:    # ????
+            jast:         # ????
+            karstark:     # Kubernetes
+            liddle:       # Kubernetes
+            manderly:     # Kubernetes
+            norcross:     # Kubernetes
             oakheart:
             paege:
             qoherys:
@@ -163,20 +150,20 @@ all:
             waxley:
         old_anchor:
           hosts:
-            allyrion:
-            bettley:
-            cargyll:
-            darry:
-            erenford:
-            fell:
-            garner:
-            harclay:
-            ironmaker:
-            jordayne:
-            kellington:
-            lightfoot:
-            manwoody:
-            norrey:
+            allyrion:     # ????
+            bettley:      # ????
+            cargyll:      # ????
+            darry:        # ????
+            erenford:     # ????
+            fell:         # ????
+            garner:       # ????
+            harclay:      # ????
+            ironmaker:    # ????
+            jordayne:     # ????
+            kellington:   # Kubernetes
+            lightfoot:    # Kubernetes
+            manwoody:     # Kubernetes
+            norrey:       # Kubernetes
             oldflowers:
             poole:
             qorgyle:
@@ -188,20 +175,20 @@ all:
             webber:
         rain_house:
           hosts:
-            ambrose:
-            blackbar:
-            caron:
-            donniger:
-            estren:
-            fenn:
-            gaunt:
-            harlton:
-            ironsmith:
-            justman:
-            kettleblack:
-            lipps:
-            marsh:
-            norridge:
+            ambrose:      # Torrents
+            blackbar:     # ????
+            caron:        # ????
+            donniger:     # ????
+            estren:       # ????
+            fenn:         # ????
+            gaunt:        # ????
+            harlton:      # ????
+            ironsmith:    # ????
+            justman:      # ????
+            kettleblack:  # Kubernetes
+            lipps:        # Kubernetes
+            marsh:        # Kubernetes
+            norridge:     # Kubernetes
             orkwood:
             prester:
             quagg:

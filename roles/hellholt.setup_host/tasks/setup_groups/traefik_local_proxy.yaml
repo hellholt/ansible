@@ -8,12 +8,12 @@
 - name: 'Create the Traefik container.'
   community.general.docker_container:
     name: 'traefik'
-    image: 'traefik:2.2'
+    image: 'traefik:2.6'
     restart_policy: 'unless-stopped'
     recreate: yes
     network_mode: 'host'
     volumes:
-      - "/mnt/host/traefik:/etc/traefik"
+      - '/mnt/host/traefik:/etc/traefik'
       - '/var/run/docker.sock:/var/run/docker.sock'
     command: |
       --log.level=WARN

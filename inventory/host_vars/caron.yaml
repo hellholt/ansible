@@ -1,5 +1,5 @@
 description: |-
-  Proxmox LXC Container - Komga
+  Proxmox LXC Container - Currently Unused
 prompt:
   colors:
     primary: 11
@@ -9,8 +9,4 @@ prompt:
 pve_host_index: 2
 pve_ip_address: 10.3.0.102
 pve_mac_address: de:fe:c8:03:00:66
-pve_mountpoints:
-  - host_path: '/mnt/comics'
-    node_path: '/leo/media/comics'
-    name: 'Comics'
 pve_vm_id: '102'

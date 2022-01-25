@@ -16,3 +16,4 @@ k8s_cluster_roles:
   - 'aws_iam_user'                # Create an AWS IAM user for the cluster.
   - 'aws_iam_policy'              # Allow retrieval of secrets from AWS SSM Parameter Store.
   - 'external_secrets'            # Allow secrets to persist past cluster lifetimes.
+pve_template: 'ubuntu-20.04-standard_20.04-1_amd64.tar.gz'

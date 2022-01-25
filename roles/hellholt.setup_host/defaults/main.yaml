@@ -98,15 +98,12 @@ sh_setup_groups:
   - 'ssh_certs'
   - 'traefik_local_proxy'
   - 'traefik_site_proxy'
-  - 'tubesync'
-  - 'comics'
-  - 'books'
   - 'podcasts'
-  - 'plunking'
-  - 'organizr'
   - 'motd'
   - 'bash_prompt'
   - 'dotfiles'
+  - 'watchtower'
+  - 'youtube'
 
 # Some setup groups contain all hosts.
 sh_universal_setup_groups:
@@ -117,8 +114,10 @@ sh_universal_setup_groups:
   - 'route53'
   - 'motd'
   - 'bash_prompt'
-  - 'dotfiles'
   - 'ssh_certs'
+  - 'dotfiles'
+  - 'portainer'
+  - 'watchtower'
 
 # Some setup groups contain all PVE hosts.
 sh_pve_universal_setup_groups:
@@ -220,7 +219,7 @@ sh_dotfiles_repo: null
 sh_s3_bucket_name: "hosts.{{ sh_hostname }}"
 
 # Kubernetes version.
-sh_kubernetes_version: '1.22'
+sh_kubernetes_version: '1.20'
 
 # Plex Media Server directory.
 sh_plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'

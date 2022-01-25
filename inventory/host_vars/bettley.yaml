@@ -1,3 +1,5 @@
+description: |-
+  Proxmox LXC Container - Unifi Controller
 prompt:
   colors:
     primary: 220

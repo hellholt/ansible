@@ -17,6 +17,7 @@
     content: |
       vm.swappiness=0
       net.ipv4.ip_forward=1
+      net.netfilter.nf_conntrack_max=131072
     mode: 0600
 
 - name: 'Run all sysctl updates.'

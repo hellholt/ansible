@@ -42,7 +42,6 @@
       vmid: "{{ pve_vm_id }}"
       node: "{{ pve_node }}"
       cores: "{{ pve_cores }}"
-      cpus: 1
       memory: "{{ pve_memory_size }}"
       swap: "{{ pve_swap_size }}"
       password: "{{ pve_root_password }}"

@@ -36,8 +36,13 @@
     restart_policy: 'unless-stopped'
     labels:
       traefik.enable: 'true'
-      traefik.http.routers.airsonic.rule: "HostRegexp(`airsonic.{{ sh_personal_fqdn }}`, `{subdomain}.airsonic.{{ sh_personal_fqdn }}`, `airsonic.{{ sh_private_fqdn }}`, `{subdomain}.airsonic.{{ sh_private_fqdn }}`)"
+      traefik.http.routers.airsonic.rule: "HostRegexp(`airsonic.{{ sh_personal_fqdn }}`, `{subdomain:[a-z0-9-]+}.airsonic.{{ sh_personal_fqdn }}`, `airsonic.{{ sh_private_fqdn }}`, `{subdomain:[a-z0-9-]+}.airsonic.{{ sh_private_fqdn }}`)"
       traefik.http.routers.airsonic.tls: 'true'
+      traefik.http.routers.airsonic.tls.certresolver: "{{ sh_letsencrypt_private_domain_resolver_name }}"
+      traefik.http.routers.airsonic.tls.domains[0].main: "airsonic.{{ sh_private_fqdn }}"
+      traefik.http.routers.airsonic.tls.domains[0].sans: "*.airsonic.{{ sh_private_fqdn }}"
+      traefik.http.routers.airsonic.tls.domains[1].main: "airsonic.{{ sh_personal_fqdn }}"
+      traefik.http.routers.airsonic.tls.domains[1].sans: "*.airsonic.{{ sh_personal_fqdn }}"
       traefik.http.routers.airsonic.service: 'airsonic'
       traefik.http.services.airsonic.loadbalancer.server.port: '4040'
       traefik.http.services.airsonic.loadbalancer.server.scheme: 'http'
