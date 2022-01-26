@@ -9,3 +9,7 @@ prompt:
 web:
   protocol: 'https'
   port: 5001
+homer_application_services:
+  - name: 'Synology DiskStation Manager'
+    subdomain: 'dsm'
+    url: 'https://uller.hellholt.net:5001/'

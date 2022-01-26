@@ -48,6 +48,9 @@ all:
         k8s_nfs:
           hosts:
             lefford:
+        homer:
+          hosts:
+            dalt:
         pihole:
           hosts:
         plex:
@@ -128,7 +131,7 @@ all:
             algood:       # Traefik Site Proxy
             ball:         # Certificate Authority
             cafferen:     # Pi-Hole?
-            dalt:         # Organizr [delet this]
+            dalt:         # Homer
             egen:         #
             farman:       # ????
             gardener:     # ????

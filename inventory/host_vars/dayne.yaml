@@ -12,3 +12,7 @@ web:
   additional_backends:
     - name: 'webdav'
       url: 'https://dayne.hellholt.net:5006/'
+homer_application_services:
+  - name: 'Synology DiskStation Manager'
+    subdomain: 'dsm'
+    url: 'https://dayne.hellholt.net:5001/'

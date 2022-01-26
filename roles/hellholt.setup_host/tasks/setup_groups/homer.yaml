@@ -1,0 +1,53 @@
+---
+- name: 'Create the Homer configuration directory.'
+  ansible.builtin.file:
+    path: '/mnt/host/homer/assets/'
+    state: 'directory'
+    mode: '0755'
+
+- name: 'Create the Homer images directory.'
+  ansible.builtin.file:
+    path: '/mnt/host/homer/assets/images/'
+    state: 'directory'
+    mode: '0755'
+
+- name: 'Download the header image.'
+  ansible.builtin.get_url:
+    url: "{{ sh_assets_base_url }}/images/hellholt.jpg"
+    dest: '/mnt/host/homer/assets/images/hellholt.jpg'
+    force: no
+    owner: 'root'
+    mode: 0644
+  ignore_errors: yes
+
+- name: 'Populate Homer config information.'
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/homer_assets_config.yaml.j2"
+    dest: '/mnt/host/homer/assets/config.yml'
+  changed_when: no
+
+- name: 'Set up Homer.'
+  community.docker.docker_container:
+    name: 'homer'
+    image: 'b4bz/homer:latest'
+    state: 'started'
+    restart: yes
+    volumes:
+      - '/mnt/host/homer/assets:/www/assets'
+    env:
+      TZ: 'America/New_York'
+    restart_policy: 'unless-stopped'
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.homer.rule: "HostRegexp(`homer.{{ sh_personal_fqdn }}`, `{subdomain:[a-z0-9-]+}.homer.{{ sh_personal_fqdn }}`, `homer.{{ sh_private_fqdn }}`, `{subdomain:[a-z0-9-]+}.homer.{{ sh_private_fqdn }}`)"
+      traefik.http.routers.homer.tls: 'true'
+      traefik.http.routers.homer.tls.certresolver: "{{ sh_letsencrypt_private_domain_resolver_name }}"
+      traefik.http.routers.homer.tls.domains[0].main: "homer.{{ sh_personal_fqdn }}"
+      traefik.http.routers.homer.tls.domains[0].sans: "*.homer.{{ sh_personal_fqdn }}"
+      traefik.http.routers.homer.tls.domains[1].main: "homer.{{ sh_private_fqdn }}"
+      traefik.http.routers.homer.tls.domains[1].sans: "*.homer.{{ sh_private_fqdn }}"
+      traefik.http.routers.homer.service: 'homer'
+      traefik.http.services.homer.loadbalancer.server.port: '8080'
+      traefik.http.services.homer.loadbalancer.server.scheme: 'http'
+    container_default_behavior: 'no_defaults'
+

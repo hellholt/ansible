@@ -37,3 +37,17 @@
     special_time: 'weekly'
     job: |
       /bin/bash -lc 'yt_download_new /mnt/youtube'
+
+- name: 'Set up rsync cron job.'
+  ansible.builtin.cron:
+    name: 'download-new-videos'
+    special_time: 'weekly'
+    job: |
+      rsync --rsync-path=/volume1/@appstore/synocli-net/bin/rsync \
+        --archive \
+        --human-readable \
+        --verbose \
+        --whole-file \
+        /mnt/youtube/* uller:/volume1/Video/YouTube/
+
+

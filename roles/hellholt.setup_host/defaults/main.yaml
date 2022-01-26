@@ -206,8 +206,14 @@ sh_pihole_dns:
   - '208.67.220.220'
 sh_pihole_password: null
 
+# Assets base URL.
+sh_assets_base_url: null
+
 # MOTD base URL, from which MOTD text files can be retrieved.
 sh_motd_base_url: null
+
+# Homer application icon base URLs.
+sh_homer_icon_base_url: null
 
 # Git configuration.
 sh_gitconfig: {}

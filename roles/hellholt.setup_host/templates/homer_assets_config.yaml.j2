@@ -1,0 +1,38 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+---
+title: 'Hellholt'
+subtitle: 'Homer@Dalt'
+logo: 'assets/images/hellholt.jpg'
+header: no
+footer: |
+  <p>Created with <span class="has-text-danger">❤️</span> with
+    <a href="https://bulma.io/">bulma</a>,
+    <a href="https://vuejs.org/">vuejs</a> &
+    <a href="https://fontawesome.com/">font awesome</a>
+    // Fork me on <a href="https://github.com/bastienwirtz/homer">
+      <i class="fab fa-github-alt">
+      </i>
+    </a>
+  </p>
+columns: "auto" # "auto" or number (must be a factor of 12: 1, 2, 3, 4, 6, 12)
+connectivityCheck: yes
+proxy:
+  useCredentials: no
+theme: 'default'
+services:
+  - name: 'Applications'
+    icon: 'fas fa-server'
+    items:
+    {% for sh_backend_hostname in groups['all'] | sort %}
+      {% for sh_service_item in hostvars[sh_backend_hostname].homer_application_services %}
+      {% set sh_service_domain_suffix = sh_backend_hostname + '.' + sh_private_domain_name %}
+      {% set sh_service_subdomain = sh_service_item.subdomain | default(sh_service_item.name | default('') | lower) %}
+      {% set sh_service_url = sh_service_item.url | default('https://' + sh_service_subdomain + '.' + sh_service_domain_suffix + '/') %}
+      - name: "{{ sh_service_item.name }}"
+        icon: "{{ sh_service_item.icon | default('') }}"
+        logo: "{{ sh_service_item.logo | default(sh_homer_icon_base_url + '/' + sh_backend_hostname + '.png') }}"
+        subtitle: "@{{ sh_backend_hostname }}"
+        url: "{{ sh_service_url }}"
+        target: "_blank"
+      {% endfor %}
+    {% endfor %}

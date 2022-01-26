@@ -90,6 +90,9 @@ plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Suppo
 # Local share prefix on Lefford.
 local_share_prefix: '/leo/local/hosts'
 
+# Homer service advertisements.
+homer_application_services: []
+
 # The following sections are per-role variables.
 #
 # My general approach is to have role-specific variables, namespaced, so that I
@@ -225,8 +228,14 @@ sh_pihole_dns:
   - '208.67.220.220'
 sh_pihole_password: "{{ vault.easy_password }}"
 
+# Assets base URL.
+sh_assets_base_url: 'https://raw.githubusercontent.com/hellholt/assets/main'
+
 # MOTD base URL, from which MOTD text files can be retrieved.
-sh_motd_base_url: 'https://raw.githubusercontent.com/hellholt/asoiaf-noble-house-images/main/ansi2/64'
+sh_motd_base_url: "{{ sh_assets_base_url }}/images/houses/ansi/64"
+
+# Homer icon base URL.
+sh_homer_icon_base_url: "{{ sh_assets_base_url }}/images/houses/png/64"
 
 # Git config.
 sh_gitconfig: "{{ my.gitconfig }}"
