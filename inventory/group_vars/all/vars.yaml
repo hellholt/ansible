@@ -17,6 +17,11 @@ ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addres
 web:
   protocol: 'https'
   port: 443
+  additional_backends: []
+
+# Homer service advertisements.
+homer:
+  applications: []
 
 # Data structure for my personal preferences.
 my:
@@ -89,9 +94,6 @@ plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Suppo
 
 # Local share prefix on Lefford.
 local_share_prefix: '/leo/local/hosts'
-
-# Homer service advertisements.
-homer_application_services: []
 
 # The following sections are per-role variables.
 #
@@ -260,6 +262,12 @@ sh_nfs_server: "{{ groups['pve_nfs'][0] }}"
 
 # YouTube NFS share.
 sh_nfs_youtube_path: '/leo/media/youtube'
+
+# Images NFS server.
+sh_nfs_images_server: 'uller'
+
+# Images NFS share.
+sh_nfs_images_path: '/volume1/Images'
 
 #########################
 # hellholt.kubernetes

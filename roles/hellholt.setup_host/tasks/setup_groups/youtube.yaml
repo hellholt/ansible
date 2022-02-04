@@ -1,37 +1,11 @@
 ---
-- name: 'Create NFS automount custom service.'
-  ansible.builtin.copy:
-    dest: "/etc/systemd/system/mnt-youtube.mount"
-    content: |
-      [Unit]
-      Description=Mount YouTube NFS Share
-
-      [Mount]
-      What={{ sh_nfs_server }}:{{ sh_nfs_youtube_path }}
-      Where=/mnt/youtube
-      Type=nfs
-      Options=defaults
-      TimeoutSec=10
-
-      [Install]
-      WantedBy=multi-user.target
-      WantedBy=docker.target
-    mode: 0644
-    owner: 'root'
-    group: 'root'
-
-- name: 'Start NFS automount custom service.'
-  ansible.builtin.systemd:
-    name: 'mnt-youtube.mount'
-    daemon_reload: yes
-    state: 'started'
-    enabled: yes
-
 - name: 'Install yt-dlp.'
   ansible.builtin.pip:
     name: 'yt-dlp'
 
 - name: 'Set up YouTube cron job.'
+  become: yes
+  become_user: "{{ sh_normal_user_name }}"
   ansible.builtin.cron:
     name: 'download-new-videos'
     special_time: 'weekly'
@@ -39,15 +13,10 @@
       /bin/bash -lc 'yt_download_new /mnt/youtube'
 
 - name: 'Set up rsync cron job.'
+  become: yes
+  become_user: "{{ sh_normal_user_name }}"
   ansible.builtin.cron:
-    name: 'download-new-videos'
-    special_time: 'weekly'
+    name: 'sync-videos'
+    special_time: 'daily'
     job: |
-      rsync --rsync-path=/volume1/@appstore/synocli-net/bin/rsync \
-        --archive \
-        --human-readable \
-        --verbose \
-        --whole-file \
-        /mnt/youtube/* uller:/volume1/Video/YouTube/
-
-
+      /bin/bash -lc 'rsync --rsync-path=/volume1/@appstore/synocli-net/bin/rsync --archive --human-readable --verbose --whole-file /mnt/youtube/* uller:/volume1/Video/YouTube/'

@@ -5,6 +5,10 @@
     state: 'directory'
     mode: '0600'
 
+- name: 'Create the Traefik network.'
+  community.docker.docker_network:
+    name: 'traefik'
+
 - name: 'Create the Traefik container.'
   community.general.docker_container:
     name: 'traefik'

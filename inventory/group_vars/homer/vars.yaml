@@ -1,2 +1,3 @@
-homer_application_services:
-  - name: 'Homer'
+homer:
+  applications:
+    - name: 'Homer'

@@ -53,6 +53,8 @@ all:
             dalt:
         pihole:
           hosts:
+        piwigo:
+          hosts:
         plex:
           hosts:
             fenn:
@@ -75,7 +77,7 @@ all:
           hosts:
         youtube:
           hosts:
-            cafferen:
+            blackbar:
     k8s:
       children:
         k8s_masters:

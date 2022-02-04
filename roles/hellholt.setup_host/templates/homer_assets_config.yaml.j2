@@ -24,7 +24,7 @@ services:
     icon: 'fas fa-server'
     items:
     {% for sh_backend_hostname in groups['all'] | sort %}
-      {% for sh_service_item in hostvars[sh_backend_hostname].homer_application_services %}
+      {% for sh_service_item in hostvars[sh_backend_hostname].homer.applications %}
       {% set sh_service_domain_suffix = sh_backend_hostname + '.' + sh_private_domain_name %}
       {% set sh_service_subdomain = sh_service_item.subdomain | default(sh_service_item.name | default('') | lower) %}
       {% set sh_service_url = sh_service_item.url | default('https://' + sh_service_subdomain + '.' + sh_service_domain_suffix + '/') %}

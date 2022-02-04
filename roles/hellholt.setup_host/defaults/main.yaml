@@ -104,6 +104,7 @@ sh_setup_groups:
   - 'dotfiles'
   - 'watchtower'
   - 'youtube'
+  - 'piwigo'
 
 # Some setup groups contain all hosts.
 sh_universal_setup_groups:
@@ -232,3 +233,9 @@ sh_plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Su
 
 # Destination for saving YouTube video downloads.
 sh_nfs_youtube_path: null
+
+# NFS server for images.
+sh_nfs_images_server: null
+
+# Destination for serving images.
+sh_nfs_images_path: null

@@ -1,0 +1,3 @@
+pve_mountpoints:
+  - node_path: '/leo/media/podcasts'
+    host_path: '/mnt/podcasts'

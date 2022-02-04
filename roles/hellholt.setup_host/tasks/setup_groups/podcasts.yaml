@@ -1,49 +1,27 @@
 ---
-- name: 'Set fact for directories to create and change ownership.'
-  ansible.builtin.set_fact:
-    sh_app_paths:
-    - '/mnt/host/airsonic-data'
-    - '/mnt/host/airsonic-playlists'
-    - '/mnt/podcasts'
+- name: 'Install npm.'
+  ansible.builtin.apt:
+    name: 'npm'
 
-- name: 'Change file permissions.'
-  ansible.builtin.file:
-    path: "{{ sh_filepath }}"
-    owner: '1000'
-    group: '1000'
-    mode: '0755'
-    state: 'directory'
-  loop: "{{ sh_app_paths }}"
-  loop_control:
-    loop_var: 'sh_filepath'
+- name: 'Globally install podcast-dl.'
+  community.general.npm:
+    name: 'podcast-dl'
+    global: yes
 
-- name: 'Set up Airsonic.'
-  community.docker.docker_container:
-    name: 'airsonic'
-    image: 'airsonic/airsonic'
-    state: 'started'
-    restart: yes
-    network_mode: 'host'
-    volumes:
-      - '/mnt/host/airsonic-data:/airsonic/data'
-      - '/mnt/host/airsonic-playlists:/airsonic/playlists'
-      - '/mnt/podcasts:/airsonic/podcasts'
-    env:
-      PUID: '1000'
-      PGID: '1000'
-      TZ: 'America/New_York'
-      MAXMEM: '8192'
-    restart_policy: 'unless-stopped'
-    labels:
-      traefik.enable: 'true'
-      traefik.http.routers.airsonic.rule: "HostRegexp(`airsonic.{{ sh_personal_fqdn }}`, `{subdomain:[a-z0-9-]+}.airsonic.{{ sh_personal_fqdn }}`, `airsonic.{{ sh_private_fqdn }}`, `{subdomain:[a-z0-9-]+}.airsonic.{{ sh_private_fqdn }}`)"
-      traefik.http.routers.airsonic.tls: 'true'
-      traefik.http.routers.airsonic.tls.certresolver: "{{ sh_letsencrypt_private_domain_resolver_name }}"
-      traefik.http.routers.airsonic.tls.domains[0].main: "airsonic.{{ sh_private_fqdn }}"
-      traefik.http.routers.airsonic.tls.domains[0].sans: "*.airsonic.{{ sh_private_fqdn }}"
-      traefik.http.routers.airsonic.tls.domains[1].main: "airsonic.{{ sh_personal_fqdn }}"
-      traefik.http.routers.airsonic.tls.domains[1].sans: "*.airsonic.{{ sh_personal_fqdn }}"
-      traefik.http.routers.airsonic.service: 'airsonic'
-      traefik.http.services.airsonic.loadbalancer.server.port: '4040'
-      traefik.http.services.airsonic.loadbalancer.server.scheme: 'http'
-    container_default_behavior: 'no_defaults'
+- name: 'Set up podcast-dl cron job.'
+  become: yes
+  become_user: "{{ sh_normal_user_name }}"
+  ansible.builtin.cron:
+    name: 'download-new-podcasts'
+    special_time: 'weekly'
+    job: |
+      /bin/bash -lc 'pod_download_new /mnt/podcasts'
+
+- name: 'Set up rsync cron job.'
+  become: yes
+  become_user: "{{ sh_normal_user_name }}"
+  ansible.builtin.cron:
+    name: 'sync-podcasts'
+    special_time: 'daily'
+    job: |
+      /bin/bash -lc 'rsync --rsync-path=/volume1/@appstore/synocli-net/bin/rsync --archive --human-readable --verbose --whole-file /mnt/podcasts/* uller:/volume1/Podcasts/'

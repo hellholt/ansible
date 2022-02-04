@@ -14,8 +14,9 @@ web:
   additional_backends:
     - name: 'pbs'
       url: 'https://pbs.lefford.hellholt.net:8007/'
-homer_application_services:
-  - name: 'Proxmox VE'
-    subdomain: 'pve'
-  - name: 'Proxmox Backup Server'
-    subdomain: 'pbs'
+homer:
+  applications:
+    - name: 'Proxmox VE'
+      subdomain: 'pve'
+    - name: 'Proxmox Backup Server'
+      subdomain: 'pbs'

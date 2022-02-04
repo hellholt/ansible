@@ -1,5 +1,6 @@
 ansible_ssh_user: 'root'
 pve_role: 'node'
-homer_application_services:
-  - name: 'Proxmox VE'
-    subdomain: 'pve'
+homer:
+  applications:
+    - name: 'Proxmox VE'
+      subdomain: 'pve'
