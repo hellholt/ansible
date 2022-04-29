@@ -1,0 +1,28 @@
+---
+- name: 'Create the core directory structure.'
+  ansible.builtin.file:
+    path: "{{ tr_root_path }}/{{ tr_directory_name }}"
+    state: 'directory'
+    mode: '0755'
+    owner: "{{ tr_owner }}"
+    group: "{{ tr_group }}"
+  loop:
+    - 'clients'
+    - 'data'
+    - 'ids'
+    - 'names'
+    - 'padded_ids'
+    - 'scripts'
+    - 'watch'
+  loop_control:
+    loop_var: 'tr_directory_name'
+
+- name: "Copy Transmission template files {{ role_path }}/files/scripts/ -> {{ tr_instance_storage_path }}/scripts/."
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ tr_root_path }}/scripts/{{ item | basename | splitext | first }}"
+    mode: '0755'
+    owner: "{{ tr_owner }}"
+    group: "{{ tr_group }}"
+  with_fileglob:
+    - "{{ role_path }}/files/scripts/*.j2"

@@ -73,6 +73,9 @@ all:
         traefik_site_proxy:
           hosts:
             algood:
+        transmission:
+          hosts:
+            uller:
         unifi:
           hosts:
         youtube:
@@ -134,7 +137,7 @@ all:
             ball:         # Certificate Authority
             cafferen:     # Pi-Hole?
             dalt:         # Homer
-            egen:         #
+            egen:         # ????
             farman:       # ????
             gardener:     # ????
             haigh:        # ????
@@ -181,10 +184,10 @@ all:
         rain_house:
           hosts:
             ambrose:      # Torrents
-            blackbar:     # ????
+            blackbar:     # YouTube Archiver
             caron:        # ????
             donniger:     # ????
-            estren:       # ????
+            estren:       # Podcast Archiver
             fenn:         # ????
             gaunt:        # ????
             harlton:      # ????

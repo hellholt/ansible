@@ -1,0 +1,14 @@
+---
+
+- name: 'Set up base.'
+  ansible.builtin.include_tasks: 'setup_base.yaml'
+
+- name: 'Set up Traefik proxy.'
+  ansible.builtin.include_tasks: 'setup_traefik.yaml'
+
+- name: 'Set up the instances.'
+  ansible.builtin.include_tasks: 'setup_instance.yaml'
+  loop: "{{ tr_instances }}"
+  loop_control:
+    loop_var: 'tr_instance'
+    label: "{{ tr_instance.name }}"

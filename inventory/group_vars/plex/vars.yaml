@@ -18,5 +18,7 @@ pve_mountpoints:
     host_path: '/Music/Multichannel'
   - node_path: '/leo/media/music/pending'
     host_path: '/Music/Pending'
+  - node_path: '/leo/media/podcasts'
+    host_path: '/Podcasts'
   - node_path: '/leo/media/youtube'
     host_path: '/YouTube'

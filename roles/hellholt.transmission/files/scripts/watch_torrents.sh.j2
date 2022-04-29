@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+# Retrieve the announce URL of a specified torrent file.
+tr_get_announce_url() {
+  : "${1?"Usage: ${FUNCNAME[0]} FILE"}";
+  torrent_file="${1}";
+  torrent_json="$(pytp "${torrent_file}")";
+  echo "${torrent_json}" | jq '.announce' -r;
+}
+
+# Retrieve the domain of the announce URL of a specified torrent file.
+tr_get_announce_domain() {
+  : "${1?"Usage: ${FUNCNAME[0]} FILE"}";
+  torrent_file="${1}";
+  tr_get_announce_url "${torrent_file}" | sed -e 's|^[^/]*//||' -e 's|/.*$||' -e 's|:[0-9]*||';
+}
+
+# Retrieve the "safe" (alphanumeric) domain of the announce URL of a specified
+# torrent file.
+tr_get_safe_announce_domain() {
+  : "${1?"Usage: ${FUNCNAME[0]} TORRENT_FILE"}";
+  torrent_file="${1}";
+  safe_announce_domain="$(tr_get_announce_domain "${torrent_file}" | tr -cd '[:alnum:]')";
+  {% for search, replace in tr_announce_map.items() %}
+    if [ "${safe_announce_domain}" == "{{ search }}" ]; then
+      safe_announce_domain="{{ replace }}";
+    fi
+  {% endfor %}
+  echo "${safe_announce_domain}";
+}
+
+# Retrieve the numeric instance ID for an instance for the specified torrent
+# Returns -1 if not found.
+tr_get_current_instance_id() {
+  : "${1?"Usage: ${FUNCNAME[0]} TORRENT_FILE|DOMAIN"}";
+  torrent_file="${1}";
+  if [ -f "${torrent_file}" ]; then
+    tr_get_current_instance_id "$(tr_get_safe_announce_domain "${torrent_file}")";
+  else
+    safe_domain="${1}";
+    safe_domain_path="{{ tr_root_path }}/names/${safe_domain}";
+    if [ -L "${safe_domain_path}" ]; then
+      original="$(readlink -f "${safe_domain_path}")";
+      basename "${original}" | grep --color=never -oE '[0-9]+';
+    else
+      return 255;
+    fi;
+  fi
+}
+
+# Assigns a torrent to an appropriate instance.
+tr_assign_torrent() {
+  : "${1?"Usage: ${FUNCNAME[0]} TORRENT_FILE"}";
+  torrent_file="${1}";
+  torrent_domain="$(tr_get_safe_announce_domain "${torrent_file}")";
+  instance_id="$(tr_get_current_instance_id "${torrent_domain}")";
+  instance_watch_path="{{ tr_root_path }}/padded_ids/${instance_id}/watch";
+  if [ -d "${instance_watch_path}" ]; then
+    mv "${torrent_file}" "${instance_watch_path}/";
+  fi;
+}
+
+# Given a watch directory, process any existing torrent files accordingly.
+tr_watch_torrents() {
+  : "${1?"Usage: ${FUNCNAME[0]} DIRECTORY"}";
+  torrent_directory="${1}";
+  if test -n "$(shopt -s nullglob; echo "${torrent_directory}"/*.torrent)"; then
+    for torrent_file in "${torrent_directory}"/*.torrent; do
+      echo "${torrent_file}";
+      if [ -f "${torrent_file}" ]; then
+        tr_assign_torrent "${torrent_file}";
+      fi;
+    done;
+  fi;
+}
+
+tr_watch_torrents "${1}";

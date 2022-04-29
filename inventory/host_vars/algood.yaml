@@ -1,5 +1,3 @@
-description: |
-  Proxmox LXC Container - Traefik Cluster-wide Proxy
 prompt:
     colors:
         primary: 184
@@ -10,6 +8,3 @@ pve_host_index: 0
 pve_ip_address: 10.1.0.100
 pve_mac_address: de:fe:c8:01:00:64
 pve_vm_id: '100'
-pve_cores: 2
-pve_memory_size: 2048
-pve_rootfs_size: 16

@@ -1,0 +1,72 @@
+---
+- name: 'Create the Traefik configuration directory.'
+  ansible.builtin.file:
+    path: "{{ tr_traefik_dir }}/conf.d/"
+    state: 'directory'
+    mode: '0600'
+
+- name: 'Create the Traefik network.'
+  community.docker.docker_network:
+    name: 'traefik'
+
+- name: 'Create the Traefik container.'
+  community.general.docker_container:
+    name: 'traefik'
+    image: 'traefik:2.6'
+    restart_policy: 'unless-stopped'
+    recreate: yes
+    network_mode: 'host'
+    volumes:
+      - '{{ tr_traefik_dir }}:/etc/traefik'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    command: |
+      --log.level=WARN
+      --api.dashboard=false
+      --serversTransport.insecureskipverify=true
+      --providers.docker=true
+      --providers.docker.watch=true
+      --providers.docker.exposedByDefault=false
+      --providers.file=true
+      --providers.file.directory='/etc/traefik/conf.d'
+      --providers.file.watch=true
+      --entryPoints.web
+      --entryPoints.web.address=':5080'
+      --entryPoints.web.http
+      --entryPoints.web.http.redirections
+      --entryPoints.web.http.redirections.entryPoint
+      --entryPoints.web.http.redirections.entryPoint.to='websecure'
+      --entryPoints.web.http.redirections.entryPoint.scheme='https'
+      --entryPoints.web.forwardedHeaders.insecure
+      --entryPoints.websecure
+      --entryPoints.websecure.address=':50443'
+      --entryPoints.websecure.http.tls.certResolver={{ tr_letsencrypt_resolver_name }}
+      --certificatesResolvers.{{ tr_letsencrypt_resolver_name }}.acme.email="{{ tr_letsencrypt_email }}"
+      --certificatesResolvers.{{ tr_letsencrypt_resolver_name }}.acme.storage='/etc/traefik/letsencrypt.json'
+      --certificatesResolvers.{{ tr_letsencrypt_resolver_name }}.acme.dnsChallenge
+      --certificatesResolvers.{{ tr_letsencrypt_resolver_name }}.acme.dnsChallenge.provider='route53'
+    env:
+      AWS_ACCESS_KEY_ID: "{{ tr_aws_main_access_key }}"
+      AWS_SECRET_ACCESS_KEY: "{{ tr_aws_main_secret_key }}"
+    container_default_behavior: 'no_defaults'
+
+- name: 'Create privately-resolvable Route 53 records for the host.'
+  community.aws.route53:
+    overwrite: yes
+    aws_access_key: "{{ tr_aws_main_access_key }}"
+    aws_secret_key: "{{ tr_aws_main_secret_key }}"
+    hosted_zone_id: "{{ tr_route53_private_zone_id }}"
+    state: 'present'
+    type: 'A'
+    record: "{{ tr_private_fqdn }}"
+    value: "{{ ipv4_address }}"
+
+- name: 'Create privately-resolvable Route 53 wildcard records for the host.'
+  community.aws.route53:
+    overwrite: yes
+    aws_access_key: "{{ tr_aws_main_access_key }}"
+    aws_secret_key: "{{ tr_aws_main_secret_key }}"
+    hosted_zone_id: "{{ tr_route53_private_zone_id }}"
+    state: 'present'
+    type: 'A'
+    record: "*.{{ tr_private_fqdn }}"
+    value: "{{ ipv4_address }}"

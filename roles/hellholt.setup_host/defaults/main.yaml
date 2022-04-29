@@ -94,6 +94,7 @@ sh_setup_groups:
   - 'pve_nodes'
   - 'pihole'
   - 'unifi'
+  - 'ssh_authorized_keys'
   - 'ssh_ca'
   - 'ssh_certs'
   - 'traefik_local_proxy'
@@ -118,6 +119,7 @@ sh_universal_setup_groups:
   - 'ssh_certs'
   - 'dotfiles'
   - 'portainer'
+  - 'ssh_authorized_keys'
   - 'watchtower'
 
 # Some setup groups contain all PVE hosts.

@@ -1,0 +1,5 @@
+description: |
+  Proxmox LXC Container - Traefik Cluster-wide Proxy
+pve_cores: 2
+pve_memory_size: 4096
+pve_rootfs_size: 16

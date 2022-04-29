@@ -1,1 +1,8 @@
-ansible_python_interpreter: '/var/services/homes/nathan/python3/bin/python3'
+ansible_python_interpreter: '/bin/python3'
+
+tr_traefik_dir: '/volume1/Docker/traefik'
+tr_root_path: '/volume1/Torrents'
+tr_uid: '1026'
+tr_gid: '100'
+tr_owner: 'nathan'
+tr_group: 'users'

@@ -22,3 +22,19 @@
   ansible.builtin.command:
     cmd: "yadm clone --bootstrap {{ sh_dotfiles_repo }} -b main"
     creates: "{{ sh_yadm_repo_path }}"
+
+- name: 'Update dotfiles (root).'
+  ansible.builtin.cron:
+    name: 'update-dotfiles'
+    special_time: 'daily'
+    job: |
+      /bin/bash -lc 'yadm pull' > /dev/null
+
+- name: 'Update dotfiles (normal user).'
+  become: yes
+  become_user: "{{ sh_normal_user_name }}"
+  ansible.builtin.cron:
+    name: 'update-dotfiles'
+    special_time: 'daily'
+    job: |
+      /bin/bash -lc 'yadm pull' > /dev/null

@@ -1,0 +1,95 @@
+---
+- name: 'Get the padded instance ID.'
+  ansible.builtin.set_fact:
+    tr_padded_instance_id: "{{ '%04d' | format(tr_instance.id) }}"
+
+- name: 'Set some useful facts.'
+  ansible.builtin.set_fact:
+    tr_instance_id_path: "{{ tr_root_path }}/ids/{{ tr_instance.id }}"
+    tr_padded_instance_id_path: "{{ tr_root_path }}/padded_ids/{{ tr_padded_instance_id }}"
+    tr_instance_name_path: "{{ tr_root_path }}/names/{{ tr_instance.name }}"
+    tr_instance_data_path: "{{ tr_root_path }}/data/{{ tr_instance.name }}"
+    tr_peer_port: "{{ tr_base_port + ( tr_instance.id | int ) }}"
+    tr_service_name: "{{ tr_padded_instance_id }}{{ tr_instance.name }}"
+
+- name: 'Set some more useful facts.'
+  ansible.builtin.set_fact:
+    tr_instance_storage_path: "{{ tr_root_path }}/clients/{{ tr_service_name }}"
+    tr_service_fqdn: "{{ tr_service_name }}.{{ tr_private_fqdn }}"
+    tr_domain_fqdn: "{{ tr_instance.name }}.{{ tr_private_fqdn }}"
+
+- name: 'Create instance root directory.'
+  ansible.builtin.file:
+    path: "{{ tr_instance_storage_path }}"
+    state: 'directory'
+    mode: '0755'
+    owner: "{{ tr_owner }}"
+    group: "{{ tr_group }}"
+
+- name: 'Create symlink pointing to instance storage path from name, ID, and padded ID.'
+  ansible.builtin.file:
+    path: "{{ tr_destination_path }}"
+    src: "{{ tr_instance_storage_path }}"
+    state: 'link'
+    force: yes
+  loop:
+    - "{{ tr_instance_name_path }}"
+    - "{{ tr_instance_id_path }}"
+    - "{{ tr_padded_instance_id_path }}"
+  loop_control:
+    loop_var: 'tr_destination_path'
+
+- name: 'Create instance destination path.'
+  ansible.builtin.file:
+    path: "{{ tr_instance_data_path }}"
+    state: 'directory'
+    mode: '0755'
+    owner: "{{ tr_owner }}"
+    group: "{{ tr_group }}"
+
+- name: 'Prepare directory structure.'
+  ansible.builtin.file:
+    path: "{{ tr_instance_storage_path }}/{{ tr_directory_name }}"
+    state: 'directory'
+    mode: '0755'
+  loop:
+    - 'config'
+    - 'watch'
+    - 'incomplete'
+    - 'downloads'
+  loop_control:
+    loop_var: 'tr_directory_name'
+
+- name: "Copy Transmission template files {{ role_path }}/files/config/ -> {{ tr_instance_storage_path }}/config/."
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ tr_instance_storage_path }}/config/{{ item | basename | splitext | first }}"
+    mode: '0755'
+    owner: "{{ tr_owner }}"
+    group: "{{ tr_group }}"
+  with_fileglob:
+    - "{{ role_path }}/files/config/*.j2"
+
+- name: 'Create the Docker container.'
+  community.docker.docker_container:
+    name: "{{ tr_service_name }}"
+    image: 'linuxserver/transmission'
+    state: 'started'
+    restart: yes
+    volumes:
+     - "{{ tr_instance_storage_path }}/config:/config"
+     - "{{ tr_instance_storage_path }}/watch:/watch"
+     - "{{ tr_instance_storage_path }}/incomplete:/incomplete"
+     - "{{ tr_instance_storage_path }}/downloads:/downloads"
+     - "{{ tr_instance_data_path }}:/downloads2"
+    labels: "{{ tr_service_name | transmission_traefik_labels(tr_service_fqdn, tr_domain_fqdn, tr_letsencrypt_resolver_name) }}"
+    ports:
+      - "{{ tr_peer_port }}:{{ tr_peer_port }}"
+      - "{{ tr_peer_port }}:{{ tr_peer_port }}/udp"
+    memory: '1G'
+    env:
+      PUID: "{{ tr_uid }}"
+      PGID: "{{ tr_gid }}"
+      TZ: "{{ tr_local_timezone }}"
+    restart_policy: 'unless-stopped'
+    container_default_behavior: 'no_defaults'

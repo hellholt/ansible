@@ -81,6 +81,7 @@
       - 'proxmoxer'
       - 'requests'
       - 'torrent_parser'
+      - 'typing_extensions'
       - 'virtualenv'
     extra_args: '--ignore-installed'
 
