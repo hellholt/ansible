@@ -52,6 +52,8 @@
     path: "{{ tr_instance_storage_path }}/{{ tr_directory_name }}"
     state: 'directory'
     mode: '0755'
+    owner: "{{ tr_owner }}"
+    group: "{{ tr_group }}"
   loop:
     - 'config'
     - 'watch'
