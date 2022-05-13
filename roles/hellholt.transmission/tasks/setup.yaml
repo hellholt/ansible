@@ -1,5 +1,4 @@
 ---
-
 - name: 'Set up base.'
   ansible.builtin.include_tasks: 'setup_base.yaml'
 

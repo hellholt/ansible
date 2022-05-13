@@ -1,6 +1,0 @@
----
-- name: 'Destroy host.'
-  ansible.builtin.include_tasks: 'destroy_host.yaml'
-
-- name: 'Create host.'
-  ansible.builtin.include_tasks: 'create_host.yaml'

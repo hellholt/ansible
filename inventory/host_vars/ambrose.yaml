@@ -10,9 +10,3 @@ pve_host_index: 0
 pve_ip_address: 10.3.0.100
 pve_mac_address: de:fe:c8:03:00:64
 pve_vm_id: '100'
-web:
-  protocol: 'https'
-  port: 5001
-  additional_backends:
-    - name: 'webdav'
-      url: 'https://dayne.hellholt.net:5006/'

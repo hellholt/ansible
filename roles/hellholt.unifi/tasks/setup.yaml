@@ -1,0 +1,63 @@
+---
+- name: 'Create instance root directory.'
+  ansible.builtin.file:
+    path: "{{ un_storage_path }}/config"
+    state: 'directory'
+    mode: '0755'
+    owner: "{{ un_owner }}"
+    group: "{{ un_group }}"
+
+- name: 'Create the Docker container.'
+  community.docker.docker_container:
+    name: 'unifi-controller'
+    image: 'linuxserver/unifi-controller:latest'
+    state: 'started'
+    restart: yes
+    volumes:
+      - "{{ un_storage_path }}/config:/config"
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.unifi.entrypoints: 'websecure'
+      traefik.http.routers.unifi.rule: "Host(`{{ un_host_fqdn }}`)"
+      traefik.http.routers.unifi.service: 'unifi'
+      traefik.http.routers.unifi.tls: 'true'
+      traefik.http.routers.unifi.tls.certresolver: "{{ un_certresolver }}"
+      traefik.http.services.unifi.loadbalancer.server.port: '8443'
+      traefik.http.services.unifi.loadbalancer.server.scheme: 'https'
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    memory: '1G'
+    env:
+      PUID: "{{ un_uid }}"
+      PGID: "{{ un_gid }}"
+    restart_policy: 'unless-stopped'
+    container_default_behavior: 'no_defaults'
+
+- name: 'Create privately-resolvable Route 53 records for the host.'
+  community.aws.route53:
+    overwrite: yes
+    aws_access_key: "{{ un_route53_access_key_id }}"
+    aws_secret_key: "{{ un_route53_secret_access_key }}"
+    hosted_zone_id: "{{ un_route53_zone_id }}"
+    state: 'present'
+    type: 'A'
+    record: "{{ un_host_fqdn }}"
+    value: "{{ ipv4_address }}"
+
+- name: 'Create privately-resolvable Route 53 wildcard records for the host.'
+  community.aws.route53:
+    overwrite: yes
+    aws_access_key: "{{ un_route53_access_key_id }}"
+    aws_secret_key: "{{ un_route53_secret_access_key }}"
+    hosted_zone_id: "{{ un_route53_zone_id }}"
+    state: 'present'
+    type: 'A'
+    record: "*.{{ un_host_fqdn }}"
+    value: "{{ ipv4_address }}"

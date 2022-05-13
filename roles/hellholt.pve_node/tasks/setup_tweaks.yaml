@@ -1,0 +1,19 @@
+---
+- name: 'Redirect port 443 to port 8006 for the PVE admin interface.'
+  ansible.builtin.shell:
+    cmd: |
+      /sbin/iptables -F
+      /sbin/iptables -t nat -F
+      /sbin/iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8006
+  changed_when: no
+
+- name: 'Disable the subscription banner.'
+  ansible.builtin.replace:
+    path: '/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js'
+    regexp: "data.status !== 'Active'"
+    replace: 'false'
+
+- name: 'Restart PVE Proxy.'
+  ansible.builtin.systemd:
+    name: 'pveproxy'
+    state: 'restarted'

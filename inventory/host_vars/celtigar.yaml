@@ -8,3 +8,6 @@ prompt:
   emoji: 🦀
 pve_cluster_id: old_anchor
 pve_ip_address: 10.2.0.2
+spn_pci_ids:
+  - '10de:1c82'
+  - '10de:0fb9'

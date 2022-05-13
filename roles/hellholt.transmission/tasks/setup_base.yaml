@@ -1,4 +1,24 @@
 ---
+- name: 'Install Pip packages.'
+  ansible.builtin.pip:
+    name:
+      - 'ansible'
+      - 'awscli'
+      - 'bcrypt'
+      - 'bdfr'
+      - 'boto'
+      - 'boto3'
+      - 'docker'
+      - 'kubernetes'
+      - 'passlib'
+      - 'proxmoxer'
+      - 'requests'
+      - 'torrent_parser'
+      - 'typing_extensions'
+      - 'virtualenv'
+    extra_args: '--ignore-installed'
+    executable: '/volume1/@appstore/python38/bin/pip3'
+
 - name: 'Create the core directory structure.'
   ansible.builtin.file:
     path: "{{ tr_root_path }}/{{ tr_directory_name }}"

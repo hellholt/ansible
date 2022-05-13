@@ -1,0 +1,7 @@
+---
+
+# Plex Media Server directory.
+plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
+
+# Plex NFS Mounts
+plex_nfs_mounts: []

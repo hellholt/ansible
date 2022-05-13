@@ -1,24 +1,8 @@
+description: |-
+  Proxmox LXC Container - Plex
 pve_mountpoints:
   - node_path: "{{ local_share_prefix }}/{{ hostname }}/plex"
     host_path: "{{ plex_media_server_directory }}"
     perms: '0755'
     uid: 998
     gid: 998
-  - node_path: '/leo/media/tv'
-    host_path: '/TV'
-  - node_path: '/leo/media/movies'
-    host_path: '/Movies'
-  - node_path: '/leo/media/movies_adult'
-    host_path: '/Adult_Movies'
-  - node_path: '/leo/media/music/nathan'
-    host_path: '/Music/Nathan'
-  - node_path: '/leo/media/music/all'
-    host_path: '/Music/All'
-  - node_path: '/leo/media/music/multichannel'
-    host_path: '/Music/Multichannel'
-  - node_path: '/leo/media/music/pending'
-    host_path: '/Music/Pending'
-  - node_path: '/leo/media/podcasts'
-    host_path: '/Podcasts'
-  - node_path: '/leo/media/youtube'
-    host_path: '/YouTube'

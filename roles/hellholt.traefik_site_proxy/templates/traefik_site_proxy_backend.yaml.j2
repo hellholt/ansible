@@ -1,0 +1,39 @@
+http:
+  routers:
+    {{ tsp_backend_hostname }}:
+      rule: "HostRegexp(`{{ tsp_backend_hostname_personal_fqdn }}`, `{subdomain}.{{ tsp_backend_hostname_personal_fqdn }}`)"
+      entryPoints:
+        - 'websecure'
+      service: '{{ tsp_backend_hostname }}'
+      priority: 10
+      tls:
+        certResolver: '{{ tsp_letsencrypt_resolver_name }}'
+        domains:
+          - main: '{{ tsp_backend_hostname_personal_fqdn }}'
+            sans:
+              - '*.{{ tsp_backend_hostname_personal_fqdn }}'
+{% for tsp_additional_backend in tsp_backend_additional_backends %}
+    {{ tsp_backend_hostname }}_{{ tsp_additional_backend.name }}:
+      rule: "HostRegexp(`{{ tsp_additional_backend.name }}.{{ tsp_backend_hostname_personal_fqdn }}`, `{subdomain}.{{ tsp_additional_backend.name }}.{{ tsp_backend_hostname_personal_fqdn }}`)"
+      entryPoints:
+        - 'websecure'
+      service: '{{ tsp_backend_hostname }}_{{ tsp_additional_backend.name }}'
+      priority: {{ tsp_additional_backend.priority | default(20) }}
+      tls:
+        certResolver: '{{ tsp_letsencrypt_resolver_name }}'
+        domains:
+          - main: '{{ tsp_additional_backend.name }}.{{ tsp_backend_hostname_personal_fqdn }}'
+            sans:
+              - '*.{{ tsp_additional_backend.name }}.{{ tsp_backend_hostname_personal_fqdn }}'
+{% endfor %}
+  services:
+    {{ tsp_backend_hostname }}:
+      loadBalancer:
+        servers:
+          - url: '{{ tsp_backend_hostname_server_url }}'
+{% for tsp_additional_backend in tsp_backend_additional_backends %}
+    {{ tsp_backend_hostname }}_{{ tsp_additional_backend.name }}:
+      loadBalancer:
+        servers:
+          - url: '{{ tsp_additional_backend.url }}'
+{% endfor %}

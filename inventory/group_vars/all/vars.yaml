@@ -100,9 +100,6 @@ k8s_cluster_names:
   - 'mistwood'
   - 'ninestars'
 
-# Plex Media Server directory.
-plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
-
 # Local share prefix on Lefford.
 local_share_prefix: '/leo/local/hosts'
 
@@ -265,9 +262,6 @@ sh_s3_bucket_name: "{{ project_name }}.hosts.{{ sh_hostname }}"
 # Kubernetes version.
 sh_kubernetes_version: '1.20'
 
-# Plex Media Server directory.
-sh_plex_media_server_directory: "{{ plex_media_server_directory }}"
-
 # NFS server.
 sh_nfs_server: "{{ groups['pve_nfs'][0] }}"
 
@@ -338,6 +332,77 @@ k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_cluster }}"
 k8s_github_token: "{{ vault.github.tokens.clusters[k8s_cluster] }}"
 
 #########################
+# hellholt.plex
+#########################
+
+# Plex Media Server directory.
+plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
+
+# Mounts for Plex.
+plex_nfs_mounts:
+  - path: '/Movies'
+    server: 'uller'
+    server_path: '/volume1/Video/Movies'
+    safe_path: 'Movies'
+  - path: '/TV'
+    server: 'uller'
+    server_path: '/volume1/Video/TV'
+    safe_path: 'TV'
+  - path: '/YouTube'
+    server: 'uller'
+    server_path: '/volume1/Video/YouTube'
+    safe_path: 'YouTube'
+  - path: '/Music'
+    server: 'uller'
+    server_path: '/volume1/Music'
+    safe_path: 'Music'
+  - path: '/Podcasts'
+    server: 'uller'
+    server_path: '/volume1/Podcasts'
+    safe_path: 'Podcasts'
+
+#########################
+# hellholt.unifi
+#########################
+
+# AWS access key ID.
+un_route53_access_key_id: "{{ vault.aws.profiles.route53.key_id }}"
+
+# AWS secret access key.
+un_route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
+
+# AWS Route 53 Zone ID.
+un_route53_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
+
+#########################
+# hellholt.traefik_site_proxy
+#########################
+
+# The root path shared with Traefik for its configuration.
+tsp_traefik_dir: '/traefik_site_proxy'
+
+# The personal domain name associated with hosts.
+tsp_personal_domain_name: "{{ my.domains.personal }}"
+
+# The private domain name associated with hosts.
+tsp_private_domain_name: "{{ my.domains.private }}"
+
+# Kubernetes cluster names.
+tsp_k8s_cluster_names: "{{ sh_k8s_cluster_names }}"
+
+# LetsEncrypt email address.
+tsp_letsencrypt_email: "letsencrypt@{{ tsp_private_domain_name }}"
+
+# LetsEncrypt personal domain resolver name.
+tsp_letsencrypt_resolver_name: "{{ tsp_personal_domain_name | splitext | first }}"
+
+# AWS Access Key ID.
+tsp_aws_route53_access_key_id: "{{ vault.aws.profiles.route53.key_id }}"
+
+# AWS Secret Access Key.
+tsp_aws_route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
+
+#########################
 # hellholt.transmission
 #########################
 
@@ -347,8 +412,8 @@ tr_traefik_dir: '/traefik'
 # Account ID, access key, etc used to create policies, users, Route 53 records, etc.
 tr_aws_region: "{{ vault.aws.defaults.region }}"
 tr_aws_account_id: "{{ vault.aws.defaults.account_id }}"
-tr_aws_main_access_key: "{{ vault.aws.profiles.main.key_id }}"
-tr_aws_main_secret_key: "{{ vault.aws.profiles.main.secret_key }}"
+tr_aws_main_access_key: "{{ vault.aws.profiles.route53.key_id }}"
+tr_aws_main_secret_key: "{{ vault.aws.profiles.route53.secret_key }}"
 
 # A private domain name.
 tr_private_domain_name: "{{ my.domains.private }}"

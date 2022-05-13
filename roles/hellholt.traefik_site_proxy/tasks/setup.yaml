@@ -1,0 +1,80 @@
+---
+- name: 'Create the Traefik configuration directory.'
+  ansible.builtin.file:
+    path: "{{ tsp_traefik_dir }}/conf.d/"
+    state: 'directory'
+    mode: '0600'
+    owner: 'root'
+    group: 'root'
+
+- name: 'Populate cluster backend information.'
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/traefik_site_proxy_backend.yaml.j2"
+    dest: "{{ tsp_traefik_dir }}/conf.d/{{ tsp_backend_hostname }}.yaml"
+  vars:
+    tsp_backend_hostname_personal_fqdn: "{{ tsp_backend_hostname }}.{{ tsp_personal_domain_name }}"
+    tsp_backend_hostname_server_url: "https://{{ tsp_backend_hostname }}.{{ tsp_private_domain_name }}:443/"
+    tsp_backend_additional_backends: []
+  loop: "{{ tsp_k8s_cluster_names }}"
+  loop_control:
+    index_var: 'tsp_index'
+    loop_var: 'tsp_backend_hostname'
+  changed_when: no
+
+- name: 'Populate host backend information.'
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/traefik_site_proxy_backend.yaml.j2"
+    dest: "{{ tsp_traefik_dir }}/conf.d/{{ tsp_backend_hostname }}.yaml"
+  vars:
+    tsp_backend_hostname_personal_fqdn: "{{ tsp_backend_hostname }}.{{ tsp_personal_domain_name }}"
+    tsp_backend_hostname_server_url: "{{ hostvars[tsp_backend_hostname].web.protocol}}://{{ tsp_backend_hostname }}.{{ tsp_private_domain_name }}:{{ hostvars[tsp_backend_hostname].web.port }}/"
+    tsp_backend_additional_backends: "{{ hostvars[tsp_backend_hostname].web.additional_backends | default([]) }}"
+  loop: "{{ groups['all'] }}"
+  loop_control:
+    index_var: 'tsp_index'
+    loop_var: 'tsp_backend_hostname'
+  changed_when: no
+
+- name: 'Create the Traefik network.'
+  community.docker.docker_network:
+    name: 'traefik'
+
+- name: 'Create the Traefik container.'
+  community.general.docker_container:
+    name: 'traefik-site-proxy'
+    image: 'traefik:latest'
+    restart_policy: 'unless-stopped'
+    recreate: yes
+    network_mode: 'host'
+    volumes:
+      - '{{ tsp_traefik_dir }}:/etc/traefik'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    command: |
+      --log.level=WARN
+      --api.dashboard=false
+      --serversTransport.insecureskipverify=true
+      --providers.docker=true
+      --providers.docker.watch=true
+      --providers.docker.exposedByDefault=false
+      --providers.file=true
+      --providers.file.directory='/etc/traefik/conf.d'
+      --providers.file.watch=true
+      --entryPoints.web
+      --entryPoints.web.address=":{{ tsp_web_port }}"
+      --entryPoints.web.http
+      --entryPoints.web.http.redirections
+      --entryPoints.web.http.redirections.entryPoint
+      --entryPoints.web.http.redirections.entryPoint.to='websecure'
+      --entryPoints.web.http.redirections.entryPoint.scheme='https'
+      --entryPoints.web.forwardedHeaders.insecure
+      --entryPoints.websecure
+      --entryPoints.websecure.address=":{{ tsp_websecure_port }}"
+      --entryPoints.websecure.http.tls.certResolver="{{ tsp_letsencrypt_resolver_name }}"
+      --certificatesResolvers.{{ tsp_letsencrypt_resolver_name }}.acme.email="{{ tsp_letsencrypt_email }}"
+      --certificatesResolvers.{{ tsp_letsencrypt_resolver_name }}.acme.storage='/etc/traefik/letsencrypt.json'
+      --certificatesResolvers.{{ tsp_letsencrypt_resolver_name }}.acme.dnsChallenge
+      --certificatesResolvers.{{ tsp_letsencrypt_resolver_name }}.acme.dnsChallenge.provider='route53'
+    env:
+      AWS_ACCESS_KEY_ID: "{{ tsp_aws_route53_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ tsp_aws_route53_secret_access_key }}"
+    container_default_behavior: 'no_defaults'

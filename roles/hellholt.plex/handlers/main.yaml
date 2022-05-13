@@ -1,6 +1,6 @@
 ---
 - name: 'Restart Plex Media Server.'
-  become: yes
   ansible.builtin.service:
     name: 'plexmediaserver'
     state: 'restarted'
+  become: yes

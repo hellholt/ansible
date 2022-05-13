@@ -1,0 +1,35 @@
+---
+- name: 'Create NFS automount custom service.'
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/{{ plex_nfs_mount.safe_path }}.mount"
+    content: |
+      [Unit]
+      Description=Mount {{ plex_nfs_mount.path }} NFS Share
+
+      [Mount]
+      What={{ plex_nfs_mount.server }}:{{ plex_nfs_mount.server_path }}
+      Where={{ plex_nfs_mount.path }}
+      Type=nfs
+      Options=defaults
+      TimeoutSec=10
+      ForceUnmount=true
+
+      [Install]
+      WantedBy=multi-user.target
+      WantedBy=docker.target
+    mode: 0644
+    owner: 'root'
+    group: 'root'
+  loop: "{{ plex_nfs_mounts }}"
+  loop_control:
+    loop_var: 'plex_nfs_mount'
+
+- name: 'Start NFS automount custom service.'
+  ansible.builtin.systemd:
+    name: "{{ plex_nfs_mount.safe_path }}.mount"
+    daemon_reload: yes
+    state: 'started'
+    enabled: yes
+  loop: "{{ plex_nfs_mounts }}"
+  loop_control:
+    loop_var: 'plex_nfs_mount'

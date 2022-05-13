@@ -4,6 +4,9 @@
     path: "{{ tr_traefik_dir }}/conf.d/"
     state: 'directory'
     mode: '0600'
+    owner: 'root'
+    group: 'root'
+  become: yes
 
 - name: 'Create the Traefik network.'
   community.docker.docker_network:

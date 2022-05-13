@@ -26,6 +26,9 @@ all:
       hosts:
         dayne:
         uller:
+    unifi:
+      hosts:
+        uller:
     aquaria:
       hosts:
         # Reef-Pi (End Table)
@@ -58,9 +61,6 @@ all:
         plex:
           hosts:
             fenn:
-        podcasts:
-          hosts:
-            estren:
         pve_file:
           hosts:
             lefford:
@@ -72,15 +72,13 @@ all:
             ball:
         traefik_site_proxy:
           hosts:
-            algood:
+            uller:
         transmission:
           hosts:
             uller:
         unifi:
           hosts:
-        youtube:
-          hosts:
-            blackbar:
+            uller:
     k8s:
       children:
         k8s_masters:
@@ -184,10 +182,10 @@ all:
         rain_house:
           hosts:
             ambrose:      # Torrents
-            blackbar:     # YouTube Archiver
+            blackbar:     # ????
             caron:        # ????
             donniger:     # ????
-            estren:       # Podcast Archiver
+            estren:       # ????
             fenn:         # ????
             gaunt:        # ????
             harlton:      # ????
