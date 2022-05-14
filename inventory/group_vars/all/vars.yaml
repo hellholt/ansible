@@ -204,6 +204,87 @@ description: "{{ description }}"
 # An ample mount, local storage for all LXC containers.
 default_lxc_mount: 'local-lvm:64,mp=/mnt/host,backup=1,size=64G'
 
+# All K8s hosts, regardless of role or cluster.
+k8s_hosts: "{{ groups['k8s'] }}"
+# All K8s masters, regardless of cluster.
+k8s_master_hosts: "{{ groups['k8s_masters'] }}"
+# All K8s nodes, regardless of cluster.
+k8s_node_hosts: "{{ groups['k8s_nodes'] }}"
+# All K8s hosts in this cluster.
+k8s_cluster_hosts: "{{ groups[k8s_cluster] }}"
+
+# Name and password of IAM user for cluster.
+k8s_aws_iam_cluster_user: "{{ cluster_aws_iam_user_prefix }}{{ k8s_cluster }}"
+k8s_aws_iam_cluster_password: "{{ cluster_aws_iam_password }}"
+
+# Pattern for which SSM parameters this cluster is permitted to access.
+k8s_aws_ssm_policy_pattern: "{{ project_name }}.clusters.{{ k8s_cluster }}.*"
+
+# Prefix of SSM parameter store data for cluster.
+k8s_aws_iam_cluster_ssm_parameter_store_data_prefix: "{{ project_name }}.clusters."
+
+# Prefix to NFS path exported to k8s clusters.
+k8s_nfs_prefix: "{{ k8s_nfs_prefix }}"
+
+# Easy password.
+easy_password: "{{ vault.easy_password }}"
+
+# The hostname of the K8s NFS server.
+k8s_nfs_server: "{{ groups['k8s_nfs'][0] }}"
+
+# S3 bucket for this cluster.
+k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_cluster }}"
+
+# GitHub token.
+k8s_github_token: "{{ vault.github.tokens.clusters[k8s_cluster] }}"
+
+# Storage directory.
+k8s_storage_dir: '/mnt/host/k8s'
+
+# Plex Media Server directory.
+plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
+
+# Mounts for Plex.
+plex_nfs_mounts:
+  - path: '/Movies'
+    server: 'uller'
+    server_path: '/volume1/Video/Movies'
+    safe_path: 'Movies'
+  - path: '/TV'
+    server: 'uller'
+    server_path: '/volume1/Video/TV'
+    safe_path: 'TV'
+  - path: '/YouTube'
+    server: 'uller'
+    server_path: '/volume1/Video/YouTube'
+    safe_path: 'YouTube'
+  - path: '/Music'
+    server: 'uller'
+    server_path: '/volume1/Music'
+    safe_path: 'Music'
+  - path: '/Podcasts'
+    server: 'uller'
+    server_path: '/volume1/Podcasts'
+    safe_path: 'Podcasts'
+
+# The root path shared with Traefik for its configuration.
+traefik_site_proxy_data_dir: '/traefik_site_proxy'
+
+# LetsEncrypt personal domain resolver name.
+letsencrypt_personal_domain_resolver: "{{ my.private.domain | splitext | first }}"
+
+# The root directory for torrent data.
+torrent_data_path: '/torrents'
+
+# The actual instances (an array of objects).
+torrent_client_instances: "{{ vault.torrents.instances }}"
+# Don't reuse IDs!
+# - id: 3
+#   name: debian
+
+# Announcement URL domain -> tracker name map.
+torrent_domains_announce_map: "{{ vault.torrents.announce_map }}"
+
 #########################
 # hellholt.setup_host
 #########################
@@ -292,88 +373,3 @@ sh_nfs_images_server: 'uller'
 
 # Images NFS share.
 sh_nfs_images_path: '/volume1/Images'
-
-#########################
-# hellholt.kubernetes
-#########################
-
-# All K8s hosts, regardless of role or cluster.
-k8s_hosts: "{{ groups['k8s'] }}"
-# All K8s masters, regardless of cluster.
-k8s_master_hosts: "{{ groups['k8s_masters'] }}"
-# All K8s nodes, regardless of cluster.
-k8s_node_hosts: "{{ groups['k8s_nodes'] }}"
-# All K8s hosts in this cluster.
-k8s_cluster_hosts: "{{ groups[k8s_cluster] }}"
-
-# Name and password of IAM user for cluster.
-k8s_aws_iam_cluster_user: "{{ cluster_aws_iam_user_prefix }}{{ k8s_cluster }}"
-k8s_aws_iam_cluster_password: "{{ cluster_aws_iam_password }}"
-
-# Pattern for which SSM parameters this cluster is permitted to access.
-k8s_aws_ssm_policy_pattern: "{{ project_name }}.clusters.{{ k8s_cluster }}.*"
-
-# Prefix of SSM parameter store data for cluster.
-k8s_aws_iam_cluster_ssm_parameter_store_data_prefix: "{{ project_name }}.clusters."
-
-# Prefix to NFS path exported to k8s clusters.
-k8s_nfs_prefix: "{{ k8s_nfs_prefix }}"
-
-# Easy password.
-easy_password: "{{ vault.easy_password }}"
-
-# The hostname of the K8s NFS server.
-k8s_nfs_server: "{{ groups['k8s_nfs'][0] }}"
-
-# S3 bucket for this cluster.
-k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_cluster }}"
-
-# GitHub token.
-k8s_github_token: "{{ vault.github.tokens.clusters[k8s_cluster] }}"
-
-# Storage directory.
-k8s_storage_dir: '/mnt/host/k8s'
-
-# Plex Media Server directory.
-plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
-
-# Mounts for Plex.
-plex_nfs_mounts:
-  - path: '/Movies'
-    server: 'uller'
-    server_path: '/volume1/Video/Movies'
-    safe_path: 'Movies'
-  - path: '/TV'
-    server: 'uller'
-    server_path: '/volume1/Video/TV'
-    safe_path: 'TV'
-  - path: '/YouTube'
-    server: 'uller'
-    server_path: '/volume1/Video/YouTube'
-    safe_path: 'YouTube'
-  - path: '/Music'
-    server: 'uller'
-    server_path: '/volume1/Music'
-    safe_path: 'Music'
-  - path: '/Podcasts'
-    server: 'uller'
-    server_path: '/volume1/Podcasts'
-    safe_path: 'Podcasts'
-
-# The root path shared with Traefik for its configuration.
-traefik_site_proxy_data_dir: '/traefik_site_proxy'
-
-# LetsEncrypt personal domain resolver name.
-letsencrypt_personal_domain_resolver: "{{ my.private.domain | splitext | first }}"
-
-# The root directory for torrent data.
-torrent_data_path: '/torrents'
-
-# The actual instances (an array of objects).
-torrent_client_instances: "{{ vault.torrents.instances }}"
-# Don't reuse IDs!
-# - id: 3
-#   name: debian
-
-# Announcement URL domain -> tracker name map.
-torrent_domains_announce_map: "{{ vault.torrents.announce_map }}"
