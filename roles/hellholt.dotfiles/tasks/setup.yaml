@@ -1,7 +1,7 @@
 ---
 - name: 'Set YADM facts.'
   ansible.builtin.set_fact:
-    sh_yadm_repo_paths_by_os:
+    dot_yadm_repo_paths_by_os:
       Debian: '~/.yadm/repo.git'
       Ubuntu: '~/.local/share/yadm/repo.git'
       MacOSX: '~/.local/share/yadm/repo.git'
@@ -9,19 +9,18 @@
 
 - name: 'Set more YADM facts.'
   ansible.builtin.set_fact:
-    sh_yadm_repo_path: "{{ sh_yadm_repo_paths_by_os[ansible_distribution] | default(ansible_distribution['default']) }}"
+    dot_yadm_repo_path: "{{ dot_yadm_repo_paths_by_os[ansible_distribution] | default(ansible_distribution['default']) }}"
 
 - name: 'YADM bootstrap (root).'
   ansible.builtin.command:
-    cmd: "yadm clone --bootstrap {{ sh_dotfiles_repo }} -b main"
-    creates: "{{ sh_yadm_repo_path }}"
+    cmd: "yadm clone --bootstrap {{ dot_dotfiles_repo }} -b main"
+    creates: "{{ dot_yadm_repo_path }}"
+  become: yes
 
 - name: 'YADM bootstrap (normal user).'
-  become: yes
-  become_user: "{{ sh_normal_user_name }}"
   ansible.builtin.command:
-    cmd: "yadm clone --bootstrap {{ sh_dotfiles_repo }} -b main"
-    creates: "{{ sh_yadm_repo_path }}"
+    cmd: "yadm clone --bootstrap {{ dot_dotfiles_repo }} -b main"
+    creates: "{{ dot_yadm_repo_path }}"
 
 - name: 'Update dotfiles (root).'
   ansible.builtin.cron:
@@ -29,12 +28,19 @@
     special_time: 'daily'
     job: |
       /bin/bash -lc 'yadm pull' > /dev/null
+  ignore_errors: yes
+  become: yes
 
 - name: 'Update dotfiles (normal user).'
-  become: yes
-  become_user: "{{ sh_normal_user_name }}"
   ansible.builtin.cron:
     name: 'update-dotfiles'
     special_time: 'daily'
     job: |
       /bin/bash -lc 'yadm pull' > /dev/null
+  ignore_errors: yes
+
+- name: 'Set up the Bash prompt.'
+  ansible.builtin.include_tasks: 'setup_bash_prompt.yaml'
+
+- name: 'Set up the Message-of-the-Day.'
+  ansible.builtin.include_tasks: 'setup_motd.yaml'

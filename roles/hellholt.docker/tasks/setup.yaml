@@ -1,0 +1,16 @@
+---
+- name: 'Set up Docker and related utilities.'
+  remote_user: 'root'
+  block:
+
+    - name: 'Set up Docker.'
+      ansible.builtin.include_tasks: 'setup_docker.yaml'
+
+    - name: 'Set up Traefik local proxy.'
+      ansible.builtin.include_tasks: 'setup_traefik.yaml'
+
+    - name: 'Set up Watchtower.'
+      ansible.builtin.include_tasks: 'setup_watchtower.yaml'
+
+    - name: 'Set up Portainer.'
+      ansible.builtin.include_tasks: 'setup_portainer.yaml'

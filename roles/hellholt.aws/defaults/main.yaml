@@ -1,0 +1,43 @@
+---
+# Clean, simple hostname.
+aws_hostname: "{{ inventory_hostname | splitext | first | lower }}"
+
+# Name of IAM user for host.
+aws_iam_host_user: "ndsh_{{ aws_hostname }}"
+aws_iam_host_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
+
+# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
+aws_region: 'us-east-1'
+aws_account_id: null
+aws_access_key_id: null
+aws_secret_access_key: null
+
+# Parameter pattern for SSM parameters for which the SSM policy should permit access.
+aws_iam_ssm_policy_pattern: "{{ aws_hostname }}.*"
+
+# S3 bucket for this host.
+aws_s3_bucket_name: "hosts.{{ aws_hostname }}"
+
+# Prefix of SSM parameter store data for host.
+aws_iam_host_ssm_parameter_store_data_prefix: null
+
+# Name of SSM parameter store data for host.
+aws_iam_host_ssm_parameter_store_data_name: "{{ aws_iam_host_ssm_parameter_store_data_prefix }}{{ aws_hostname }}.host_data"
+
+# A private domain name.
+aws_private_domain_name: 'example.net'
+# A personal domain name.
+aws_personal_domain_name: 'example.com'
+
+# A Route 53 "private" zone ID.
+aws_route53_private_zone_id: null
+# A Route 53 "personal" zone ID.
+aws_route53_personal_zone_id: null
+
+# A "private" FQDN.
+aws_private_fqdn: "{{ aws_hostname }}.{{ aws_private_domain_name }}"
+# A "personal" FQDN.
+aws_personal_fqdn: "{{ aws_hostname }}.{{ aws_personal_domain_name }}"
+
+# The IP address of this host.
+aws_ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"

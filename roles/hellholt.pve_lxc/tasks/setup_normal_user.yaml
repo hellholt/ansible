@@ -1,0 +1,53 @@
+---
+- name: 'Run host-specific setup.'
+  remote_user: 'root'
+  block:
+
+    - name: 'Create sudo group.'
+      ansible.builtin.group:
+        name: 'sudo'
+        state: 'present'
+
+    - name: 'Create a password for the user account.'
+      ansible.builtin.set_fact:
+        pve_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
+
+    - name: 'Create normal user account.'
+      ansible.builtin.user:
+        name: "{{ pve_normal_user_name }}"
+        password: "{{ pve_password | password_hash('sha512', pve_hostname) }}"
+        shell: '/bin/bash'
+        append: yes
+        groups: 'sudo'
+        create_home: yes
+
+    - name: 'Set SSH keys for user account.'
+      ansible.posix.authorized_key:
+        user: "{{ pve_normal_user_name }}"
+        state: 'present'
+        key: "{{ pve_pubkey_item }}"
+      become: yes
+      become_user: "{{ pve_normal_user_name }}"
+      loop: "{{ pve_admin_ssh_public_keys }}"
+      loop_control:
+        index_var: 'pve_pubkey_index'
+        loop_var: 'pve_pubkey_item'
+
+    - name: 'Create an SSH key for the normal user.'
+      community.crypto.openssh_keypair:
+        path: '~/.ssh/id_rsa'
+        comment: "{{ pve_normal_user_name }}@{{ pve_hostname }}"
+        owner: "{{ pve_normal_user_name }}"
+        mode: 0600
+        regenerate: 'full_idempotence'
+        size: 4096
+        type: 'rsa'
+      become: yes
+      become_user: "{{ pve_normal_user_name }}"
+
+    - name: 'Enable passwordless sudo.'
+      ansible.builtin.copy:
+        content: "{{ pve_normal_user_name }} ALL=(ALL:ALL) NOPASSWD:ALL"
+        dest: "/etc/sudoers.d/{{ pve_normal_user_name }}"
+        mode: 0644
+      when: 'pve_enable_passwordless_sudo is true'

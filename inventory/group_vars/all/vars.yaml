@@ -110,7 +110,142 @@ local_share_prefix: '/leo/local/hosts'
 # the general case below.
 
 #########################
-# hellholt.proxmox
+# hellholt.aws
+#########################
+
+# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
+aws_region: "{{ vault.aws.defaults.region }}"
+aws_account_id: "{{ vault.aws.defaults.account_id }}"
+aws_access_key_id: "{{ vault.aws.profiles.main.key_id }}"
+aws_secret_access_key: "{{ vault.aws.profiles.main.secret_key }}"
+
+# Parameter pattern for SSM parameters for which the SSM policy should permit access.
+aws_iam_ssm_policy_pattern: "{{ aws_hostname }}.*"
+
+# S3 bucket for this host.
+aws_s3_bucket_name: "hosts.{{ aws_hostname }}"
+
+# Prefix of SSM parameter store data for host.
+aws_iam_host_ssm_parameter_store_data_prefix: null
+
+# Name of SSM parameter store data for host.
+aws_iam_host_ssm_parameter_store_data_name: "{{ aws_iam_host_ssm_parameter_store_data_prefix }}{{ aws_hostname }}.host_data"
+
+# A private domain name.
+aws_private_domain_name: "{{ my.domains.private }}"
+# A personal domain name.
+aws_personal_domain_name: "{{ my.domains.personal }}"
+
+# A Route 53 "private" zone ID.
+aws_route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
+# A Route 53 "personal" zone ID.
+aws_route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
+
+# A "private" FQDN.
+aws_private_fqdn: "{{ aws_hostname }}.{{ aws_private_domain_name }}"
+# A "personal" FQDN.
+aws_personal_fqdn: "{{ aws_hostname }}.{{ aws_personal_domain_name }}"
+
+# The IP address of this host.
+aws_ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+
+#########################
+# hellholt.docker
+#########################
+
+# Log in to Docker Hub?
+dck_docker_hub_login: yes
+dck_docker_hub_username: "{{ vault.docker.hub.username }}"
+dck_docker_hub_password: "{{ vault.docker.hub.password }}"
+
+# Traefik directory.
+dck_traefik_dir: '/mnt/host/traefik'
+
+# LetsEncrypt certificate resolver name.
+dck_letsencrypt_resolver_name: "{{ my.domains.private | splitext | first }}"
+
+# LetsEncrypt email address.
+dck_letsencrypt_email:  "letsencrypt@{{ my.domains.private }}"
+
+# AWS credentials
+dck_aws_access_key_id: "{{ vault.aws.profiles.main.key_id }}"
+dck_aws_secret_access_key: "{{ vault.aws.profiles.main.secret_key }}"
+
+# A private domain name.
+dck_private_domain_name: "{{ my.domains.private }}"
+# A personal domain name.
+dck_personal_domain_name: "{{ my.domains.personal }}"
+
+# Normal (i.e. non-root) username.
+dck_normal_user_name: "{{ my.name.lower }}"
+
+#########################
+# hellholt.dotfiles
+#########################
+
+# A normal (i.e. non-root) username.
+dot_normal_user_name: "{{ my.name.lower }}"
+
+# Dotfiles repository.
+dot_dotfiles_repo: 'https://github.com/hellholt/dotfiles.git'
+
+# Assets base URL.
+dot_assets_base_url: 'https://raw.githubusercontent.com/hellholt/assets/main'
+
+# MOTD base URL, from which MOTD text files can be retrieved.
+dot_motd_base_url: "{{ dot_assets_base_url }}/images/houses/ansi/64"
+
+#########################
+# hellholt.pve_lxc
+#########################
+
+# Explicitly set the hostname instead of e.g. "debian", "nug-dougs-macbook-pro," etc.
+pve_set_hostname: yes
+
+# Some potential security risk, depending on what you run on the host.
+pve_enable_passwordless_sudo: yes
+
+# Create a non-root user.
+pve_create_normal_user: yes
+
+# This can take a while and should be avoided when possible.
+pve_install_common_packages: yes
+
+# A normal (i.e. non-root) username.
+pve_normal_user_name: "{{ my.name.lower }}"
+
+# Set the sh_hostname to the hostname.
+pve_hostname: "{{ hostname }}"
+
+# My local timezone.
+pve_local_timezone: "{{ my.local.timezone }}"
+
+# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
+pve_aws_region: "{{ vault.aws.defaults.region }}"
+pve_aws_account_id: "{{ vault.aws.defaults.account_id }}"
+pve_aws_route53_access_key_id: "{{ vault.aws.profiles.route53.key_id }}"
+pve_aws_route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
+
+# I have three domain names I use for networks:
+# - "private", which resolves to LAN IP addresses (e.g. 192.168.x.x).
+# - "personal", which resolves to my home IP address (e.g. 69.420.x.x).
+# - "public", which is hosted in the cloud and hosts my blog, etc.
+#
+# Some FQDNs are used only internally, some only externally, some both,
+# and some neither.  They're easy to calculate and populate.
+#
+# In this context, I don't really use my "public" domain name.
+
+# A private domain name.
+pve_private_domain_name: "{{ my.domains.private }}"
+# A personal domain name.
+pve_personal_domain_name: "{{ my.domains.personal }}"
+
+pve_admin_ssh_public_keys: "{{ admin_ssh_public_keys }}"
+pve_admin_ssh_public_key: "{{ admin_ssh_public_key }}"
+
+#########################
+# hellholt.pve_node
 #########################
 
 # By default, use Ubuntu 21.04 as our template.

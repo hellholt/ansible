@@ -1,0 +1,50 @@
+---
+- name: 'Set a fact for the user.'
+  ansible.builtin.set_fact:
+    pve_user: "{{ ansible_env.SUDO_USER | default(ansible_env.USER, true) | default(ansible_user_id, true) | default('root') }}"
+  become: no
+  when: 'pve_user is not defined'
+
+- name: 'Run a command to determine the user''s primary group.'
+  ansible.builtin.command:
+    cmd: 'id -gn'
+  register: 'pve_group_command'
+  when: 'pve_group is not defined'
+  changed_when: no
+
+- name: 'Run a command to determine the user''s uid.'
+  ansible.builtin.command:
+    cmd: 'id -u'
+  register: 'pve_uid_command'
+  when: 'pve_uid is not defined'
+  changed_when: no
+
+- name: 'Run a command to determine the user''s primary gid.'
+  ansible.builtin.command:
+    cmd: 'id -g'
+  register: 'pve_gid_command'
+  when: 'pve_gid is not defined'
+  changed_when: no
+
+- name: 'Set a fact for the group.'
+  ansible.builtin.set_fact:
+    pve_group: "{{ pve_group_command.stdout }}"
+  when: 'pve_group is not defined and pve_group_command is defined'
+
+- name: 'Set a fact for the uid.'
+  ansible.builtin.set_fact:
+    pve_uid: "{{ pve_uid_command.stdout | int }}"
+  when: 'pve_uid is not defined and pve_uid_command is defined'
+
+- name: 'Set a fact for the gid.'
+  ansible.builtin.set_fact:
+    pve_gid: "{{ pve_gid_command.stdout | int }}"
+  when: 'pve_gid is not defined and pve_gid_command is defined'
+
+- name: 'Set a fact for the user @ hostname.'
+  ansible.builtin.set_fact:
+    pve_user_at_hostname: "{{ ( pve_user + '@' + pve_hostname ) | lower }}"
+
+- name: 'Set a fact for the host email address.'
+  ansible.builtin.set_fact:
+    sh_host_email_address: "{{ pve_hostname }}@{{ pve_host_email_domain }}"

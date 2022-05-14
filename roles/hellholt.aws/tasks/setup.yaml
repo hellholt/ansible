@@ -1,0 +1,181 @@
+---
+- name: 'AWS IAM user management.'
+  delegate_to: 'localhost'
+  block:
+
+    - name: 'Create an AWS IAM user for this host.'
+      community.aws.iam:
+        aws_access_key: "{{ aws_access_key_id }}"
+        aws_secret_key: "{{ aws_secret_access_key }}"
+        region: "{{ aws_region }}"
+        iam_type: 'user'
+        name: "{{ aws_iam_host_user }}"
+        state: 'present'
+        password: "{{ aws_iam_host_password }}"
+        update_password: 'on_create'
+        access_key_state: 'create'
+        key_count: 0
+
+    - name: 'Create or update IAM policy for host.'
+      community.aws.iam_policy:
+        aws_access_key: "{{ aws_access_key_id }}"
+        aws_secret_key: "{{ aws_secret_access_key }}"
+        region: "{{ aws_region }}"
+        iam_type: 'user'
+        iam_name: "{{ aws_iam_host_user }}"
+        policy_name: "{{ aws_iam_host_user }}_policy"
+        state: 'present'
+        skip_duplicates: no
+        policy_json: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "SsmPolicyStatement",
+                "Effect": "Allow",
+                "Action": [
+                  "ssm:GetParameterHistory",
+                  "ssm:GetParametersByPath",
+                  "ssm:GetParameters",
+                  "ssm:GetParameter",
+                  "ssm:PutParameter"
+                ],
+                "Resource": "arn:aws:ssm:*:{{ aws_account_id }}:parameter/{{ aws_iam_ssm_policy_pattern }}"
+              },
+              {
+                "Sid": "S3BucketPolicyStatement",
+                "Effect": "Allow",
+                "Action": "s3:*",
+                "Resource": [
+                  "arn:aws:s3:::{{ aws_s3_bucket_name }}",
+                  "arn:aws:s3:::{{ aws_s3_bucket_name }}/*"
+                ]
+              }
+            ]
+          }
+
+    - name: 'Create S3 bucket.'
+      amazon.aws.s3_bucket:
+        aws_access_key: "{{ aws_access_key_id }}"
+        aws_secret_key: "{{ aws_secret_access_key }}"
+        region: "{{ aws_region }}"
+        name: "{{ aws_s3_bucket_name }}"
+        state: 'present'
+        versioning: no
+
+    - name: 'Retrieve host data for this host.'
+      block:
+
+        - name: 'Lookup host data for this host.'
+          ansible.builtin.set_fact:
+            aws_iam_host_data: "{{ lookup('amazon.aws.aws_ssm', aws_iam_host_ssm_parameter_store_data_name, aws_access_key=aws_access_key_id, aws_secret_key=aws_secret_access_key) | from_json }}"
+
+      rescue:
+
+        - name: 'Set a safe default fact.'
+          ansible.builtin.set_fact:
+            aws_iam_host_data: {}
+
+    - name: 'Set facts for access key ID and secret access key.'
+      ansible.builtin.set_fact:
+        host_iam_access_key_id: "{{ aws_iam_host_data.access_key_id | default('') }}"
+        host_iam_secret_access_key: "{{ aws_iam_host_data.secret_access_key | default('') }}"
+
+    - name: 'Create a new access key ID and secret access key.'
+      when: 'not host_iam_access_key_id or not host_iam_secret_access_key'
+      block:
+
+        - name: 'Create and retrieve access key.'
+          ansible.builtin.command:
+            cmd: "aws iam create-access-key --user-name {{ iam_host_user }}"
+          environment:
+            AWS_REGION: '{{ aws_region }}'
+            AWS_ACCESS_KEY_ID: '{{ aws_access_key_id }}'
+            AWS_SECRET_ACCESS_KEY: '{{ aws_secret_access_key }}'
+          register: 'aws_iam_access_key_command'
+
+        - name: 'Get access key ID and secret access key from command output.'
+          ansible.builtin.set_fact:
+            aws_iam_access_key_output: "{{ aws_iam_access_key_command.stdout | from_json }}"
+
+        - name: 'Set new access key ID and secret access key.'
+          ansible.builtin.set_fact:
+            host_iam_new_access_key_id: "{{ aws_iam_access_key_output.AccessKey.AccessKeyId }}"
+            host_iam_new_secret_access_key: "{{ aws_iam_access_key_output.AccessKey.SecretAccessKey }}"
+
+        - name: 'Set new host data.'
+          ansible.builtin.set_fact:
+            aws_iam_new_host_data:
+              access_key_id: "{{ host_iam_new_access_key_id }}"
+              secret_access_key: "{{ host_iam_new_secret_access_key }}"
+
+        - name: 'Rebuild host data.'
+          ansible.builtin.set_fact:
+            aws_iam_host_data: "{{ aws_iam_host_data | default({}) | combine(aws_iam_new_host_data) }}"
+
+        - name: 'Update access key ID and secret access key.'
+          community.aws.aws_ssm_parameter_store:
+            name: "{{ aws_iam_host_ssm_parameter_store_data_name }}"
+            description: "Host data for {{ aws_hostname }}"
+            string_type: 'SecureString'
+            value: "{{ aws_iam_host_data | to_nice_json }}"
+
+        - name: 'Finally, set variables appropriately.'
+          ansible.builtin.set_fact:
+            host_iam_access_key_id: "{{ host_iam_new_access_key_id }}"
+            host_iam_secret_access_key: "{{ host_iam_new_secret_access_key }}"
+
+    - name: 'Create privately-resolvable DNS records for the host.'
+      delegate_to: 'localhost'
+      community.aws.route53:
+        aws_access_key: "{{ aws_access_key_id }}"
+        aws_secret_key: "{{ aws_secret_access_key }}"
+        overwrite: yes
+        hosted_zone_id: "{{ aws_route53_private_zone_id }}"
+        state: 'present'
+        type: 'A'
+        record: "{{ aws_private_fqdn }}"
+        value: "{{ aws_ipv4_address }}"
+
+    - name: 'Create privately-resolvable wildcard DNS records for the host.'
+      delegate_to: 'localhost'
+      community.aws.route53:
+        aws_access_key: "{{ aws_access_key_id }}"
+        aws_secret_key: "{{ aws_secret_access_key }}"
+        alias: yes
+        alias_hosted_zone_id: "{{ aws_route53_private_zone_id }}"
+        overwrite: yes
+        hosted_zone_id: "{{ aws_route53_private_zone_id }}"
+        state: 'present'
+        type: 'A'
+        record: "*.{{ aws_private_fqdn }}"
+        value: "{{ aws_private_fqdn }}"
+
+    - name: 'Create publicly-resolvable DNS records for the host.'
+      delegate_to: 'localhost'
+      community.aws.route53:
+        aws_access_key: "{{ aws_access_key_id }}"
+        aws_secret_key: "{{ aws_secret_access_key }}"
+        alias: yes
+        alias_hosted_zone_id: "{{ sh_route53_personal_zone_id }}"
+        overwrite: yes
+        hosted_zone_id: "{{ sh_route53_personal_zone_id }}"
+        state: 'present'
+        type: 'A'
+        record: "{{ aws_personal_fqdn }}"
+        value: "{{ aws_personal_domain_name }}"
+
+    - name: 'Create publicly-resolvable wildcard DNS records for the host.'
+      delegate_to: 'localhost'
+      community.aws.route53:
+        aws_access_key: "{{ aws_access_key_id }}"
+        aws_secret_key: "{{ aws_secret_access_key }}"
+        alias: yes
+        alias_hosted_zone_id: "{{ sh_route53_personal_zone_id }}"
+        overwrite: yes
+        hosted_zone_id: "{{ sh_route53_personal_zone_id }}"
+        state: 'present'
+        type: 'A'
+        record: "*.{{ aws_personal_fqdn }}"
+        value: "{{ aws_personal_fqdn }}"
+

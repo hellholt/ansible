@@ -1,15 +1,13 @@
 ---
-- name: 'Copy Bash prompt template script.'
+- name: 'Copy Bash prompt template script (root).'
   ansible.builtin.template:
     src: "{{ role_path }}/templates/bash_prompt_local.sh.j2"
     dest: '~/.bash_prompt_local'
   changed_when: no
-
-- name: 'Copy Bash prompt template script.'
   become: yes
-  become_user: "{{ sh_normal_user_name }}"
+
+- name: 'Copy Bash prompt template script (normal user).'
   ansible.builtin.template:
     src: "{{ role_path }}/templates/bash_prompt_local.sh.j2"
     dest: '~/.bash_prompt_local'
   changed_when: no
-

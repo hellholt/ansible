@@ -56,7 +56,7 @@
       features: "{{ pve_features }}"
       state: 'present'
       storage: 'local'
-      pubkey: "{{ pve_ssh_pub_key }}"
+      pubkey: "{{ pve_admin_ssh_public_key }}"
       proxmox_default_behavior: 'no_defaults'
       timeout: 600
 
@@ -87,3 +87,23 @@
     remote_user: 'root'
     ansible.builtin.wait_for_connection:
 
+  - name: 'Create an SSH key for root.'
+    community.crypto.openssh_keypair:
+      path: '~/id_rsa'
+      comment: "root@{{ pve_hostname }}"
+      owner: 'root'
+      group: 'root'
+      mode: 0600
+      regenerate: 'full_idempotence'
+      size: 4096
+      type: 'rsa'
+
+  - name: 'Set SSH keys for root account.'
+    ansible.posix.authorized_key:
+      user: 'root'
+      state: 'present'
+      key: "{{ pve_pubkey_item }}"
+    loop: "{{ pve_admin_ssh_public_keys }}"
+    loop_control:
+      index_var: 'pve_pubkey_index'
+      loop_var: 'pve_pubkey_item'
