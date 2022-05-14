@@ -21,7 +21,7 @@
           traefik.enable: 'true'
           traefik.http.routers.watchtower.rule: "HostRegexp(`watchtower.{{ dck_private_fqdn }}`, `{subdomain:[a-z0-9-]+}.watchtower.{{ dck_private_fqdn }}`)"
           traefik.http.routers.watchtower.tls: 'true'
-          traefik.http.routers.watchtower.tls.certresolver: "{{ dck_letsencrypt_resolver_name }}"
+          traefik.http.routers.watchtower.tls.certresolver: "{{ letsencrypt_private_domain_resolver }}"
           traefik.http.routers.watchtower.tls.domains[0].main: "watchtower.{{ dck_private_fqdn }}"
           traefik.http.routers.watchtower.tls.domains[0].sans: "*.watchtower.{{ dck_private_fqdn }}"
           traefik.http.routers.watchtower.service: 'watchtower'

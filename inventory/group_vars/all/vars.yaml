@@ -9,7 +9,7 @@ admin_ssh_public_keys:
 admin_ssh_public_key: "{{ admin_ssh_public_keys[0] }}"
 
 # A clean, consistent version of the hostname.
-hostname: "{{ inventory_hostname | splitext | first | lower }}"
+clean_hostname: "{{ ansible_hostname | splitext | first | lower }}"
 
 # Just the name of the project as a whole.  This will be used in a few places.
 project_name: 'hellholt'
@@ -109,122 +109,35 @@ local_share_prefix: '/leo/local/hosts'
 # can scope and control them accordingly.  I then set reasonable defaults for
 # the general case below.
 
-#########################
-# hellholt.aws
-#########################
-
 # Account ID, access key, etc used to create policies, users, Route 53 records, etc.
 aws_region: "{{ vault.aws.defaults.region }}"
 aws_account_id: "{{ vault.aws.defaults.account_id }}"
-aws_access_key_id: "{{ vault.aws.profiles.main.key_id }}"
-aws_secret_access_key: "{{ vault.aws.profiles.main.secret_key }}"
+aws_default_access_key_id: "{{ vault.aws.profiles.main.key_id }}"
+aws_default_secret_access_key: "{{ vault.aws.profiles.main.secret_key }}"
+route53_access_key_id: "{{ vault.aws.profiles.route53.key_id }}"
+route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
 
 # Parameter pattern for SSM parameters for which the SSM policy should permit access.
-aws_iam_ssm_policy_pattern: "{{ aws_hostname }}.*"
+aws_iam_ssm_policy_pattern: "{{ clean_hostname }}.*"
 
 # S3 bucket for this host.
-aws_s3_bucket_name: "hosts.{{ aws_hostname }}"
+lxc_s3_bucket_name: "hosts.{{ clean_hostname }}"
 
 # Prefix of SSM parameter store data for host.
 aws_iam_host_ssm_parameter_store_data_prefix: null
 
 # Name of SSM parameter store data for host.
-aws_iam_host_ssm_parameter_store_data_name: "{{ aws_iam_host_ssm_parameter_store_data_prefix }}{{ aws_hostname }}.host_data"
+aws_iam_host_ssm_parameter_store_data_name: "{{ aws_iam_host_ssm_parameter_store_data_prefix }}{{ clean_hostname }}.host_data"
 
 # A private domain name.
-aws_private_domain_name: "{{ my.domains.private }}"
+private_domain_name: "{{ my.domains.private }}"
 # A personal domain name.
-aws_personal_domain_name: "{{ my.domains.personal }}"
+personal_domain_name: "{{ my.domains.personal }}"
 
 # A Route 53 "private" zone ID.
-aws_route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
+route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
 # A Route 53 "personal" zone ID.
-aws_route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
-
-# A "private" FQDN.
-aws_private_fqdn: "{{ aws_hostname }}.{{ aws_private_domain_name }}"
-# A "personal" FQDN.
-aws_personal_fqdn: "{{ aws_hostname }}.{{ aws_personal_domain_name }}"
-
-# The IP address of this host.
-aws_ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
-
-#########################
-# hellholt.docker
-#########################
-
-# Log in to Docker Hub?
-dck_docker_hub_login: yes
-dck_docker_hub_username: "{{ vault.docker.hub.username }}"
-dck_docker_hub_password: "{{ vault.docker.hub.password }}"
-
-# Traefik directory.
-dck_traefik_dir: '/mnt/host/traefik'
-
-# LetsEncrypt certificate resolver name.
-dck_letsencrypt_resolver_name: "{{ my.domains.private | splitext | first }}"
-
-# LetsEncrypt email address.
-dck_letsencrypt_email:  "letsencrypt@{{ my.domains.private }}"
-
-# AWS credentials
-dck_aws_access_key_id: "{{ vault.aws.profiles.main.key_id }}"
-dck_aws_secret_access_key: "{{ vault.aws.profiles.main.secret_key }}"
-
-# A private domain name.
-dck_private_domain_name: "{{ my.domains.private }}"
-# A personal domain name.
-dck_personal_domain_name: "{{ my.domains.personal }}"
-
-# Normal (i.e. non-root) username.
-dck_normal_user_name: "{{ my.name.lower }}"
-
-#########################
-# hellholt.dotfiles
-#########################
-
-# A normal (i.e. non-root) username.
-dot_normal_user_name: "{{ my.name.lower }}"
-
-# Dotfiles repository.
-dot_dotfiles_repo: 'https://github.com/hellholt/dotfiles.git'
-
-# Assets base URL.
-dot_assets_base_url: 'https://raw.githubusercontent.com/hellholt/assets/main'
-
-# MOTD base URL, from which MOTD text files can be retrieved.
-dot_motd_base_url: "{{ dot_assets_base_url }}/images/houses/ansi/64"
-
-#########################
-# hellholt.pve_lxc
-#########################
-
-# Explicitly set the hostname instead of e.g. "debian", "nug-dougs-macbook-pro," etc.
-pve_set_hostname: yes
-
-# Some potential security risk, depending on what you run on the host.
-pve_enable_passwordless_sudo: yes
-
-# Create a non-root user.
-pve_create_normal_user: yes
-
-# This can take a while and should be avoided when possible.
-pve_install_common_packages: yes
-
-# A normal (i.e. non-root) username.
-pve_normal_user_name: "{{ my.name.lower }}"
-
-# Set the sh_hostname to the hostname.
-pve_hostname: "{{ hostname }}"
-
-# My local timezone.
-pve_local_timezone: "{{ my.local.timezone }}"
-
-# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
-pve_aws_region: "{{ vault.aws.defaults.region }}"
-pve_aws_account_id: "{{ vault.aws.defaults.account_id }}"
-pve_aws_route53_access_key_id: "{{ vault.aws.profiles.route53.key_id }}"
-pve_aws_route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
+route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
 
 # I have three domain names I use for networks:
 # - "private", which resolves to LAN IP addresses (e.g. 192.168.x.x).
@@ -236,106 +149,85 @@ pve_aws_route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
 #
 # In this context, I don't really use my "public" domain name.
 
-# A private domain name.
-pve_private_domain_name: "{{ my.domains.private }}"
-# A personal domain name.
-pve_personal_domain_name: "{{ my.domains.personal }}"
+# A "private" FQDN.
+aws_private_fqdn: "{{ clean_hostname }}.{{ private_domain_name }}"
+# A "personal" FQDN.
+aws_personal_fqdn: "{{ clean_hostname }}.{{ personal_domain_name }}"
 
-pve_admin_ssh_public_keys: "{{ admin_ssh_public_keys }}"
-pve_admin_ssh_public_key: "{{ admin_ssh_public_key }}"
+# Log in to Docker Hub?
+docker_hub_login: yes
+docker_hub_username: "{{ vault.docker.hub.username }}"
+docker_hub_password: "{{ vault.docker.hub.password }}"
 
-#########################
-# hellholt.pve_node
-#########################
+# Traefik directory.
+traefik_data_dir: '/mnt/host/traefik'
+
+# LetsEncrypt certificate resolver name.
+letsencrypt_private_domain_resolver: "{{ my.domains.private | splitext | first }}"
+
+# LetsEncrypt email address.
+letsencrypt_email_address:  "letsencrypt@{{ my.domains.private }}"
+
+# A normal (i.e. non-root) username.
+normal_user_name: "{{ my.name.lower }}"
+
+# Dotfiles repository.
+dotfiles_repo_url: 'https://github.com/hellholt/dotfiles.git'
+
+# Assets base URL.
+dotfiles_assets_base_url: 'https://raw.githubusercontent.com/hellholt/assets/main'
+
+# MOTD base URL, from which MOTD text files can be retrieved.
+motd_assets_base_url: "{{ dotfiles_assets_base_url }}/images/houses/ansi/64"
+
+# Explicitly set the hostname instead of e.g. "debian", "nug-dougs-macbook-pro," etc.
+explicitly_set_hostname: yes
+
+# Some potential security risk, depending on what you run on the host.
+enable_passwordless_sudo: yes
+
+# Create a non-root user.
+create_normal_user: yes
+
+# This can take a while and should be avoided when possible.
+install_common_packages: yes
+
+# My local timezone.
+local_timezone: "{{ my.local.timezone }}"
 
 # By default, use Ubuntu 21.04 as our template.
-pve_template: 'ubuntu-21.04-standard_21.04-1_amd64.tar.gz'
+default_lxc_template: 'ubuntu-21.04-standard_21.04-1_amd64.tar.gz'
 
-# Set the pve_hostname to the hostname.
-pve_hostname: "{{ hostname }}"
-
-# Set the pve_description to the description.
-pve_description: "{{ description }}"
+# Set the description to the description.
+description: "{{ description }}"
 
 # An ample mount, local storage for all LXC containers.
-pve_default_mount: 'local-lvm:64,mp=/mnt/host,backup=1,size=64G'
+default_lxc_mount: 'local-lvm:64,mp=/mnt/host,backup=1,size=64G'
 
 #########################
 # hellholt.setup_host
 #########################
-
-# Explicitly set the hostname instead of e.g. "debian", "nug-dougs-macbook-pro," etc.
-sh_set_hostname: yes
-
-# Some potential security risk, depending on what you run on the host.
-sh_enable_passwordless_sudo: yes
-
-# Create a non-root user.
-sh_create_normal_user: yes
-
-# This can take a while and should be avoided when possible.
-sh_install_common_packages: yes
-
-# A normal (i.e. non-root) username.
-sh_normal_user_name: "{{ my.name.lower }}"
-
-# Set the sh_hostname to the hostname.
-sh_hostname: "{{ hostname }}"
-
-# My local timezone.
-sh_local_timezone: "{{ my.local.timezone }}"
-
-# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
-sh_aws_region: "{{ vault.aws.defaults.region }}"
-sh_aws_account_id: "{{ vault.aws.defaults.account_id }}"
-sh_aws_main_access_key: "{{ vault.aws.profiles.main.key_id }}"
-sh_aws_main_secret_key: "{{ vault.aws.profiles.main.secret_key }}"
-
-# I have three domain names I use for networks:
-# - "private", which resolves to LAN IP addresses (e.g. 192.168.x.x).
-# - "personal", which resolves to my home IP address (e.g. 69.420.x.x).
-# - "public", which is hosted in the cloud and hosts my blog, etc.
-#
-# Some FQDNs are used only internally, some only externally, some both,
-# and some neither.  They're easy to calculate and populate.
-#
-# In this context, I don't really use my "public" domain name.
-
-# A private domain name.
-sh_private_domain_name: "{{ my.domains.private }}"
-# A personal domain name.
-sh_personal_domain_name: "{{ my.domains.personal }}"
-
-# A Route 53 "private" zone ID.
-sh_route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
-# A Route 53 "personal" zone ID.
-sh_route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
 
 # Name of IAM user for host.
 sh_aws_iam_host_user: "{{ host_aws_iam_user }}"
 sh_aws_iam_host_password: "{{ host_aws_iam_password }}"
 
 # Parameter pattern for SSM parameters for which the SSM policy should permit access.
-sh_aws_ssm_policy_pattern: "{{ project_name }}.hosts.{{ sh_hostname }}.*"
+sh_aws_ssm_policy_pattern: "{{ project_name }}.hosts.{{ clean_hostname }}.*"
 
 # Prefix of SSM parameter store data for host.
 sh_aws_iam_host_ssm_parameter_store_data_prefix: "{{ project_name }}.hosts."
 
-# Docker Hub credentials.
-sh_docker_hub_login: yes
-sh_docker_hub_username: "{{ vault.docker.hub.username }}"
-sh_docker_hub_password: "{{ vault.docker.hub.password }}"
-
 # Borg stuff.
-sh_borg_username: "{{ sh_normal_user_name }}"
+sh_borg_username: "{{ normal_user_name }}"
 sh_borg_server: "{{ my.backup.repo.server }}"
 sh_borg_repo_path: "{{ my.backup.repo.path }}"
-sh_borg_repository: "{{ sh_borg_username }}@{{ sh_borg_server }}:{{ sh_borg_repo_path }}/{{ sh_hostname }}"
-sh_borg_cron_hour: "{{ 6 | random(seed=sh_hostname) }}"
-sh_borg_cron_minute: "{{ 59 | random(seed=sh_hostname) }}"
-sh_borg_cron_checks_day: "{{ 28 | random(seed=sh_hostname) }}"
-sh_borg_cron_checks_hour: "{{ range(7, 24) | random(seed=sh_hostname) }}"
-sh_borg_cron_checks_minute: "{{ 59 | random(seed=sh_hostname) }}"
+sh_borg_repository: "{{ sh_borg_username }}@{{ sh_borg_server }}:{{ sh_borg_repo_path }}/{{ clean_hostname }}"
+sh_borg_cron_hour: "{{ 6 | random(seed=clean_hostname) }}"
+sh_borg_cron_minute: "{{ 59 | random(seed=clean_hostname) }}"
+sh_borg_cron_checks_day: "{{ 28 | random(seed=clean_hostname) }}"
+sh_borg_cron_checks_hour: "{{ range(7, 24) | random(seed=clean_hostname) }}"
+sh_borg_cron_checks_minute: "{{ 59 | random(seed=clean_hostname) }}"
 sh_borg_source_directories: "{{ borg_source_directories }}"
 sh_borg_passphrase: "{{ my.backup.repo.passphrase }}"
 sh_borg_remote_path: '/usr/local/bin/borg'
@@ -353,8 +245,6 @@ sh_k8s_hostnames: "{{ groups['k8s'] }}"
 sh_k8s_master_hostnames: "{{ groups['k8s_masters'] }}"
 # All K8s nodes.
 sh_k8s_node_hostnames: "{{ groups['k8s_nodes'] }}"
-# Prefix to NFS path exported to clusters.
-sh_k8s_nfs_prefix: '/leo/nfs/clusters'
 
 # NFS mount options:
 sh_nfs_mount_options: 'rw,async,no_subtree_check,no_wdelay,crossmnt,insecure,no_root_squash,insecure_locks,sec=sys'
@@ -376,9 +266,6 @@ sh_pihole_password: "{{ vault.easy_password }}"
 # Assets base URL.
 sh_assets_base_url: 'https://raw.githubusercontent.com/hellholt/assets/main'
 
-# MOTD base URL, from which MOTD text files can be retrieved.
-sh_motd_base_url: "{{ sh_assets_base_url }}/images/houses/ansi/64"
-
 # Homer icon base URL.
 sh_homer_icon_base_url: "{{ sh_assets_base_url }}/images/houses/png/64"
 
@@ -388,11 +275,8 @@ sh_gitconfig: "{{ my.gitconfig }}"
 # Dotfiles repository.
 sh_dotfiles_repo: 'https://github.com/hellholt/dotfiles.git'
 
-# Some crap that appears to be too cumbersome to do automatically.
-sh_k8s_cluster_names: "{{ k8s_cluster_names }}"
-
 # S3 bucket for this host.
-sh_s3_bucket_name: "{{ project_name }}.hosts.{{ sh_hostname }}"
+sh_s3_bucket_name: "{{ project_name }}.hosts.{{ clean_hostname }}"
 
 # Kubernetes version.
 sh_kubernetes_version: '1.20'
@@ -413,9 +297,6 @@ sh_nfs_images_path: '/volume1/Images'
 # hellholt.kubernetes
 #########################
 
-# Set the k8s_hostname to the hostname.
-k8s_hostname: "{{ hostname }}"
-
 # All K8s hosts, regardless of role or cluster.
 k8s_hosts: "{{ groups['k8s'] }}"
 # All K8s masters, regardless of cluster.
@@ -424,12 +305,6 @@ k8s_master_hosts: "{{ groups['k8s_masters'] }}"
 k8s_node_hosts: "{{ groups['k8s_nodes'] }}"
 # All K8s hosts in this cluster.
 k8s_cluster_hosts: "{{ groups[k8s_cluster] }}"
-
-# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
-k8s_aws_region: "{{ vault.aws.defaults.region }}"
-k8s_aws_account_id: "{{ vault.aws.defaults.account_id }}"
-k8s_aws_main_access_key: "{{ vault.aws.profiles.main.key_id }}"
-k8s_aws_main_secret_key: "{{ vault.aws.profiles.main.secret_key }}"
 
 # Name and password of IAM user for cluster.
 k8s_aws_iam_cluster_user: "{{ cluster_aws_iam_user_prefix }}{{ k8s_cluster }}"
@@ -441,21 +316,11 @@ k8s_aws_ssm_policy_pattern: "{{ project_name }}.clusters.{{ k8s_cluster }}.*"
 # Prefix of SSM parameter store data for cluster.
 k8s_aws_iam_cluster_ssm_parameter_store_data_prefix: "{{ project_name }}.clusters."
 
-# A private domain name.
-k8s_private_domain_name: "{{ my.domains.private }}"
-# A personal domain name.
-k8s_personal_domain_name: "{{ my.domains.personal }}"
-
-# A Route 53 "private" zone ID.
-k8s_route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
-# A Route 53 "personal" zone ID.
-k8s_route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
-
 # Prefix to NFS path exported to k8s clusters.
-k8s_nfs_prefix: "{{ sh_k8s_nfs_prefix }}"
+k8s_nfs_prefix: "{{ k8s_nfs_prefix }}"
 
 # Easy password.
-k8s_easy_password: "{{ vault.easy_password }}"
+easy_password: "{{ vault.easy_password }}"
 
 # The hostname of the K8s NFS server.
 k8s_nfs_server: "{{ groups['k8s_nfs'][0] }}"
@@ -466,9 +331,8 @@ k8s_s3_bucket_name: "{{ project_name }}.clusters.{{ k8s_cluster }}"
 # GitHub token.
 k8s_github_token: "{{ vault.github.tokens.clusters[k8s_cluster] }}"
 
-#########################
-# hellholt.plex
-#########################
+# Storage directory.
+k8s_storage_dir: '/mnt/host/k8s'
 
 # Plex Media Server directory.
 plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
@@ -496,79 +360,20 @@ plex_nfs_mounts:
     server_path: '/volume1/Podcasts'
     safe_path: 'Podcasts'
 
-#########################
-# hellholt.unifi
-#########################
-
-# AWS access key ID.
-un_route53_access_key_id: "{{ vault.aws.profiles.route53.key_id }}"
-
-# AWS secret access key.
-un_route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
-
-# AWS Route 53 Zone ID.
-un_route53_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
-
-#########################
-# hellholt.traefik_site_proxy
-#########################
-
 # The root path shared with Traefik for its configuration.
-tsp_traefik_dir: '/traefik_site_proxy'
-
-# The personal domain name associated with hosts.
-tsp_personal_domain_name: "{{ my.domains.personal }}"
-
-# The private domain name associated with hosts.
-tsp_private_domain_name: "{{ my.domains.private }}"
-
-# Kubernetes cluster names.
-tsp_k8s_cluster_names: "{{ sh_k8s_cluster_names }}"
-
-# LetsEncrypt email address.
-tsp_letsencrypt_email: "letsencrypt@{{ tsp_private_domain_name }}"
+traefik_site_proxy_data_dir: '/traefik_site_proxy'
 
 # LetsEncrypt personal domain resolver name.
-tsp_letsencrypt_resolver_name: "{{ tsp_personal_domain_name | splitext | first }}"
-
-# AWS Access Key ID.
-tsp_aws_route53_access_key_id: "{{ vault.aws.profiles.route53.key_id }}"
-
-# AWS Secret Access Key.
-tsp_aws_route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
-
-#########################
-# hellholt.transmission
-#########################
-
-# The root path shared with Traefik for its configuration.
-tr_traefik_dir: '/traefik'
-
-# Account ID, access key, etc used to create policies, users, Route 53 records, etc.
-tr_aws_region: "{{ vault.aws.defaults.region }}"
-tr_aws_account_id: "{{ vault.aws.defaults.account_id }}"
-tr_aws_main_access_key: "{{ vault.aws.profiles.route53.key_id }}"
-tr_aws_main_secret_key: "{{ vault.aws.profiles.route53.secret_key }}"
-
-# A private domain name.
-tr_private_domain_name: "{{ my.domains.private }}"
-
-# A Route 53 "private" zone ID.
-tr_route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
-
-# LetsEncrypt private domain resolver name.
-tr_letsencrypt_private_domain_resolver_name: "{{ tr_private_domain_name | splitext | first }}"
-# LetsEncrypt email address.
-tr_letsencrypt_email: "letsencrypt@{{ tr_private_domain_name }}"
+letsencrypt_personal_domain_resolver: "{{ my.private.domain | splitext | first }}"
 
 # The root directory for torrent data.
-tr_root_path: '/torrents'
+torrent_data_path: '/torrents'
 
 # The actual instances (an array of objects).
-tr_instances: "{{ vault.torrents.instances }}"
+torrent_client_instances: "{{ vault.torrents.instances }}"
 # Don't reuse IDs!
 # - id: 3
 #   name: debian
 
 # Announcement URL domain -> tracker name map.
-tr_announce_map: "{{ vault.torrents.announce_map }}"
+torrent_domains_announce_map: "{{ vault.torrents.announce_map }}"

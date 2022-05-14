@@ -21,10 +21,10 @@ un_certresolver: null
 un_host_fqdn: null
 
 # AWS access key ID.
-un_route53_access_key_id: null
+route53_access_key_id: null
 
 # AWS secret access key.
-un_route53_secret_access_key: null
+route53_secret_access_key: null
 
 # AWS Route 53 Zone ID.
-un_route53_zone_id: null
+route53_private_zone_id: null

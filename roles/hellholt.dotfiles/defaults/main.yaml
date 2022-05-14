@@ -1,12 +1,12 @@
 ---
 # Clean, simple hostname.
-dot_hostname: "{{ inventory_hostname | splitext | first | lower }}"
+clean_hostname: "{{ clean_hostname | splitext | first | lower }}"
 
 # Normal (i.e. non-root) username.
-dot_normal_user_name: null
+normal_user_name: null
 
 # Dotfiles repository.
-dot_dotfiles_repo: null
+dotfiles_repo_url: null
 
 # MOTD base URL, from which MOTD text files can be retrieved.
-dot_motd_base_url: null
+motd_assets_base_url: null

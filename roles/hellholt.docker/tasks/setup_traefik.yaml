@@ -5,7 +5,7 @@
 
     - name: 'Create the Traefik configuration directory.'
       ansible.builtin.file:
-        path: "{{ dck_traefik_dir }}/conf.d/"
+        path: "{{ traefik_data_dir }}/conf.d/"
         state: 'directory'
         mode: '0600'
         owner: 'root'
@@ -23,7 +23,7 @@
         recreate: yes
         network_mode: 'host'
         volumes:
-          - "{{ dck_traefik_dir }}:/etc/traefik"
+          - "{{ traefik_data_dir }}:/etc/traefik"
           - '/var/run/docker.sock:/var/run/docker.sock'
         command: |
           --log.level=WARN
@@ -45,12 +45,12 @@
           --entryPoints.web.forwardedHeaders.insecure
           --entryPoints.websecure
           --entryPoints.websecure.address=':443'
-          --entryPoints.websecure.http.tls.certResolver={{ dck_letsencrypt_resolver_name }}
-          --certificatesResolvers.{{ dck_letsencrypt_resolver_name }}.acme.email="{{ dck_letsencrypt_email }}"
-          --certificatesResolvers.{{ dck_letsencrypt_resolver_name }}.acme.storage='/etc/traefik/letsencrypt.json'
-          --certificatesResolvers.{{ dck_letsencrypt_resolver_name }}.acme.dnsChallenge
-          --certificatesResolvers.{{ dck_letsencrypt_resolver_name }}.acme.dnsChallenge.provider='route53'
+          --entryPoints.websecure.http.tls.certResolver={{ letsencrypt_private_domain_resolver }}
+          --certificatesResolvers.{{ letsencrypt_private_domain_resolver }}.acme.email="{{ letsencrypt_email_address }}"
+          --certificatesResolvers.{{ letsencrypt_private_domain_resolver }}.acme.storage='/etc/traefik/letsencrypt.json'
+          --certificatesResolvers.{{ letsencrypt_private_domain_resolver }}.acme.dnsChallenge
+          --certificatesResolvers.{{ letsencrypt_private_domain_resolver }}.acme.dnsChallenge.provider='route53'
         env:
-          AWS_ACCESS_KEY_ID: "{{ dck_aws_access_key_id }}"
-          AWS_SECRET_ACCESS_KEY: "{{ dck_aws_secret_access_key }}"
+          AWS_ACCESS_KEY_ID: "{{ route53_access_key_id }}"
+          AWS_SECRET_ACCESS_KEY: "{{ route53_secret_access_key }}"
         container_default_behavior: 'no_defaults'

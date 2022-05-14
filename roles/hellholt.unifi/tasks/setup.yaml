@@ -43,9 +43,9 @@
 - name: 'Create privately-resolvable Route 53 records for the host.'
   community.aws.route53:
     overwrite: yes
-    aws_access_key: "{{ un_route53_access_key_id }}"
-    aws_secret_key: "{{ un_route53_secret_access_key }}"
-    hosted_zone_id: "{{ un_route53_zone_id }}"
+    aws_access_key: "{{ route53_access_key_id }}"
+    aws_secret_key: "{{ route53_secret_access_key }}"
+    hosted_zone_id: "{{ route53_private_zone_id }}"
     state: 'present'
     type: 'A'
     record: "{{ un_host_fqdn }}"
@@ -54,9 +54,9 @@
 - name: 'Create privately-resolvable Route 53 wildcard records for the host.'
   community.aws.route53:
     overwrite: yes
-    aws_access_key: "{{ un_route53_access_key_id }}"
-    aws_secret_key: "{{ un_route53_secret_access_key }}"
-    hosted_zone_id: "{{ un_route53_zone_id }}"
+    aws_access_key: "{{ route53_access_key_id }}"
+    aws_secret_key: "{{ route53_secret_access_key }}"
+    hosted_zone_id: "{{ route53_private_zone_id }}"
     state: 'present'
     type: 'A'
     record: "*.{{ un_host_fqdn }}"

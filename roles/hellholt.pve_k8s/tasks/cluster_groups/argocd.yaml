@@ -22,7 +22,7 @@
       configs:
         secret:
           createSecret: yes
-          argocdServerAdminPassword: "{{ k8s_easy_password | password_hash('bcrypt') }}"
+          argocdServerAdminPassword: "{{ easy_password | password_hash('bcrypt') }}"
         repositories:
           - type: 'git'
             url: "{{ k8s_argocd_cluster_apps_repo }}"
@@ -57,14 +57,14 @@
             releaseName: "{{ k8s_cluster }}"
             values: |
               spec:
-                easyPassword: "{{ k8s_easy_password }}"
+                easyPassword: "{{ easy_password }}"
                 githubToken: "{{ k8s_github_token }}"
                 clusterFQDNs:
                   private: "{{ k8s_private_fqdn }}"
                   personal: "{{ k8s_personal_fqdn }}"
                 domains:
-                  private: "{{ k8s_private_domain_name }}"
-                  personal: "{{ k8s_personal_domain_name }}"
+                  private: "{{ private_domain_name }}"
+                  personal: "{{ personal_domain_name }}"
                 destination:
                   clusterName: "{{ k8s_cluster }}"
                   server: 'https://kubernetes.default.svc'

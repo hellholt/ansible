@@ -1,7 +1,7 @@
 ---
 - name: 'Create the Traefik configuration directory.'
   ansible.builtin.file:
-    path: "{{ tsp_traefik_dir }}/conf.d/"
+    path: "{{ traefik_site_proxy_data_dir }}/conf.d/"
     state: 'directory'
     mode: '0600'
     owner: 'root'
@@ -10,12 +10,12 @@
 - name: 'Populate cluster backend information.'
   ansible.builtin.template:
     src: "{{ role_path }}/templates/traefik_site_proxy_backend.yaml.j2"
-    dest: "{{ tsp_traefik_dir }}/conf.d/{{ tsp_backend_hostname }}.yaml"
+    dest: "{{ traefik_site_proxy_data_dir }}/conf.d/{{ tsp_backend_hostname }}.yaml"
   vars:
-    tsp_backend_hostname_personal_fqdn: "{{ tsp_backend_hostname }}.{{ tsp_personal_domain_name }}"
-    tsp_backend_hostname_server_url: "https://{{ tsp_backend_hostname }}.{{ tsp_private_domain_name }}:443/"
+    tsp_backend_hostname_personal_fqdn: "{{ tsp_backend_hostname }}.{{ personal_domain_name }}"
+    tsp_backend_hostname_server_url: "https://{{ tsp_backend_hostname }}.{{ private_domain_name }}:443/"
     tsp_backend_additional_backends: []
-  loop: "{{ tsp_k8s_cluster_names }}"
+  loop: "{{ k8s_cluster_names }}"
   loop_control:
     index_var: 'tsp_index'
     loop_var: 'tsp_backend_hostname'
@@ -24,10 +24,10 @@
 - name: 'Populate host backend information.'
   ansible.builtin.template:
     src: "{{ role_path }}/templates/traefik_site_proxy_backend.yaml.j2"
-    dest: "{{ tsp_traefik_dir }}/conf.d/{{ tsp_backend_hostname }}.yaml"
+    dest: "{{ traefik_site_proxy_data_dir }}/conf.d/{{ tsp_backend_hostname }}.yaml"
   vars:
-    tsp_backend_hostname_personal_fqdn: "{{ tsp_backend_hostname }}.{{ tsp_personal_domain_name }}"
-    tsp_backend_hostname_server_url: "{{ hostvars[tsp_backend_hostname].web.protocol}}://{{ tsp_backend_hostname }}.{{ tsp_private_domain_name }}:{{ hostvars[tsp_backend_hostname].web.port }}/"
+    tsp_backend_hostname_personal_fqdn: "{{ tsp_backend_hostname }}.{{ personal_domain_name }}"
+    tsp_backend_hostname_server_url: "{{ hostvars[tsp_backend_hostname].web.protocol}}://{{ tsp_backend_hostname }}.{{ private_domain_name }}:{{ hostvars[tsp_backend_hostname].web.port }}/"
     tsp_backend_additional_backends: "{{ hostvars[tsp_backend_hostname].web.additional_backends | default([]) }}"
   loop: "{{ groups['all'] }}"
   loop_control:
@@ -47,7 +47,7 @@
     recreate: yes
     network_mode: 'host'
     volumes:
-      - '{{ tsp_traefik_dir }}:/etc/traefik'
+      - '{{ traefik_site_proxy_data_dir }}:/etc/traefik'
       - '/var/run/docker.sock:/var/run/docker.sock'
     command: |
       --log.level=WARN
@@ -69,12 +69,12 @@
       --entryPoints.web.forwardedHeaders.insecure
       --entryPoints.websecure
       --entryPoints.websecure.address=":{{ tsp_websecure_port }}"
-      --entryPoints.websecure.http.tls.certResolver="{{ tsp_letsencrypt_resolver_name }}"
-      --certificatesResolvers.{{ tsp_letsencrypt_resolver_name }}.acme.email="{{ tsp_letsencrypt_email }}"
-      --certificatesResolvers.{{ tsp_letsencrypt_resolver_name }}.acme.storage='/etc/traefik/letsencrypt.json'
-      --certificatesResolvers.{{ tsp_letsencrypt_resolver_name }}.acme.dnsChallenge
-      --certificatesResolvers.{{ tsp_letsencrypt_resolver_name }}.acme.dnsChallenge.provider='route53'
+      --entryPoints.websecure.http.tls.certResolver="{{ letsencrypt_personal_domain_resolver }}"
+      --certificatesResolvers.{{ letsencrypt_personal_domain_resolver }}.acme.email="{{ letsencrypt_email_address }}"
+      --certificatesResolvers.{{ letsencrypt_personal_domain_resolver }}.acme.storage='/etc/traefik/letsencrypt.json'
+      --certificatesResolvers.{{ letsencrypt_personal_domain_resolver }}.acme.dnsChallenge
+      --certificatesResolvers.{{ letsencrypt_personal_domain_resolver }}.acme.dnsChallenge.provider='route53'
     env:
-      AWS_ACCESS_KEY_ID: "{{ tsp_aws_route53_access_key_id }}"
-      AWS_SECRET_ACCESS_KEY: "{{ tsp_aws_route53_secret_access_key }}"
+      AWS_ACCESS_KEY_ID: "{{ route53_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ route53_secret_access_key }}"
     container_default_behavior: 'no_defaults'

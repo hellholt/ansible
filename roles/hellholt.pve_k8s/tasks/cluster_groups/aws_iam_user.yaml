@@ -5,9 +5,9 @@
 
     - name: 'Create an AWS IAM user for this cluster.'
       community.aws.iam:
-        aws_access_key: "{{ k8s_aws_main_access_key }}"
-        aws_secret_key: "{{ k8s_aws_main_secret_key }}"
-        region: "{{ k8s_aws_region }}"
+        aws_access_key: "{{ aws_default_access_key_id }}"
+        aws_secret_key: "{{ aws_default_secret_access_key }}"
+        region: "{{ aws_region }}"
         iam_type: 'user'
         name: "{{ k8s_aws_iam_cluster_user }}"
         state: 'present'
@@ -21,7 +21,7 @@
 
         - name: 'Lookup cluster data for this cluster.'
           ansible.builtin.set_fact:
-            k8s_cluster_data: "{{ lookup('amazon.aws.aws_ssm', k8s_aws_iam_cluster_ssm_parameter_store_data_name, aws_access_key=k8s_aws_main_access_key, aws_secret_key=k8s_aws_main_secret_key) | from_json }}"
+            k8s_cluster_data: "{{ lookup('amazon.aws.aws_ssm', k8s_aws_iam_cluster_ssm_parameter_store_data_name, aws_access_key=aws_default_access_key_id, aws_secret_key=aws_default_secret_access_key) | from_json }}"
 
       rescue:
 
@@ -42,9 +42,9 @@
           ansible.builtin.command:
             cmd: "aws iam create-access-key --user-name {{ k8s_aws_iam_cluster_user }}"
           environment:
-            AWS_REGION: '{{ k8s_aws_region }}'
-            AWS_ACCESS_KEY_ID: '{{ k8s_aws_main_access_key }}'
-            AWS_SECRET_ACCESS_KEY: '{{ k8s_aws_main_secret_key }}'
+            AWS_REGION: '{{ aws_region }}'
+            AWS_ACCESS_KEY_ID: '{{ aws_default_access_key_id }}'
+            AWS_SECRET_ACCESS_KEY: '{{ aws_default_secret_access_key }}'
           register: 'k8s_access_key_command'
 
         - name: 'Get access key ID and secret access key from command output.'

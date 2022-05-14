@@ -1,30 +1,30 @@
 ---
 # Explicitly set the hostname instead of e.g. "debian", "nug-dougs-macbook-pro," etc.
-sh_set_hostname: yes
+explicitly_set_hostname: yes
 
 # Some potential security risk, depending on what you run on the host.
-sh_enable_passwordless_sudo: yes
+enable_passwordless_sudo: yes
 
 # Create a non-root user.
-sh_create_normal_user: yes
+create_normal_user: yes
 
 # This can take a while and should be avoided when possible.
-sh_install_common_packages: yes
+install_common_packages: yes
 
 # Normal (i.e. non-root) username.
-sh_normal_user_name: null
+normal_user_name: null
 
 # Clean, simple hostname.
-sh_hostname: "{{ inventory_hostname | splitext | first | lower }}"
+clean_hostname: "{{ clean_hostname | splitext | first | lower }}"
 
 # Local timezone.
-sh_local_timezone: 'America/New_York'
+local_timezone: 'America/New_York'
 
 # Account ID, access key, etc used to create policies, users, Route 53 records, etc.
-sh_aws_region: 'us-east-1'
-sh_aws_account_id: null
-sh_aws_main_access_key: null
-sh_aws_main_secret_key: null
+aws_region: 'us-east-1'
+aws_account_id: null
+aws_default_access_key_id: null
+aws_default_secret_access_key: null
 
 # I have three domain names I use for networks:
 # - "private", which resolves to LAN IP addresses (e.g. 192.168.x.x).
@@ -37,31 +37,31 @@ sh_aws_main_secret_key: null
 # In this context, I don't really use my "public" domain name.
 
 # A private domain name.
-sh_private_domain_name: 'example.net'
+private_domain_name: 'example.net'
 # A personal domain name.
-sh_personal_domain_name: 'example.com'
+personal_domain_name: 'example.com'
 
 # A Route 53 "private" zone ID.
-sh_route53_private_zone_id: null
+route53_private_zone_id: null
 # A Route 53 "personal" zone ID.
-sh_route53_personal_zone_id: null
+route53_personal_zone_id: null
 
 # LetsEncrypt private domain resolver name.
-sh_letsencrypt_private_domain_resolver_name: "{{ sh_private_domain_name | splitext | first }}"
+letsencrypt_private_domain_resolver: "{{ private_domain_name | splitext | first }}"
 # LetsEncrypt personal domain resolver name.
-sh_letsencrypt_personal_domain_resolver_name: "{{ sh_personal_domain_name | splitext | first }}"
+letsencrypt_personal_domain_resolver: "{{ personal_domain_name | splitext | first }}"
 # LetsEncrypt email address.
-sh_letsencrypt_email: "letsencrypt@{{ sh_private_domain_name }}"
+letsencrypt_email_address: "letsencrypt@{{ private_domain_name }}"
 
 # A "private" FQDN.
-sh_private_fqdn: "{{ sh_hostname }}.{{ sh_private_domain_name }}"
+sh_private_fqdn: "{{ clean_hostname }}.{{ private_domain_name }}"
 # A "personal" FQDN.
-sh_personal_fqdn: "{{ sh_hostname }}.{{ sh_personal_domain_name }}"
+sh_personal_fqdn: "{{ clean_hostname }}.{{ personal_domain_name }}"
 
 # The domain for host email addresses.
 # If the host cron, etc sends me an email, it comes from <hostname>@<email-domain>
 # Should always be overridden.
-sh_host_email_domain: "{{ sh_private_domain_name }}"
+sh_host_email_domain: "{{ private_domain_name }}"
 
 sh_ssh_private_key_path: '~/.ssh/id_rsa'
 sh_ssh_public_key_path: "{{ sh_ssh_private_key_path }}.pub"
@@ -76,7 +76,7 @@ sh_package_versions:
   python: '3.9'
 
 # The IP address of this host.
-sh_ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+ipv4_address: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
 
 # Setup Groups are special groups that have a defined setup task.
 sh_setup_groups:
@@ -104,20 +104,20 @@ sh_pve_universal_setup_groups:
   - 'pve_nfs_automount'
 
 # Name of IAM user for host.
-sh_aws_iam_host_user: "ndsh_{{ sh_hostname }}"
+sh_aws_iam_host_user: "ndsh_{{ clean_hostname }}"
 sh_aws_iam_host_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
 
 # Prefix of SSM parameter store data for host.
 sh_aws_iam_host_ssm_parameter_store_data_prefix: null
 
 # Name of SSM parameter store data for host.
-sh_aws_iam_host_ssm_parameter_store_data_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ sh_hostname }}.host_data"
+sh_aws_iam_host_ssm_parameter_store_data_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ clean_hostname }}.host_data"
 
 # Name of SSM parameter store host cert signing key data for host.
-sh_aws_iam_host_ssm_parameter_store_host_cert_signing_key_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ sh_hostname }}.ssh_host_cert_signing_key"
+sh_aws_iam_host_ssm_parameter_store_host_cert_signing_key_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ clean_hostname }}.ssh_host_cert_signing_key"
 
 # Name of SSM parameter store user cert signing key data for host.
-sh_aws_iam_host_ssm_parameter_store_user_cert_signing_key_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ sh_hostname }}.ssh_user_cert_signing_key"
+sh_aws_iam_host_ssm_parameter_store_user_cert_signing_key_name: "{{ sh_aws_iam_host_ssm_parameter_store_data_prefix }}{{ clean_hostname }}.ssh_user_cert_signing_key"
 
 # Host certificate signing key path.
 sh_ssh_host_cert_signing_key_path: '~/.ssh/host_signing_key'
@@ -131,22 +131,22 @@ sh_ssh_user_cert_path: '~/.ssh/id_rsa-cert.pub'
 sh_ssh_user_ca_path: '/etc/ssh/user_ca.pub'
 
 # Parameter pattern for SSM parameters for which the SSM policy should permit access.
-sh_aws_ssm_policy_pattern: "{{ sh_hostname }}.*"
+sh_aws_ssm_policy_pattern: "{{ clean_hostname }}.*"
 
-sh_docker_hub_login: no
-sh_docker_hub_username: null
-sh_docker_hub_password: null
+docker_hub_login: no
+docker_hub_username: null
+docker_hub_password: null
 
 # Borg stuff.
-sh_borg_username: "{{ sh_normal_user_name }}"
+sh_borg_username: "{{ normal_user_name }}"
 sh_borg_server: null
 sh_borg_repo_path: null
-sh_borg_repository: "{{ sh_borg_username }}@{{ sh_borg_server }}:{{ sh_borg_repo_path }}/{{ sh_hostname }}"
-sh_borg_cron_hour: "{{ 6 | random(seed=sh_hostname) }}"
-sh_borg_cron_minute: "{{ 59 | random(seed=sh_hostname) }}"
-sh_borg_cron_checks_day: "{{ 28 | random(seed=sh_hostname) }}"
-sh_borg_cron_checks_hour: "{{ range(7, 24) | random(seed=sh_hostname) }}"
-sh_borg_cron_checks_minute: "{{ 59 | random(seed=sh_hostname) }}"
+sh_borg_repository: "{{ sh_borg_username }}@{{ sh_borg_server }}:{{ sh_borg_repo_path }}/{{ clean_hostname }}"
+sh_borg_cron_hour: "{{ 6 | random(seed=clean_hostname) }}"
+sh_borg_cron_minute: "{{ 59 | random(seed=clean_hostname) }}"
+sh_borg_cron_checks_day: "{{ 28 | random(seed=clean_hostname) }}"
+sh_borg_cron_checks_hour: "{{ range(7, 24) | random(seed=clean_hostname) }}"
+sh_borg_cron_checks_minute: "{{ 59 | random(seed=clean_hostname) }}"
 sh_borg_source_directories: []
 sh_borg_passphrase: null
 sh_borg_remote_path: '/usr/local/bin/borg'
@@ -165,9 +165,9 @@ sh_k8s_master_hostnames: []
 # All K8s nodes.
 sh_k8s_node_hostnames: []
 # All K8s clusteres.
-sh_k8s_cluster_names: []
+k8s_cluster_names: []
 # Prefix to NFS path exported to k8s clusters.
-sh_k8s_nfs_prefix: null
+k8s_nfs_prefix: null
 
 # NFS mount options:
 sh_nfs_mount_options: 'rw,async,no_subtree_check,no_wdelay,crossmnt,insecure,no_root_squash,insecure_locks,sec=sys'
@@ -190,7 +190,7 @@ sh_pihole_password: null
 sh_assets_base_url: null
 
 # MOTD base URL, from which MOTD text files can be retrieved.
-sh_motd_base_url: null
+motd_assets_base_url: null
 
 # Homer application icon base URLs.
 sh_homer_icon_base_url: null
@@ -202,7 +202,7 @@ sh_gitconfig: {}
 sh_dotfiles_repo: null
 
 # S3 bucket for this host.
-sh_s3_bucket_name: "hosts.{{ sh_hostname }}"
+sh_s3_bucket_name: "hosts.{{ clean_hostname }}"
 
 # Kubernetes version.
 sh_kubernetes_version: '1.20'
@@ -216,4 +216,4 @@ sh_nfs_images_server: null
 # Destination for serving images.
 sh_nfs_images_path: null
 
-sh_admin_ssh_public_keys: []
+admin_ssh_public_keys: []

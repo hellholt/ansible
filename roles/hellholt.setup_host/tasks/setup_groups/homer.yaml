@@ -41,7 +41,7 @@
       traefik.enable: 'true'
       traefik.http.routers.homer.rule: "HostRegexp(`homer.{{ sh_personal_fqdn }}`, `{subdomain:[a-z0-9-]+}.homer.{{ sh_personal_fqdn }}`, `homer.{{ sh_private_fqdn }}`, `{subdomain:[a-z0-9-]+}.homer.{{ sh_private_fqdn }}`)"
       traefik.http.routers.homer.tls: 'true'
-      traefik.http.routers.homer.tls.certresolver: "{{ sh_letsencrypt_private_domain_resolver_name }}"
+      traefik.http.routers.homer.tls.certresolver: "{{ letsencrypt_private_domain_resolver }}"
       traefik.http.routers.homer.tls.domains[0].main: "homer.{{ sh_personal_fqdn }}"
       traefik.http.routers.homer.tls.domains[0].sans: "*.homer.{{ sh_personal_fqdn }}"
       traefik.http.routers.homer.tls.domains[1].main: "homer.{{ sh_private_fqdn }}"

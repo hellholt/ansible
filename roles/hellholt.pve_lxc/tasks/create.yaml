@@ -12,7 +12,7 @@
       api_host: "{{ pve_node }}"
       storage: 'local'
       content_type: 'vztmpl'
-      template: "{{ pve_template }}"
+      template: "{{ default_lxc_template }}"
 
   - name: 'Ensure mountpoints exist on host.'
     ansible.builtin.file:
@@ -45,18 +45,18 @@
       memory: "{{ pve_memory_size }}"
       swap: "{{ pve_swap_size }}"
       password: "{{ pve_root_password }}"
-      hostname: "{{ pve_hostname }}"
+      hostname: "{{ clean_hostname }}"
       mounts: "{{ pve_mountpoints_dict | to_json }}"
       onboot: "{{ pve_onboot }}"
-      ostemplate: "{{ pve_template_path }}/{{ pve_template }}"
-      description: "{{ pve_description | default(pve_hostname) }}"
+      ostemplate: "{{ pve_template_path }}/{{ default_lxc_template }}"
+      description: "{{ description | default(clean_hostname) }}"
       netif: '{"net0":"type=veth,name=eth0,ip=dhcp,bridge=vmbr0,firewall=1,hwaddr={{ pve_mac_address }}"}'
       unprivileged: "{{ pve_unprivileged  }}"
       disk: "local-lvm:{{ pve_rootfs_size }}"
       features: "{{ pve_features }}"
       state: 'present'
       storage: 'local'
-      pubkey: "{{ pve_admin_ssh_public_key }}"
+      pubkey: "{{ admin_ssh_public_key }}"
       proxmox_default_behavior: 'no_defaults'
       timeout: 600
 
@@ -83,14 +83,14 @@
       timeout: 600
 
   - name: 'Wait for connectivity.'
-    delegate_to: "{{ pve_hostname }}"
+    delegate_to: "{{ clean_hostname }}"
     remote_user: 'root'
     ansible.builtin.wait_for_connection:
 
   - name: 'Create an SSH key for root.'
     community.crypto.openssh_keypair:
       path: '~/id_rsa'
-      comment: "root@{{ pve_hostname }}"
+      comment: "root@{{ clean_hostname }}"
       owner: 'root'
       group: 'root'
       mode: 0600
@@ -103,7 +103,7 @@
       user: 'root'
       state: 'present'
       key: "{{ pve_pubkey_item }}"
-    loop: "{{ pve_admin_ssh_public_keys }}"
+    loop: "{{ admin_ssh_public_keys }}"
     loop_control:
       index_var: 'pve_pubkey_index'
       loop_var: 'pve_pubkey_item'

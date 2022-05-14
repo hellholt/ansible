@@ -25,12 +25,12 @@
   become: yes
   become_user: "{{ sh_key_user }}"
   ansible.builtin.known_hosts:
-    name: "*.{{ sh_private_domain_name }}"
-    key: "@cert-authority *.{{ sh_private_domain_name }} {{ sh_ssh_host_cert_signing_pub_key_data }}"
+    name: "*.{{ private_domain_name }}"
+    key: "@cert-authority *.{{ private_domain_name }} {{ sh_ssh_host_cert_signing_pub_key_data }}"
     state: 'present'
   loop:
     - 'root'
-    - "{{ sh_normal_user_name }}"
+    - "{{ normal_user_name }}"
   loop_control:
     index_var: 'sh_index'
     loop_var: 'sh_key_user'
@@ -42,7 +42,7 @@
 
 - name: 'Slurp the normal user public SSH key.'
   become: yes
-  become_user: "{{ sh_normal_user_name }}"
+  become_user: "{{ normal_user_name }}"
   ansible.builtin.slurp:
     src: "{{ sh_ssh_public_key_path }}"
   register: 'sh_ssh_user_public_key_slurp'
@@ -107,7 +107,7 @@
         valid_from: 'always'
         valid_to: 'forever'
         principals:
-          - "{{ sh_normal_user_name }}"
+          - "{{ normal_user_name }}"
 
     - name: 'Slurp the host certificate.'
       ansible.builtin.slurp:
@@ -170,9 +170,9 @@
 
     - name: 'Write out the user certificate.'
       become: yes
-      become_user: "{{ sh_normal_user_name }}"
+      become_user: "{{ normal_user_name }}"
       ansible.builtin.copy:
         content: "{{ sh_ssh_user_cert_slurp['content'] | b64decode }}"
         dest: "{{ sh_ssh_user_cert_path }}"
-        owner: "{{ sh_normal_user_name }}"
+        owner: "{{ normal_user_name }}"
         mode: 0600

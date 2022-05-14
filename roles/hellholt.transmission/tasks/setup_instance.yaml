@@ -5,16 +5,16 @@
 
 - name: 'Set some useful facts.'
   ansible.builtin.set_fact:
-    tr_instance_id_path: "{{ tr_root_path }}/ids/{{ tr_instance.id }}"
-    tr_padded_instance_id_path: "{{ tr_root_path }}/padded_ids/{{ tr_padded_instance_id }}"
-    tr_instance_name_path: "{{ tr_root_path }}/names/{{ tr_instance.name }}"
-    tr_instance_data_path: "{{ tr_root_path }}/data/{{ tr_instance.name }}"
+    tr_instance_id_path: "{{ torrent_data_path }}/ids/{{ tr_instance.id }}"
+    tr_padded_instance_id_path: "{{ torrent_data_path }}/padded_ids/{{ tr_padded_instance_id }}"
+    tr_instance_name_path: "{{ torrent_data_path }}/names/{{ tr_instance.name }}"
+    tr_instance_data_path: "{{ torrent_data_path }}/data/{{ tr_instance.name }}"
     tr_peer_port: "{{ tr_base_port + ( tr_instance.id | int ) }}"
     tr_service_name: "{{ tr_padded_instance_id }}{{ tr_instance.name }}"
 
 - name: 'Set some more useful facts.'
   ansible.builtin.set_fact:
-    tr_instance_storage_path: "{{ tr_root_path }}/clients/{{ tr_service_name }}"
+    tr_instance_storage_path: "{{ torrent_data_path }}/clients/{{ tr_service_name }}"
     tr_service_fqdn: "{{ tr_service_name }}.{{ tr_private_fqdn }}"
     tr_domain_fqdn: "{{ tr_instance.name }}.{{ tr_private_fqdn }}"
 
@@ -92,6 +92,6 @@
     env:
       PUID: "{{ tr_uid }}"
       PGID: "{{ tr_gid }}"
-      TZ: "{{ tr_local_timezone }}"
+      TZ: "{{ local_timezone }}"
     restart_policy: 'unless-stopped'
     container_default_behavior: 'no_defaults'

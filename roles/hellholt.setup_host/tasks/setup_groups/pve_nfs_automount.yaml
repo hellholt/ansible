@@ -11,7 +11,7 @@
           Description=Mount NFS Share
 
           [Mount]
-          What={{ sh_nfs_server }}:{{ sh_node_nfs_prefix + '/' + sh_hostname }}
+          What={{ sh_nfs_server }}:{{ sh_node_nfs_prefix + '/' + clean_hostname }}
           Where=/mnt/nfs
           Type=nfs
           Options=defaults

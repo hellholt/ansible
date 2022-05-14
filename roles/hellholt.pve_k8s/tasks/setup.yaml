@@ -1,4 +1,9 @@
 ---
+- name: 'Setup hosts.'
+  ansible.builtin.include_role:
+    name: 'hellholt.pve_lxc'
+    tasks_from: 'setup.yaml'
+
 - name: 'Set a fact for the master node.'
   ansible.builtin.set_fact:
     k8s_master: "{{ k8s_node_hostname }}"
@@ -17,7 +22,11 @@
 
     - name: 'General setup.'
       ansible.builtin.include_role:
-        name: 'hellholt.setup_host'
+        name: 'hellholt.pve_lxc'
+        tasks_from: 'setup.yaml'
+
+    - name: 'Setup Kubernetes.'
+      ansible.builtin.include_tasks: 'setup_k8s.yaml'
 
     - name: 'Label nodes.'
       delegate_to: "{{ k8s_master }}"
@@ -28,12 +37,9 @@
           apiVersion: 'v1'
           kind: 'Node'
           metadata:
-            name: "{{ k8s_hostname }}"
+            name: "{{ clean_hostname }}"
             labels:
               "pve_node": "{{ pve_node }}"
               "k8s_cluster": "{{ k8s_cluster }}"
               "k8s_role": "{{ k8s_role }}"
               "k8s_master": "{{ k8s_master }}"
-
-- name: 'Execute cluster group tasks.'
-  ansible.builtin.include_tasks: 'redeploy_cluster.yaml'

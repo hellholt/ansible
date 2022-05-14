@@ -21,7 +21,7 @@ tr_get_safe_announce_domain() {
   : "${1?"Usage: ${FUNCNAME[0]} TORRENT_FILE"}";
   torrent_file="${1}";
   safe_announce_domain="$(tr_get_announce_domain "${torrent_file}" | tr -cd '[:alnum:]')";
-  {% for search, replace in tr_announce_map.items() %}
+  {% for search, replace in torrent_domains_announce_map.items() %}
     if [ "${safe_announce_domain}" == "{{ search }}" ]; then
       safe_announce_domain="{{ replace }}";
     fi
@@ -38,7 +38,7 @@ tr_get_current_instance_id() {
     tr_get_current_instance_id "$(tr_get_safe_announce_domain "${torrent_file}")";
   else
     safe_domain="${1}";
-    safe_domain_path="{{ tr_root_path }}/names/${safe_domain}";
+    safe_domain_path="{{ torrent_data_path }}/names/${safe_domain}";
     if [ -L "${safe_domain_path}" ]; then
       original="$(readlink -f "${safe_domain_path}")";
       basename "${original}" | grep --color=never -oE '[0-9]+';
@@ -54,7 +54,7 @@ tr_assign_torrent() {
   torrent_file="${1}";
   torrent_domain="$(tr_get_safe_announce_domain "${torrent_file}")";
   instance_id="$(tr_get_current_instance_id "${torrent_domain}")";
-  instance_watch_path="{{ tr_root_path }}/padded_ids/${instance_id}/watch";
+  instance_watch_path="{{ torrent_data_path }}/padded_ids/${instance_id}/watch";
   if [ -d "${instance_watch_path}" ]; then
     mv "${torrent_file}" "${instance_watch_path}/";
   fi;

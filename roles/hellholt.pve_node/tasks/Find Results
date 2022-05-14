@@ -1,0 +1,60 @@
+Searching 211 files for "local_share_hosts" (regex)
+
+/Users/nathan/Projects/ansible/roles/hellholt.pve_node/defaults/main.yaml:
+   49  spn_local_share_prefix: null
+   50  # Hosts that exist on this Proxmox node (and can thus mount local shares).
+   51: spn_local_share_hosts: []
+   52  
+
+/Users/nathan/Projects/ansible/roles/hellholt.pve_node/tasks/setup_local_shares.yaml:
+    4      name: "{{ spn_local_share_prefix | regex_replace('^\\/', '') }}/{{ spn_local_hostname }}"
+    5      state: 'present'
+    6:   loop: "{{ spn_local_share_hosts }}"
+    7    loop_control:
+    8      index_var: 'spn_index'
+
+/Users/nathan/Projects/ansible/roles/hellholt.setup_host/defaults/main.yaml:
+  176  sh_local_share_prefix: null
+  177  # Hosts that exist on this Proxmox node (and can thus mount local shares).
+  178: sh_local_share_hosts: []
+  179  
+  180  sh_nfs_share_hosts: []
+
+3 matches across 3 files
+
+
+Searching 211 files for "local_share_hosts"
+
+/Users/nathan/Projects/ansible/roles/hellholt.pve_node/defaults/main.yaml:
+   49  spn_local_share_prefix: null
+   50  # Hosts that exist on this Proxmox node (and can thus mount local shares).
+   51: spn_local_share_hosts: []
+   52  
+
+/Users/nathan/Projects/ansible/roles/hellholt.pve_node/tasks/setup_local_shares.yaml:
+    4      name: "{{ spn_local_share_prefix | regex_replace('^\\/', '') }}/{{ spn_local_hostname }}"
+    5      state: 'present'
+    6:   loop: "{{ spn_local_share_hosts }}"
+    7    loop_control:
+    8      index_var: 'spn_index'
+
+/Users/nathan/Projects/ansible/roles/hellholt.setup_host/defaults/main.yaml:
+  176  sh_local_share_prefix: null
+  177  # Hosts that exist on this Proxmox node (and can thus mount local shares).
+  178: sh_local_share_hosts: []
+  179  
+  180  sh_nfs_share_hosts: []
+
+3 matches across 3 files
+
+
+Searching 211 files for "sh_local_share_hosts"
+
+/Users/nathan/Projects/ansible/roles/hellholt.setup_host/defaults/main.yaml:
+  176  sh_local_share_prefix: null
+  177  # Hosts that exist on this Proxmox node (and can thus mount local shares).
+  178: sh_local_share_hosts: []
+  179  
+  180  sh_nfs_share_hosts: []
+
+1 match in 1 file

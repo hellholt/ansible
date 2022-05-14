@@ -22,3 +22,6 @@
 
 - name: 'Setup Miscellaneous Tweaks.'
   ansible.builtin.include_tasks: 'setup_tweaks.yaml'
+
+- name: 'Setup Local Shares.'
+  ansible.builtin.include_tasks: 'setup_local_shares.yaml'

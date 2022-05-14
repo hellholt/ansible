@@ -7,7 +7,7 @@ http:
       service: '{{ tsp_backend_hostname }}'
       priority: 10
       tls:
-        certResolver: '{{ tsp_letsencrypt_resolver_name }}'
+        certResolver: '{{ letsencrypt_personal_domain_resolver }}'
         domains:
           - main: '{{ tsp_backend_hostname_personal_fqdn }}'
             sans:
@@ -20,7 +20,7 @@ http:
       service: '{{ tsp_backend_hostname }}_{{ tsp_additional_backend.name }}'
       priority: {{ tsp_additional_backend.priority | default(20) }}
       tls:
-        certResolver: '{{ tsp_letsencrypt_resolver_name }}'
+        certResolver: '{{ letsencrypt_personal_domain_resolver }}'
         domains:
           - main: '{{ tsp_additional_backend.name }}.{{ tsp_backend_hostname_personal_fqdn }}'
             sans:

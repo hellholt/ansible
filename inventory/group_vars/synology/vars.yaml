@@ -1,7 +1,7 @@
 ansible_python_interpreter: '/volume1/@appstore/python38/bin/python3'
 
-tr_traefik_dir: '/volume1/docker/traefik'
-tr_root_path: '/volume1/Torrents'
+traefik_data_dir: '/volume1/docker/traefik'
+torrent_data_path: '/volume1/Torrents'
 tr_uid: '1026'
 tr_gid: '100'
 tr_owner: 'nathan'
@@ -15,6 +15,6 @@ un_storage_path: '/volume1/docker/unifi'
 un_certresolver: 'hellholt'
 un_host_fqdn: 'unifi.hellholt.net'
 
-tsp_traefik_dir: '/volume1/docker/traefik_site_proxy'
+traefik_data_dir: '/volume1/docker/traefik_site_proxy'
 tsp_web_port: 4080
 tsp_websecure_port: 4443

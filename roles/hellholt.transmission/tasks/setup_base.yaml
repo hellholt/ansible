@@ -21,7 +21,7 @@
 
 - name: 'Create the core directory structure.'
   ansible.builtin.file:
-    path: "{{ tr_root_path }}/{{ tr_directory_name }}"
+    path: "{{ torrent_data_path }}/{{ tr_directory_name }}"
     state: 'directory'
     mode: '0755'
     owner: "{{ tr_owner }}"
@@ -40,7 +40,7 @@
 - name: "Copy Transmission template files {{ role_path }}/files/scripts/ -> {{ tr_instance_storage_path }}/scripts/."
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: "{{ tr_root_path }}/scripts/{{ item | basename | splitext | first }}"
+    dest: "{{ torrent_data_path }}/scripts/{{ item | basename | splitext | first }}"
     mode: '0755'
     owner: "{{ tr_owner }}"
     group: "{{ tr_group }}"

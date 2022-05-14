@@ -21,7 +21,7 @@
       grafana:
         enabled: yes
         namespaceOverride: ""
-        adminPassword: "{{ k8s_easy_password }}"
+        adminPassword: "{{ easy_password }}"
         ingress:
           enabled: yes
           ingressClassName: 'traefik'

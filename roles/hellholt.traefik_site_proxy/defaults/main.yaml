@@ -1,27 +1,27 @@
 ---
 # The root path shared with Traefik for its configuration.
-tsp_traefik_dir: '/traefik'
+traefik_site_proxy_data_dir: '/traefik_site_proxy'
 
 # The personal domain name associated with hosts.
-tsp_personal_domain_name: null
+personal_domain_name: null
 
 # The private domain name associated with hosts.
-tsp_private_domain_name: null
+private_domain_name: null
 
 # Kubernetes cluster names.
-tsp_k8s_cluster_names: []
+k8s_cluster_names: []
 
 # LetsEncrypt email.
-tsp_letsencrypt_email: null
+letsencrypt_email_address: null
 
 # LetsEncrypt personal domain resolver name.
-tsp_letsencrypt_resolver_name: null
+letsencrypt_personal_domain_resolver: null
 
 # AWS Access Key ID.
-tsp_aws_route53_access_key_id: null
+route53_access_key_id: null
 
 # AWS Secret Access Key.
-tsp_aws_route53_secret_access_key: null
+route53_secret_access_key: null
 
 # HTTP port.
 tsp_web_port: 80

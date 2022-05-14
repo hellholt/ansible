@@ -47,8 +47,8 @@
                 "Effect": "Allow",
                 "Action": "s3:*",
                 "Resource": [
-                  "arn:aws:s3:::{{ aws_s3_bucket_name }}",
-                  "arn:aws:s3:::{{ aws_s3_bucket_name }}/*"
+                  "arn:aws:s3:::{{ lxc_s3_bucket_name }}",
+                  "arn:aws:s3:::{{ lxc_s3_bucket_name }}/*"
                 ]
               }
             ]
@@ -59,7 +59,7 @@
         aws_access_key: "{{ aws_access_key_id }}"
         aws_secret_key: "{{ aws_secret_access_key }}"
         region: "{{ aws_region }}"
-        name: "{{ aws_s3_bucket_name }}"
+        name: "{{ lxc_s3_bucket_name }}"
         state: 'present'
         versioning: no
 
@@ -116,7 +116,7 @@
         - name: 'Update access key ID and secret access key.'
           community.aws.aws_ssm_parameter_store:
             name: "{{ aws_iam_host_ssm_parameter_store_data_name }}"
-            description: "Host data for {{ aws_hostname }}"
+            description: "Host data for {{ clean_hostname }}"
             string_type: 'SecureString'
             value: "{{ aws_iam_host_data | to_nice_json }}"
 
@@ -131,11 +131,11 @@
         aws_access_key: "{{ aws_access_key_id }}"
         aws_secret_key: "{{ aws_secret_access_key }}"
         overwrite: yes
-        hosted_zone_id: "{{ aws_route53_private_zone_id }}"
+        hosted_zone_id: "{{ route53_private_zone_id }}"
         state: 'present'
         type: 'A'
         record: "{{ aws_private_fqdn }}"
-        value: "{{ aws_ipv4_address }}"
+        value: "{{ ipv4_address }}"
 
     - name: 'Create privately-resolvable wildcard DNS records for the host.'
       delegate_to: 'localhost'
@@ -143,9 +143,9 @@
         aws_access_key: "{{ aws_access_key_id }}"
         aws_secret_key: "{{ aws_secret_access_key }}"
         alias: yes
-        alias_hosted_zone_id: "{{ aws_route53_private_zone_id }}"
+        alias_hosted_zone_id: "{{ route53_private_zone_id }}"
         overwrite: yes
-        hosted_zone_id: "{{ aws_route53_private_zone_id }}"
+        hosted_zone_id: "{{ route53_private_zone_id }}"
         state: 'present'
         type: 'A'
         record: "*.{{ aws_private_fqdn }}"
@@ -157,13 +157,13 @@
         aws_access_key: "{{ aws_access_key_id }}"
         aws_secret_key: "{{ aws_secret_access_key }}"
         alias: yes
-        alias_hosted_zone_id: "{{ sh_route53_personal_zone_id }}"
+        alias_hosted_zone_id: "{{ route53_personal_zone_id }}"
         overwrite: yes
-        hosted_zone_id: "{{ sh_route53_personal_zone_id }}"
+        hosted_zone_id: "{{ route53_personal_zone_id }}"
         state: 'present'
         type: 'A'
         record: "{{ aws_personal_fqdn }}"
-        value: "{{ aws_personal_domain_name }}"
+        value: "{{ personal_domain_name }}"
 
     - name: 'Create publicly-resolvable wildcard DNS records for the host.'
       delegate_to: 'localhost'
@@ -171,9 +171,9 @@
         aws_access_key: "{{ aws_access_key_id }}"
         aws_secret_key: "{{ aws_secret_access_key }}"
         alias: yes
-        alias_hosted_zone_id: "{{ sh_route53_personal_zone_id }}"
+        alias_hosted_zone_id: "{{ route53_personal_zone_id }}"
         overwrite: yes
-        hosted_zone_id: "{{ sh_route53_personal_zone_id }}"
+        hosted_zone_id: "{{ route53_personal_zone_id }}"
         state: 'present'
         type: 'A'
         record: "*.{{ aws_personal_fqdn }}"

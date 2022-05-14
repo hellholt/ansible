@@ -31,10 +31,10 @@
 
   - name: 'Copy SSH key to server.'
     delegate_to: "{{ sh_borg_server }}"
-    remote_user: "{{ sh_normal_user_name }}"
+    remote_user: "{{ normal_user_name }}"
     become: yes
     ansible.posix.authorized_key:
-      user: "{{ sh_normal_user_name }}"
+      user: "{{ normal_user_name }}"
       key: "{{ sh_ssh_public_key }}"
       state: 'present'
 

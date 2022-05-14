@@ -1,26 +1,26 @@
 ---
 # Explicitly set the hostname instead of e.g. "debian", "nug-dougs-macbook-pro," etc.
-pve_set_hostname: yes
+explicitly_set_hostname: yes
 
 # Some potential security risk, depending on what you run on the host.
-pve_enable_passwordless_sudo: yes
+enable_passwordless_sudo: yes
 
 # Create a non-root user.
-pve_create_normal_user: yes
+create_normal_user: yes
 
 # This can take a while and should be avoided when possible.
-pve_install_common_packages: yes
+install_common_packages: yes
 
 # Normal (i.e. non-root) username.
-pve_normal_user_name: null
+normal_user_name: null
 
 # Clean, simple hostname.
-pve_hostname: "{{ inventory_hostname | splitext | first | lower }}"
+clean_hostname: "{{ clean_hostname | splitext | first | lower }}"
 
 # The domain for host email addresses.
 # If the host cron, etc sends me an email, it comes from <hostname>@<email-domain>
 # Should always be overridden.
-pve_host_email_domain: "{{ pve_private_domain_name }}"
+pve_host_email_domain: "{{ private_domain_name }}"
 
 # The node hosting the host.
 # This should be defined in the inventory.
@@ -34,7 +34,7 @@ pve_api_password: "{{ vault.proxmox.nodes[pve_node].api.password }}"
 
 # The OS template that will be used for this container.
 # Defined in the inventory.
-pve_template: null
+default_lxc_template: null
 
 # The mount items for this host.
 # Defined in the inventory.
@@ -46,11 +46,11 @@ pve_mountpoints: []
 #   gid: '1000'
 
 # An ample mount, local storage for all LXC containers.
-pve_default_mount: 'local-lvm:64,mp=/mnt/host,backup=1,size=64G'
+default_lxc_mount: 'local-lvm:64,mp=/mnt/host,backup=1,size=64G'
 
 # Mountpoint dictionary (JSON), building upon the default mountpoint.
 pve_mountpoints_dict:
-  mp0: "{{ pve_default_mount }}"
+  mp0: "{{ default_lxc_mount }}"
 
 # The VM ID of this host.
 # This should always be 100 or greater, and defined in the inventory.
@@ -62,9 +62,9 @@ pve_root_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_lette
 
 # A public key to set authorized on the host.
 # Defined in inventory.
-pve_admin_ssh_public_key: null
+admin_ssh_public_key: null
 
-pve_admin_ssh_public_keys: []
+admin_ssh_public_keys: []
 
 # Allocations for this host.
 # Sensible defaults; overrides will be defined in inventory.
@@ -80,7 +80,7 @@ pve_features: 'mount=nfs,keyctl=1,nesting=1'
 pve_template_path: 'local:vztmpl'
 
 # Description.
-pve_description: null
+description: null
 
 # Apt packages.
 pve_apt_packages:

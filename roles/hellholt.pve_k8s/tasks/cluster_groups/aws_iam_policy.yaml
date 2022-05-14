@@ -2,9 +2,9 @@
 - name: 'Create or update IAM policy for cluster.'
   delegate_to: 'localhost'
   community.aws.iam_policy:
-    aws_access_key: "{{ k8s_aws_main_access_key }}"
-    aws_secret_key: "{{ k8s_aws_main_secret_key }}"
-    region: "{{ k8s_aws_region }}"
+    aws_access_key: "{{ aws_default_access_key_id }}"
+    aws_secret_key: "{{ aws_default_secret_access_key }}"
+    region: "{{ aws_region }}"
     iam_type: 'user'
     iam_name: "{{ k8s_aws_iam_cluster_user }}"
     policy_name: "{{ k8s_aws_iam_cluster_user }}_policy"
@@ -24,7 +24,7 @@
               "ssm:GetParameter",
               "ssm:PutParameter"
             ],
-            "Resource": "arn:aws:ssm:*:{{ k8s_aws_account_id }}:parameter/{{ k8s_aws_ssm_policy_pattern }}"
+            "Resource": "arn:aws:ssm:*:{{ aws_account_id }}:parameter/{{ k8s_aws_ssm_policy_pattern }}"
           },
           {
             "Sid": "S3BucketPolicyStatement",

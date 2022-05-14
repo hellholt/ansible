@@ -1,9 +1,0 @@
----
-- name: 'Destroy cluster.'
-  ansible.builtin.include_tasks: 'destroy_cluster.yaml'
-
-- name: 'Create cluster.'
-  ansible.builtin.include_tasks: 'create_cluster.yaml'
-
-- name: 'Retrieve the config.'
-  ansible.builtin.include_tasks: 'cluster_groups/get_config.yaml'

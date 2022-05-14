@@ -44,3 +44,17 @@ spn_pip_packages:
   - 'torrent_parser'
   - 'typing_extensions'
   - 'virtualenv'
+
+# Prefix to FS path mounted to hosts.
+spn_local_share_prefix: null
+# Hosts that exist on this Proxmox node (and can thus mount local shares).
+spn_local_share_hosts: []
+
+# All K8s masters.
+spn_k8s_master_hostnames: []
+# All K8s nodes.
+spn_k8s_node_hostnames: []
+# All K8s clusteres.
+k8s_cluster_names: []
+# Prefix to NFS path exported to k8s clusters.
+k8s_nfs_prefix: null

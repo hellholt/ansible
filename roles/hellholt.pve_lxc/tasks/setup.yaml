@@ -14,13 +14,13 @@
 
     - name: 'Install some universally useful packages.'
       ansible.builtin.include_tasks: 'setup_packages.yaml'
-      when: 'pve_install_common_packages is true and pve_common_packages_installed is not defined'
+      when: 'install_common_packages is true and pve_common_packages_installed is not defined'
 
     - name: 'Create a normal user account.'
       ansible.builtin.include_tasks: 'setup_normal_user.yaml'
-      when: 'pve_create_normal_user is true and pve_normal_user_name is defined'
+      when: 'create_normal_user is true and normal_user_name is defined'
 
     - name: 'Set the hostname explicitly.'
       ansible.builtin.hostname:
-        name: "{{ pve_hostname }}"
-      when: 'pve_set_hostname is true and not pve_host_is_mac and not pve_host_is_synology'
+        name: "{{ clean_hostname }}"
+      when: 'explicitly_set_hostname is true and not pve_host_is_mac and not pve_host_is_synology'

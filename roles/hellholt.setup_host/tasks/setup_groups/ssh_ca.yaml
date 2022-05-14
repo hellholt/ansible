@@ -40,11 +40,11 @@
 
     - name: 'Update host cert signing key data.'
       community.aws.aws_ssm_parameter_store:
-        region: "{{ sh_aws_region }}"
-        aws_access_key: "{{ sh_aws_main_access_key }}"
-        aws_secret_key: "{{ sh_aws_main_secret_key }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_default_access_key_id }}"
+        aws_secret_key: "{{ aws_default_secret_access_key }}"
         name: "{{ sh_aws_iam_host_ssm_parameter_store_host_cert_signing_key_name }}"
-        description: "Host cert signing key for {{ sh_hostname }}"
+        description: "Host cert signing key for {{ clean_hostname }}"
         string_type: 'SecureString'
         value: "{{ sh_new_ssh_host_cert_signing_key_data }}"
 
@@ -78,11 +78,11 @@
 
     - name: 'Update user cert signing key data.'
       community.aws.aws_ssm_parameter_store:
-        region: "{{ sh_aws_region }}"
-        aws_access_key: "{{ sh_aws_main_access_key }}"
-        aws_secret_key: "{{ sh_aws_main_secret_key }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_default_access_key_id }}"
+        aws_secret_key: "{{ aws_default_secret_access_key }}"
         name: "{{ sh_aws_iam_host_ssm_parameter_store_user_cert_signing_key_name }}"
-        description: "User cert signing key for {{ sh_hostname }}"
+        description: "User cert signing key for {{ clean_hostname }}"
         string_type: 'SecureString'
         value: "{{ sh_new_ssh_user_cert_signing_key_data }}"
 
@@ -118,6 +118,6 @@
 - name: 'Ensure that the host cert signing key is trusted.'
   delegate_to: 'localhost'
   ansible.builtin.known_hosts:
-    name: "*.{{ sh_private_domain_name }}"
-    key: "@cert-authority *.{{ sh_private_domain_name }} {{ sh_ssh_host_cert_signing_pub_key_data }}"
+    name: "*.{{ private_domain_name }}"
+    key: "@cert-authority *.{{ private_domain_name }} {{ sh_ssh_host_cert_signing_pub_key_data }}"
     state: 'present'

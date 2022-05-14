@@ -1,37 +1,37 @@
 ---
 # Clean, simple hostname.
-dck_hostname: "{{ inventory_hostname | splitext | first | lower }}"
+clean_hostname: "{{ clean_hostname | splitext | first | lower }}"
 
 # Log in to Docker Hub?
-dck_docker_hub_login: no
-dck_docker_hub_username: null
-dck_docker_hub_password: null
+docker_hub_login: no
+docker_hub_username: null
+docker_hub_password: null
 
 # Traefik directory.
-dck_traefik_dir: '/mnt/host/traefik'
+traefik_data_dir: '/mnt/host/traefik'
 
 # Portainer directory.
 dck_portainer_dir: '/mnt/host/portainer'
 
 # LetsEncrypt certificate resolver name.
-dck_letsencrypt_resolver_name: null
+letsencrypt_private_domain_resolver: null
 
 # LetsEncrypt email address.
-dck_letsencrypt_email: null
+letsencrypt_email_address: null
 
 # AWS credentials
-dck_aws_access_key_id: null
-dck_aws_secret_access_key: null
+route53_access_key_id: null
+route53_secret_access_key: null
 
 # A private domain name.
-dck_private_domain_name: null
+private_domain_name: null
 # A personal domain name.
-dck_personal_domain_name: null
+personal_domain_name: null
 
 # A "private" FQDN.
-dck_private_fqdn: "{{ dck_hostname }}.{{ dck_private_domain_name }}"
+dck_private_fqdn: "{{ clean_hostname }}.{{ private_domain_name }}"
 # A "personal" FQDN.
-dck_personal_fqdn: "{{ dck_hostname }}.{{ dck_personal_domain_name }}"
+dck_personal_fqdn: "{{ clean_hostname }}.{{ personal_domain_name }}"
 
 # Normal (i.e. non-root) username.
-dck_normal_user_name: null
+normal_user_name: null

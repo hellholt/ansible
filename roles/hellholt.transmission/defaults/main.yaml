@@ -1,35 +1,35 @@
 ---
 # The root path shared with Traefik for its configuration.
-tr_traefik_dir: '/traefik'
+traefik_data_dir: '/traefik'
 
 # Account ID, access key, etc used to create policies, users, Route 53 records, etc.
-tr_aws_region: 'us-east-1'
-tr_aws_account_id: null
-tr_aws_main_access_key: null
-tr_aws_main_secret_key: null
+aws_region: 'us-east-1'
+aws_account_id: null
+route53_access_key_id: null
+route53_secret_access_key: null
 
 # A private domain name.
-tr_private_domain_name: 'example.net'
+private_domain_name: 'example.net'
 
 # Clean, simple hostname.
-tr_hostname: "{{ inventory_hostname | splitext | first | lower }}"
+clean_hostname: "{{ clean_hostname | splitext | first | lower }}"
 
 # Local timezone.
-tr_local_timezone: 'America/New_York'
+local_timezone: 'America/New_York'
 
 # A "private" FQDN.
-tr_private_fqdn: "torrents.{{ tr_private_domain_name }}"
+tr_private_fqdn: "torrents.{{ private_domain_name }}"
 
 # A Route 53 "private" zone ID.
-tr_route53_private_zone_id: null
+route53_private_zone_id: null
 
 # LetsEncrypt private domain resolver name.
-tr_letsencrypt_resolver_name: "{{ tr_private_domain_name | splitext | first }}"
+tr_letsencrypt_resolver_name: "{{ private_domain_name | splitext | first }}"
 # LetsEncrypt email address.
-tr_letsencrypt_email: "letsencrypt@{{ tr_private_domain_name }}"
+letsencrypt_email_address: "letsencrypt@{{ private_domain_name }}"
 
 # The root directory for torrent data.
-tr_root_path: '/torrents'
+torrent_data_path: '/torrents'
 
 # The base port.
 tr_base_port: 60000
@@ -47,11 +47,11 @@ tr_uid: '1000'
 tr_gid: '1000'
 
 # The actual instances (an array of objects).
-tr_instances: []
+torrent_client_instances: []
 # Don't reuse IDs!
 # - id: 3
 #   name: debian
 
 # Announcement URL domain -> tracker name map.
-tr_announce_map: {}
+torrent_domains_announce_map: {}
 # fun-times.debian.org: 'debian'

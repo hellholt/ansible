@@ -9,7 +9,7 @@
 - name: 'Build some basic facts.'
   ansible.builtin.set_fact:
     sh_hostnames: "{{ sh_hostnames + [ sh_k8s_host_name ] }}"
-    sh_paths: "{{ sh_paths + [ sh_k8s_nfs_prefix + '/' + hostvars[sh_k8s_host_name].k8s_cluster ] }}"
+    sh_paths: "{{ sh_paths + [ k8s_nfs_prefix + '/' + hostvars[sh_k8s_host_name].k8s_cluster ] }}"
     sh_ip_addresses: "{{ sh_ip_addresses + [ hostvars[sh_k8s_host_name].pve_ip_address ] }}"
   loop: "{{ groups['k8s'] }}"
   loop_control:
