@@ -150,9 +150,9 @@ route53_personal_zone_id: "{{ vault.aws.route53.zone_ids.personal }}"
 # In this context, I don't really use my "public" domain name.
 
 # A "private" FQDN.
-aws_private_fqdn: "{{ clean_hostname }}.{{ private_domain_name }}"
+host_private_fqdn: "{{ clean_hostname }}.{{ private_domain_name }}"
 # A "personal" FQDN.
-aws_personal_fqdn: "{{ clean_hostname }}.{{ personal_domain_name }}"
+host_personal_fqdn: "{{ clean_hostname }}.{{ personal_domain_name }}"
 
 # Log in to Docker Hub?
 docker_hub_login: yes
@@ -285,6 +285,54 @@ torrent_client_instances: "{{ vault.torrents.instances }}"
 # Announcement URL domain -> tracker name map.
 torrent_domains_announce_map: "{{ vault.torrents.announce_map }}"
 
+# The API username.  This will be defined
+pve_api_username: "{{ vault.proxmox.nodes[pve_node].api.username }}"
+
+# The API password.
+pve_api_password: "{{ vault.proxmox.nodes[pve_node].api.password }}"
+
+# Apt packages.
+default_apt_packages:
+  - 'apt-file'
+  - 'bc'
+  - 'build-essential'
+  - 'cargo'
+  - 'curl'
+  - 'ffmpeg'
+  - 'git'
+  - 'jq'
+  - 'libacl1-dev'
+  - 'libffi-dev'
+  - 'libssl-dev'
+  - 'mailutils'
+  - 'nfs-client'
+  - 'nfs-common'
+  - 'python3'
+  - 'python3-apt'
+  - 'python3-dev'
+  - 'python3-pip'
+  - 'python3-setuptools'
+  - 'python3-venv'
+  - 'rsync'
+  - 'sudo'
+  - 'yadm'
+
+# Pip packages.
+default_pip_packages:
+  - 'ansible'
+  - 'awscli'
+  - 'bcrypt'
+  - 'bdfr'
+  - 'boto3'
+  - 'docker'
+  - 'kubernetes'
+  - 'passlib'
+  - 'proxmoxer'
+  - 'requests'
+  - 'torrent_parser'
+  - 'typing_extensions'
+  - 'virtualenv'
+
 #########################
 # hellholt.setup_host
 #########################
@@ -323,15 +371,15 @@ sh_k8s_role: "{{ k8s_role }}"
 # All K8s hosts, regardless of role.
 sh_k8s_hostnames: "{{ groups['k8s'] }}"
 # All K8s masters.
-sh_k8s_master_hostnames: "{{ groups['k8s_masters'] }}"
+k8s_master_hostnames: "{{ groups['k8s_masters'] }}"
 # All K8s nodes.
-sh_k8s_node_hostnames: "{{ groups['k8s_nodes'] }}"
+k8s_node_hostnames: "{{ groups['k8s_nodes'] }}"
 
 # NFS mount options:
 sh_nfs_mount_options: 'rw,async,no_subtree_check,no_wdelay,crossmnt,insecure,no_root_squash,insecure_locks,sec=sys'
 
 # Prefix to FS path mounted to hosts.
-sh_local_share_prefix: "{{ local_share_prefix }}"
+pve_local_share_prefix: "{{ local_share_prefix }}"
 # Hosts that exist on this Proxmox node (and can thus mount local shares).
 sh_local_share_hostnames: "{{ groups[pve_cluster_id] }}"
 

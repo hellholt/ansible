@@ -28,7 +28,7 @@
   community.general.zfs:
     name: "{{ spn_paths[spn_index] | regex_replace('^\\/', '') }}"
     state: 'present'
-  loop: "{{ spn_k8s_master_hostnames }}"
+  loop: "{{ k8s_master_hostnames }}"
   loop_control:
     index_var: 'spn_index'
     loop_var: 'spn_k8s_host_name'

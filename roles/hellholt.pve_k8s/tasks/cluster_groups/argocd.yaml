@@ -1,10 +1,10 @@
 ---
 - name: 'Set some facts.'
   ansible.builtin.set_fact:
-    k8s_argocd_private_fqdn: "argocd.{{ k8s_private_fqdn }}"
-    k8s_argocd_personal_fqdn: "argocd.{{ k8s_personal_fqdn }}"
-    k8s_argocdgrpc_private_fqdn: "argocd-grpc.{{ k8s_private_fqdn }}"
-    k8s_argocdgrpc_personal_fqdn: "argocd-grpc.{{ k8s_personal_fqdn }}"
+    k8s_argocd_private_fqdn: "argocd.{{ host_private_fqdn }}"
+    k8s_argocd_personal_fqdn: "argocd.{{ host_personal_fqdn }}"
+    k8s_argocdgrpc_private_fqdn: "argocd-grpc.{{ host_private_fqdn }}"
+    k8s_argocdgrpc_personal_fqdn: "argocd-grpc.{{ host_personal_fqdn }}"
     k8s_argocd_cluster_apps_repo: "https://github.com/hellholt/{{ k8s_cluster }}.git"
 
 - name: 'Add Argo chart repository.'
@@ -60,8 +60,8 @@
                 easyPassword: "{{ easy_password }}"
                 githubToken: "{{ k8s_github_token }}"
                 clusterFQDNs:
-                  private: "{{ k8s_private_fqdn }}"
-                  personal: "{{ k8s_personal_fqdn }}"
+                  private: "{{ host_private_fqdn }}"
+                  personal: "{{ host_personal_fqdn }}"
                 domains:
                   private: "{{ private_domain_name }}"
                   personal: "{{ personal_domain_name }}"

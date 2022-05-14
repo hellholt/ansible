@@ -28,7 +28,7 @@
   community.general.zfs:
     name: "{{ sh_paths[sh_index] | regex_replace('^\\/', '') }}"
     state: 'present'
-  loop: "{{ sh_k8s_master_hostnames }}"
+  loop: "{{ k8s_master_hostnames }}"
   loop_control:
     index_var: 'sh_index'
     loop_var: 'sh_k8s_host_name'

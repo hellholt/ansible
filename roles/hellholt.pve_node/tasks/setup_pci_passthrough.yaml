@@ -39,8 +39,8 @@
 - name: 'Enable PCI IDs for PCI passthrough.'
   ansible.builtin.copy:
     dest: '/etc/modprobe.d/vfio.conf'
-    content: "options vfio-pci ids={{ spn_pci_ids | join(',') }} disable_vga=1"
-  when: 'spn_pci_ids | length > 0'
+    content: "options vfio-pci ids={{ pci_passthrough_ids | join(',') }} disable_vga=1"
+  when: 'pci_passthrough_ids | length > 0'
 
 - name: 'Copy ROM to destination.'
   ansible.builtin.copy:

@@ -1,10 +1,10 @@
 ---
 - name: 'Set some facts.'
   ansible.builtin.set_fact:
-    k8s_prometheus_private_fqdn: "prometheus.{{ k8s_private_fqdn }}"
-    k8s_prometheus_personal_fqdn: "prometheus.{{ k8s_personal_fqdn }}"
-    k8s_grafana_private_fqdn: "grafana.{{ k8s_private_fqdn }}"
-    k8s_grafana_personal_fqdn: "grafana.{{ k8s_personal_fqdn }}"
+    k8s_prometheus_private_fqdn: "prometheus.{{ host_private_fqdn }}"
+    k8s_prometheus_personal_fqdn: "prometheus.{{ host_personal_fqdn }}"
+    k8s_grafana_private_fqdn: "grafana.{{ host_private_fqdn }}"
+    k8s_grafana_personal_fqdn: "grafana.{{ host_personal_fqdn }}"
 
 - name: 'Add Prometheus Community chart repository.'
   kubernetes.core.helm_repository:

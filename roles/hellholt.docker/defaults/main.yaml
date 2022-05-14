@@ -11,7 +11,7 @@ docker_hub_password: null
 traefik_data_dir: '/mnt/host/traefik'
 
 # Portainer directory.
-dck_portainer_dir: '/mnt/host/portainer'
+portainer_data_dir: '/mnt/host/portainer'
 
 # LetsEncrypt certificate resolver name.
 letsencrypt_private_domain_resolver: null
@@ -29,9 +29,9 @@ private_domain_name: null
 personal_domain_name: null
 
 # A "private" FQDN.
-dck_private_fqdn: "{{ clean_hostname }}.{{ private_domain_name }}"
+host_private_fqdn: "{{ clean_hostname }}.{{ private_domain_name }}"
 # A "personal" FQDN.
-dck_personal_fqdn: "{{ clean_hostname }}.{{ personal_domain_name }}"
+host_personal_fqdn: "{{ clean_hostname }}.{{ personal_domain_name }}"
 
 # Normal (i.e. non-root) username.
 normal_user_name: null

@@ -18,13 +18,13 @@ clean_hostname: "{{ clean_hostname | splitext | first | lower }}"
 local_timezone: 'America/New_York'
 
 # A "private" FQDN.
-tr_private_fqdn: "torrents.{{ private_domain_name }}"
+host_private_fqdn: "torrents.{{ private_domain_name }}"
 
 # A Route 53 "private" zone ID.
 route53_private_zone_id: null
 
 # LetsEncrypt private domain resolver name.
-tr_letsencrypt_resolver_name: "{{ private_domain_name | splitext | first }}"
+letsencrypt_private_domain_resolver: "{{ private_domain_name | splitext | first }}"
 # LetsEncrypt email address.
 letsencrypt_email_address: "letsencrypt@{{ private_domain_name }}"
 
@@ -32,7 +32,7 @@ letsencrypt_email_address: "letsencrypt@{{ private_domain_name }}"
 torrent_data_path: '/torrents'
 
 # The base port.
-tr_base_port: 60000
+transmission_base_port: 60000
 
 # The user.
 normal_user_name: 'nathan'

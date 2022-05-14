@@ -9,14 +9,14 @@
     tr_padded_instance_id_path: "{{ torrent_data_path }}/padded_ids/{{ tr_padded_instance_id }}"
     tr_instance_name_path: "{{ torrent_data_path }}/names/{{ tr_instance.name }}"
     tr_instance_data_path: "{{ torrent_data_path }}/data/{{ tr_instance.name }}"
-    tr_peer_port: "{{ tr_base_port + ( tr_instance.id | int ) }}"
+    tr_peer_port: "{{ transmission_base_port + ( tr_instance.id | int ) }}"
     tr_service_name: "{{ tr_padded_instance_id }}{{ tr_instance.name }}"
 
 - name: 'Set some more useful facts.'
   ansible.builtin.set_fact:
     tr_instance_storage_path: "{{ torrent_data_path }}/clients/{{ tr_service_name }}"
-    tr_service_fqdn: "{{ tr_service_name }}.{{ tr_private_fqdn }}"
-    tr_domain_fqdn: "{{ tr_instance.name }}.{{ tr_private_fqdn }}"
+    tr_service_fqdn: "{{ tr_service_name }}.{{ host_private_fqdn }}"
+    tr_domain_fqdn: "{{ tr_instance.name }}.{{ host_private_fqdn }}"
 
 - name: 'Create instance root directory.'
   ansible.builtin.file:
@@ -84,7 +84,7 @@
      - "{{ tr_instance_storage_path }}/incomplete:/incomplete"
      - "{{ tr_instance_storage_path }}/downloads:/downloads"
      - "{{ tr_instance_data_path }}:/downloads2"
-    labels: "{{ tr_service_name | transmission_traefik_labels(tr_service_fqdn, tr_domain_fqdn, tr_letsencrypt_resolver_name) }}"
+    labels: "{{ tr_service_name | transmission_traefik_labels(tr_service_fqdn, tr_domain_fqdn, letsencrypt_private_domain_resolver) }}"
     ports:
       - "{{ tr_peer_port }}:{{ tr_peer_port }}"
       - "{{ tr_peer_port }}:{{ tr_peer_port }}/udp"

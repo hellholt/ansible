@@ -20,7 +20,7 @@
 
     - name: 'Install Apt packages.'
       ansible.builtin.apt:
-        name: "{{ pve_apt_packages }}"
+        name: "{{ default_apt_packages }}"
         cache_valid_time: "{{ 3600 * 24 }}"
 
     - name: 'Make sure pip is at the latest version.'
@@ -31,5 +31,5 @@
 
     - name: 'Install Pip packages.'
       ansible.builtin.pip:
-        name: "{{ pve_pip_packages }}"
+        name: "{{ default_pip_packages }}"
         extra_args: '--ignore-installed'
