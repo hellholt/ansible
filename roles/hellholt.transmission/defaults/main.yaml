@@ -35,16 +35,16 @@ torrent_data_path: '/torrents'
 tr_base_port: 60000
 
 # The user.
-tr_owner: 'nathan'
+normal_user_name: 'nathan'
 
 # The group.
-tr_group: 'users'
+normal_user_group: 'users'
 
 # The UID.
-tr_uid: '1000'
+normal_user_uid: '1000'
 
 # The GID.
-tr_gid: '1000'
+normal_user_gid: '1000'
 
 # The actual instances (an array of objects).
 torrent_client_instances: []

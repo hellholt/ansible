@@ -60,7 +60,7 @@
       --providers.file.directory='/etc/traefik/conf.d'
       --providers.file.watch=true
       --entryPoints.web
-      --entryPoints.web.address=":{{ tsp_web_port }}"
+      --entryPoints.web.address=":{{ traefik_site_proxy_web_port }}"
       --entryPoints.web.http
       --entryPoints.web.http.redirections
       --entryPoints.web.http.redirections.entryPoint
@@ -68,7 +68,7 @@
       --entryPoints.web.http.redirections.entryPoint.scheme='https'
       --entryPoints.web.forwardedHeaders.insecure
       --entryPoints.websecure
-      --entryPoints.websecure.address=":{{ tsp_websecure_port }}"
+      --entryPoints.websecure.address=":{{ traefik_site_proxy_websecure_port }}"
       --entryPoints.websecure.http.tls.certResolver="{{ letsencrypt_personal_domain_resolver }}"
       --certificatesResolvers.{{ letsencrypt_personal_domain_resolver }}.acme.email="{{ letsencrypt_email_address }}"
       --certificatesResolvers.{{ letsencrypt_personal_domain_resolver }}.acme.storage='/etc/traefik/letsencrypt.json'

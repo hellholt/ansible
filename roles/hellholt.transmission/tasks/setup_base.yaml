@@ -24,8 +24,8 @@
     path: "{{ torrent_data_path }}/{{ tr_directory_name }}"
     state: 'directory'
     mode: '0755'
-    owner: "{{ tr_owner }}"
-    group: "{{ tr_group }}"
+    owner: "{{ normal_user_name }}"
+    group: "{{ normal_user_group }}"
   loop:
     - 'clients'
     - 'data'
@@ -42,7 +42,7 @@
     src: "{{ item }}"
     dest: "{{ torrent_data_path }}/scripts/{{ item | basename | splitext | first }}"
     mode: '0755'
-    owner: "{{ tr_owner }}"
-    group: "{{ tr_group }}"
+    owner: "{{ normal_user_name }}"
+    group: "{{ normal_user_group }}"
   with_fileglob:
     - "{{ role_path }}/files/scripts/*.j2"

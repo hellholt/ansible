@@ -1,24 +1,24 @@
 ---
 # The user.
-un_owner: 'nathan'
+normal_user_name: 'nathan'
 
 # The group.
-un_group: 'users'
+normal_user_group: 'users'
 
 # The UID.
-un_uid: '1000'
+normal_user_uid: '1000'
 
 # The GID.
-un_gid: '1000'
+normal_user_gid: '1000'
 
 # Where files will be stored.
-un_storage_path: '/opt/unifi'
+unifi_data_path: '/opt/unifi'
 
 # Traefik Cert Resolver name.
-un_certresolver: null
+letsencrypt_private_domain_resolver: null
 
 # Hostname for reverse proxying.
-un_host_fqdn: null
+unifi_controller_fqdn: null
 
 # AWS access key ID.
 route53_access_key_id: null

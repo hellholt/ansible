@@ -23,8 +23,8 @@
     path: "{{ tr_instance_storage_path }}"
     state: 'directory'
     mode: '0755'
-    owner: "{{ tr_owner }}"
-    group: "{{ tr_group }}"
+    owner: "{{ normal_user_name }}"
+    group: "{{ normal_user_group }}"
 
 - name: 'Create symlink pointing to instance storage path from name, ID, and padded ID.'
   ansible.builtin.file:
@@ -44,16 +44,16 @@
     path: "{{ tr_instance_data_path }}"
     state: 'directory'
     mode: '0755'
-    owner: "{{ tr_owner }}"
-    group: "{{ tr_group }}"
+    owner: "{{ normal_user_name }}"
+    group: "{{ normal_user_group }}"
 
 - name: 'Prepare directory structure.'
   ansible.builtin.file:
     path: "{{ tr_instance_storage_path }}/{{ tr_directory_name }}"
     state: 'directory'
     mode: '0755'
-    owner: "{{ tr_owner }}"
-    group: "{{ tr_group }}"
+    owner: "{{ normal_user_name }}"
+    group: "{{ normal_user_group }}"
   loop:
     - 'config'
     - 'watch'
@@ -67,8 +67,8 @@
     src: "{{ item }}"
     dest: "{{ tr_instance_storage_path }}/config/{{ item | basename | splitext | first }}"
     mode: '0755'
-    owner: "{{ tr_owner }}"
-    group: "{{ tr_group }}"
+    owner: "{{ normal_user_name }}"
+    group: "{{ normal_user_group }}"
   with_fileglob:
     - "{{ role_path }}/files/config/*.j2"
 
@@ -90,8 +90,8 @@
       - "{{ tr_peer_port }}:{{ tr_peer_port }}/udp"
     memory: '1G'
     env:
-      PUID: "{{ tr_uid }}"
-      PGID: "{{ tr_gid }}"
+      PUID: "{{ normal_user_uid }}"
+      PGID: "{{ normal_user_gid }}"
       TZ: "{{ local_timezone }}"
     restart_policy: 'unless-stopped'
     container_default_behavior: 'no_defaults'

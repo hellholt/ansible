@@ -24,7 +24,7 @@ route53_access_key_id: null
 route53_secret_access_key: null
 
 # HTTP port.
-tsp_web_port: 80
+traefik_site_proxy_web_port: 80
 
 # HTTPS port.
-tsp_websecure_port: 443
+traefik_site_proxy_websecure_port: 443
