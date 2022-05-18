@@ -13,6 +13,9 @@ traefik_data_dir: '/mnt/host/traefik'
 # Portainer directory.
 portainer_data_dir: '/mnt/host/portainer'
 
+# Code-Server directory.
+codeserver_data_dir: '/mnt/host/code_server'
+
 # LetsEncrypt certificate resolver name.
 letsencrypt_private_domain_resolver: null
 
@@ -35,3 +38,6 @@ host_personal_fqdn: "{{ clean_hostname }}.{{ personal_domain_name }}"
 
 # Normal (i.e. non-root) username.
 normal_user_name: null
+
+# Normal user home directory.
+normal_user_home: "/home/{{ normal_user_name }}"

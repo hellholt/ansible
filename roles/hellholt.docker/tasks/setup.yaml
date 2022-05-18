@@ -14,3 +14,6 @@
 
     - name: 'Set up Portainer.'
       ansible.builtin.include_tasks: 'setup_portainer.yaml'
+
+    - name: 'Set up Code Server.'
+      ansible.builtin.include_tasks: 'setup_code_server.yaml'

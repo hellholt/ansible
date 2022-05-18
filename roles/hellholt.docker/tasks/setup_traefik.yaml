@@ -1,5 +1,5 @@
 ---
-- name: 'Set up Docker.'
+- name: 'Set up Traefik.'
   remote_user: 'root'
   block:
 

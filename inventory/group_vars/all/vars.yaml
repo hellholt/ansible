@@ -171,6 +171,14 @@ letsencrypt_email_address:  "letsencrypt@{{ my.domains.private }}"
 # A normal (i.e. non-root) username.
 normal_user_name: "{{ my.name.lower }}"
 
+# Normal user home directory.
+normal_user_home: "/home/{{ normal_user_name }}"
+
+# Normal user stuff.
+normal_user_group: "{{ normal_user_name }}"
+normal_user_uid: '1000'
+normal_user_gid: '1000'
+
 # Dotfiles repository.
 dotfiles_repo_url: 'https://github.com/hellholt/dotfiles.git'
 

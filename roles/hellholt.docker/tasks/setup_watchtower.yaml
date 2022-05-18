@@ -1,5 +1,5 @@
 ---
-- name: 'Set up Docker.'
+- name: 'Set up Watchtower.'
   remote_user: 'root'
   block:
 
