@@ -1,6 +1,6 @@
 # ~/.bash_prompt_local: sourced from .bash_prompt to construct our prompt.
 
-clean_hostname="{{ hostname }}";
+clean_hostname="{{ clean_hostname }}";
 primary_color="$(tput setaf {{ hostvars[hostname].prompt.colors.primary }})";
 secondary_color="$(tput setaf {{ hostvars[hostname].prompt.colors.secondary }})";
 tertiary_color="$(tput setaf {{ hostvars[hostname].prompt.colors.tertiary }})";

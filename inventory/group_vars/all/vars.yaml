@@ -9,7 +9,7 @@ admin_ssh_public_keys:
 admin_ssh_public_key: "{{ admin_ssh_public_keys[0] }}"
 
 # A clean, consistent version of the hostname.
-clean_hostname: "{{ ansible_hostname | splitext | first | lower }}"
+clean_hostname: "{{ inventory_hostname | splitext | first | lower }}"
 
 # Just the name of the project as a whole.  This will be used in a few places.
 project_name: 'hellholt'
@@ -86,7 +86,7 @@ my:
 #       some-domain-name: "some-replacement-domain-name"
 
 # Name and password of IAM user for host.
-host_aws_iam_user: "{{ project_name }}_host_{{ hostname }}"
+host_aws_iam_user: "{{ project_name }}_host_{{ clean_hostname }}"
 host_aws_iam_password: "{{ lookup('password', '/dev/null length=12 chars=ascii_letters,digits,punctuation') }}"
 
 # Name and password of IAM user for cluster.
@@ -99,9 +99,6 @@ k8s_cluster_names:
   - 'longtable'
   - 'mistwood'
   - 'ninestars'
-
-# Local share prefix on Lefford.
-local_share_prefix: '/leo/local/hosts'
 
 # The following sections are per-role variables.
 #
@@ -203,11 +200,11 @@ install_common_packages: yes
 # My local timezone.
 local_timezone: "{{ my.local.timezone }}"
 
-# By default, use Ubuntu 21.04 as our template.
-default_lxc_template: 'ubuntu-21.04-standard_21.04-1_amd64.tar.gz'
+# By default, use Ubuntu 22.04 as our template.
+default_lxc_template: 'ubuntu-22.04-standard_22.04-1_amd64.tar.zst'
 
 # Set the description to the description.
-description: "{{ description }}"
+description: "{{ ansible_description }}"
 
 # An ample mount, local storage for all LXC containers.
 default_lxc_mount: 'local-lvm:64,mp=/mnt/host,backup=1,size=64G'
@@ -232,7 +229,7 @@ k8s_aws_ssm_policy_pattern: "{{ project_name }}.clusters.{{ k8s_cluster }}.*"
 k8s_aws_iam_cluster_ssm_parameter_store_data_prefix: "{{ project_name }}.clusters."
 
 # Prefix to NFS path exported to k8s clusters.
-k8s_nfs_prefix: "{{ k8s_nfs_prefix }}"
+k8s_nfs_prefix: '/leo/nfs/clusters'
 
 # Easy password.
 easy_password: "{{ vault.easy_password }}"
@@ -250,7 +247,7 @@ k8s_github_token: "{{ vault.github.tokens.clusters[k8s_cluster] }}"
 k8s_storage_dir: '/mnt/host/k8s'
 
 # Plex Media Server directory.
-plex_media_server_directory: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
+plex_media_server_directory: '/var/lib/plexmediaserver'
 
 # Mounts for Plex.
 plex_nfs_mounts:
@@ -387,7 +384,9 @@ k8s_node_hostnames: "{{ groups['k8s_nodes'] }}"
 sh_nfs_mount_options: 'rw,async,no_subtree_check,no_wdelay,crossmnt,insecure,no_root_squash,insecure_locks,sec=sys'
 
 # Prefix to FS path mounted to hosts.
-pve_local_share_prefix: "{{ local_share_prefix }}"
+pve_local_share_prefix: "/leo/local/hosts"
+pve_local_share_hosts: "{{ groups[pve_cluster_id] }}"
+
 # Hosts that exist on this Proxmox node (and can thus mount local shares).
 sh_local_share_hostnames: "{{ groups[pve_cluster_id] }}"
 

@@ -1,62 +1,65 @@
 ---
-- name: 'Install libxslt.'
-  ansible.builtin.apt:
-    name: 'libxslt1.1'
+- name: 'Set up Code-Server.'
+  remote_user: 'root'
+  block:
 
-- name: 'Add the Plex apt signing key.'
-  ansible.builtin.apt_key:
-    url: 'https://downloads.plex.tv/plex-keys/PlexSign.key'
-    state: 'present'
+    - name: 'Setup Plex Media Server.'
+      community.docker.docker_container:
+        name: 'plex'
+        image: 'linuxserver/plex:latest'
+        restart_policy: 'unless-stopped'
+        recreate: yes
+        network_mode: 'host'
+        labels:
+          traefik.enable: 'true'
+          traefik.http.routers.plex.rule: "HostRegexp(`plex.{{ host_private_fqdn }}`, `{subdomain:[a-z0-9-]+}.plex.{{ host_private_fqdn }}`)"
+          traefik.http.routers.plex.tls: 'true'
+          traefik.http.routers.plex.tls.certresolver: "{{ letsencrypt_private_domain_resolver }}"
+          traefik.http.routers.plex.tls.domains[0].main: "plex.{{ host_private_fqdn }}"
+          traefik.http.routers.plex.tls.domains[0].sans: "*.plex.{{ host_private_fqdn }}"
+          traefik.http.routers.plex.service: 'plex'
+          traefik.http.services.plex.loadbalancer.server.port: '32400'
+          traefik.http.services.plex.loadbalancer.server.scheme: 'http'
+        env:
+          PUID: "{{ normal_user_uid }}"
+          PGID: "{{ normal_user_gid }}"
+          UMASK: '0000'
+          TZ: "{{ local_timezone }}"
+        volumes:
+          - "{{ plex_media_server_directory }}:/config"
+          - '/Movies:/Movies'
+          - '/Music:/Music'
+          - '/Podcasts:/Podcasts'
+          - '/TV:/TV'
+          - '/YouTube:/YouTube'
 
-- name: 'Add APT repository for Plex.'
-  ansible.builtin.apt_repository:
-    repo: 'deb https://downloads.plex.tv/repo/deb public main'
-    state: 'present'
+    - name: 'Create the scanners/series directory.'
+      ansible.builtin.file:
+        path: "{{ plex_media_server_directory }}/Scanners/Series"
+        state: 'directory'
+        mode: '0755'
+        owner: "{{ normal_user_name }}"
+        group: "{{ normal_user_group }}"
 
-- name: 'Install Plex Media Server.'
-  ansible.builtin.apt:
-    name:
-      - 'plexmediaserver'
-    state: 'latest'
-    update_cache: yes
-  notify: 'Restart Plex Media Server.'
+    - name: 'Install Absolute Series Scanner.'
+      ansible.builtin.get_url:
+        url: 'https://raw.githubusercontent.com/ZeroQI/Absolute-Series-Scanner/master/Scanners/Series/Absolute%20Series%20Scanner.py'
+        dest: "{{ plex_media_server_directory }}/Scanners/Series/Absolute Series Scanner.py"
+        owner: "{{ normal_user_name }}"
+        group: "{{ normal_user_group }}"
 
-- name: 'Force all notified handlers to run at this point.'
-  ansible.builtin.meta: 'flush_handlers'
+    - name: 'Install YouTube Agent.'
+      ansible.builtin.git:
+        repo: 'https://github.com/ZeroQI/YouTube-Agent.bundle.git'
+        dest: "{{ plex_media_server_directory }}/Plug-ins/YouTube-Agent.bundle"
+        update: no
+      become: yes
+      become_user: "{{ normal_user_name }}"
 
-- name: 'Create the scanners/series directory.'
-  ansible.builtin.file:
-    path: "{{ plex_media_server_directory }}/Scanners/Series"
-    state: 'directory'
-    mode: '0755'
-    owner: 998
-    group: 998
-
-- name: 'Install Absolute Series Scanner.'
-  ansible.builtin.get_url:
-    url: 'https://raw.githubusercontent.com/ZeroQI/Absolute-Series-Scanner/master/Scanners/Series/Absolute%20Series%20Scanner.py'
-    dest: "{{ plex_media_server_directory }}/Scanners/Series/Absolute Series Scanner.py"
-  notify: 'Restart Plex Media Server.'
-
-- name: 'Install YouTube Agent.'
-  ansible.builtin.git:
-    repo: 'https://github.com/ZeroQI/YouTube-Agent.bundle.git'
-    dest: "{{ plex_media_server_directory }}/Plug-ins/YouTube-Agent.bundle"
-    update: no
-  notify: 'Restart Plex Media Server.'
-
-- name: 'Install YouTube-DL Agent.'
-  ansible.builtin.git:
-    repo: 'https://github.com/JordyAlkema/Youtube-DL-Agent.bundle.git'
-    dest: "{{ plex_media_server_directory }}/Plug-ins/Youtube-DL-Agent.bundle"
-    update: no
-  notify: 'Restart Plex Media Server.'
-
-- name: 'Force all notified handlers to run at this point.'
-  ansible.builtin.meta: 'flush_handlers'
-
-- name: 'Start Plex Media Server.'
-  ansible.builtin.service:
-    name: 'plexmediaserver'
-    state: 'started'
-
+    - name: 'Install YouTube-DL Agent.'
+      ansible.builtin.git:
+        repo: 'https://github.com/JordyAlkema/Youtube-DL-Agent.bundle.git'
+        dest: "{{ plex_media_server_directory }}/Plug-ins/Youtube-DL-Agent.bundle"
+        update: no
+      become: yes
+      become_user: "{{ normal_user_name }}"

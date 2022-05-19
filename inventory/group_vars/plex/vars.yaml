@@ -1,7 +1,7 @@
 description: |-
   Proxmox LXC Container - Plex
 pve_mountpoints:
-  - node_path: "{{ local_share_prefix }}/{{ hostname }}/plex"
+  - node_path: "{{ pve_local_share_prefix }}/{{ clean_hostname }}/plex"
     host_path: "{{ plex_media_server_directory }}"
     perms: '0755'
     uid: 998

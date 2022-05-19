@@ -1,6 +1,10 @@
 ---
-- name: 'Set up NFS.'
-  ansible.builtin.include_tasks: 'setup_nfs.yaml'
+- name: 'Setup Plex.'
+  remote_user: 'root'
+  block:
 
-- name: 'Set up Plex.'
-  ansible.builtin.include_tasks: 'setup_plex.yaml'
+    - name: 'Set up NFS.'
+      ansible.builtin.include_tasks: 'setup_nfs.yaml'
+
+    - name: 'Set up Plex.'
+      ansible.builtin.include_tasks: 'setup_plex.yaml'

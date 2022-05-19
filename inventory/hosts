@@ -19,6 +19,11 @@ all:
     opnsense:
       hosts:
         marbrand:
+    plex:
+      vars:
+        ansible_group_priority: 10
+      hosts:
+        fenn:
     retropie:
       hosts:
         # peat:
@@ -58,9 +63,6 @@ all:
           hosts:
         piwigo:
           hosts:
-        plex:
-          hosts:
-            fenn:
         pve_file:
           hosts:
             lefford:

@@ -1,0 +1,19 @@
+---
+- name: 'Run host-specific setup.'
+  remote_user: 'root'
+  block:
+
+    - name: 'Normal setup.'
+      ansible.builtin.include_tasks: 'setup.yaml'
+
+    - name: 'Support AWS resources.'
+      ansible.builtin.include_role:
+        name: 'hellholt.aws'
+
+    - name: 'Install Docker.'
+      ansible.builtin.include_role:
+        name: 'hellholt.docker'
+
+    - name: 'Install Dotfiles.'
+      ansible.builtin.include_role:
+        name: 'hellholt.dotfiles'
