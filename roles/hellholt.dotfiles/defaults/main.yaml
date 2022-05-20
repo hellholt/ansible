@@ -10,3 +10,6 @@ dotfiles_repo_url: null
 
 # MOTD base URL, from which MOTD text files can be retrieved.
 motd_assets_base_url: null
+
+# YADM config file path.
+yadm_config_path: '.config/yadm/config'

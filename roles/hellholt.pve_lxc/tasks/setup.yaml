@@ -6,15 +6,13 @@
     - name: 'Gather facts.'
       ansible.builtin.setup:
 
-    - name: 'Set user and group facts.'
-      ansible.builtin.include_tasks: 'set_user_facts.yaml'
-
     - name: 'Set OS and distribution facts.'
       ansible.builtin.include_tasks: 'set_os_facts.yaml'
 
     - name: 'Install some universally useful packages.'
       ansible.builtin.include_tasks: 'setup_packages.yaml'
-      when: 'install_common_packages is true and pve_common_packages_installed is not defined'
+      when: 'install_common_packages is true and common_packages_installed is not defined'
+      register: 'common_packages_installed'
 
     - name: 'Create a normal user account.'
       ansible.builtin.include_tasks: 'setup_normal_user.yaml'
@@ -23,4 +21,4 @@
     - name: 'Set the hostname explicitly.'
       ansible.builtin.hostname:
         name: "{{ clean_hostname }}"
-      when: 'explicitly_set_hostname is true and not pve_host_is_mac and not pve_host_is_synology'
+      when: 'explicitly_set_hostname is true and not host_is_mac and not host_is_synology'

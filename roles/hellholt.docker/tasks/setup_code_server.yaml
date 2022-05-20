@@ -3,6 +3,22 @@
   remote_user: 'root'
   block:
 
+    - name: 'Create the .config directory if it does not already exist.'
+      ansible.builtin.file:
+        path: "{{ normal_user_home }}/.config"
+        state: 'directory'
+        mode: '0755'
+        owner: "{{ normal_user_name }}"
+        group: "{{ normal_user_group }}"
+
+    - name: 'Create the .config/code-server directory.'
+      ansible.builtin.file:
+        path: "{{ normal_user_home }}/.config/code-server"
+        state: 'directory'
+        mode: '0755'
+        owner: "{{ normal_user_name }}"
+        group: "{{ normal_user_group }}"
+
     - name: "Setup the Code-Server service."
       community.docker.docker_container:
         name: 'code-server'

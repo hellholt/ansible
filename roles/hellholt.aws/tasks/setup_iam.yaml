@@ -5,8 +5,8 @@
 
     - name: 'Create an AWS IAM user for this host.'
       community.aws.iam:
-        aws_access_key: "{{ aws_access_key_id }}"
-        aws_secret_key: "{{ aws_secret_access_key }}"
+        aws_access_key: "{{ aws_default_access_key_id }}"
+        aws_secret_key: "{{ aws_default_secret_access_key }}"
         region: "{{ aws_region }}"
         iam_type: 'user'
         name: "{{ aws_iam_host_user }}"
@@ -15,11 +15,15 @@
         update_password: 'on_create'
         access_key_state: 'create'
         key_count: 0
+      register: 'result'
+      retries: 3
+      delay: 10
+      until: 'result is not failed'
 
     - name: 'Create or update IAM policy for host.'
       community.aws.iam_policy:
-        aws_access_key: "{{ aws_access_key_id }}"
-        aws_secret_key: "{{ aws_secret_access_key }}"
+        aws_access_key: "{{ aws_default_access_key_id }}"
+        aws_secret_key: "{{ aws_default_secret_access_key }}"
         region: "{{ aws_region }}"
         iam_type: 'user'
         iam_name: "{{ aws_iam_host_user }}"
@@ -53,22 +57,34 @@
               }
             ]
           }
+      register: 'result'
+      retries: 3
+      delay: 10
+      until: 'result is not failed'
 
     - name: 'Create S3 bucket.'
       amazon.aws.s3_bucket:
-        aws_access_key: "{{ aws_access_key_id }}"
-        aws_secret_key: "{{ aws_secret_access_key }}"
+        aws_access_key: "{{ aws_default_access_key_id }}"
+        aws_secret_key: "{{ aws_default_secret_access_key }}"
         region: "{{ aws_region }}"
         name: "{{ lxc_s3_bucket_name }}"
         state: 'present'
         versioning: no
+      register: 'result'
+      retries: 3
+      delay: 10
+      until: 'result is not failed'
 
     - name: 'Retrieve host data for this host.'
       block:
 
         - name: 'Lookup host data for this host.'
           ansible.builtin.set_fact:
-            aws_iam_host_data: "{{ lookup('amazon.aws.aws_ssm', aws_iam_host_ssm_parameter_store_data_name, aws_access_key=aws_access_key_id, aws_secret_key=aws_secret_access_key) | from_json }}"
+            aws_iam_host_data: "{{ lookup('amazon.aws.aws_ssm', aws_iam_host_ssm_parameter_store_data_name, aws_access_key=aws_default_access_key_id, aws_secret_key=aws_default_secret_access_key) | from_json }}"
+          register: 'result'
+          retries: 3
+          delay: 10
+          until: 'result is not failed'
 
       rescue:
 
@@ -87,11 +103,11 @@
 
         - name: 'Create and retrieve access key.'
           ansible.builtin.command:
-            cmd: "aws iam create-access-key --user-name {{ iam_host_user }}"
+            cmd: "aws iam create-access-key --user-name {{ aws_iam_host_user }}"
           environment:
             AWS_REGION: '{{ aws_region }}'
-            AWS_ACCESS_KEY_ID: '{{ aws_access_key_id }}'
-            AWS_SECRET_ACCESS_KEY: '{{ aws_secret_access_key }}'
+            AWS_ACCESS_KEY_ID: '{{ aws_default_access_key_id }}'
+            AWS_SECRET_ACCESS_KEY: '{{ aws_default_secret_access_key }}'
           register: 'aws_iam_access_key_command'
 
         - name: 'Get access key ID and secret access key from command output.'

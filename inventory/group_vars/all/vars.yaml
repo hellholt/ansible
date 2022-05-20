@@ -117,9 +117,6 @@ route53_secret_access_key: "{{ vault.aws.profiles.route53.secret_key }}"
 # Parameter pattern for SSM parameters for which the SSM policy should permit access.
 aws_iam_ssm_policy_pattern: "{{ clean_hostname }}.*"
 
-# S3 bucket for this host.
-lxc_s3_bucket_name: "hosts.{{ clean_hostname }}"
-
 # Prefix of SSM parameter store data for host.
 aws_iam_host_ssm_parameter_store_data_prefix: null
 
@@ -130,6 +127,9 @@ aws_iam_host_ssm_parameter_store_data_name: "{{ aws_iam_host_ssm_parameter_store
 private_domain_name: "{{ my.domains.private }}"
 # A personal domain name.
 personal_domain_name: "{{ my.domains.personal }}"
+
+# S3 bucket for this host.
+lxc_s3_bucket_name: "{{ private_domain_name | splitext | first }}.hosts.{{ clean_hostname }}"
 
 # A Route 53 "private" zone ID.
 route53_private_zone_id: "{{ vault.aws.route53.zone_ids.private }}"
@@ -320,7 +320,6 @@ default_apt_packages:
   - 'python3-venv'
   - 'rsync'
   - 'sudo'
-  - 'yadm'
 
 # Pip packages.
 default_pip_packages:

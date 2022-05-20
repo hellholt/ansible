@@ -1,46 +1,13 @@
 ---
-- name: 'Set YADM facts.'
-  ansible.builtin.set_fact:
-    dot_yadm_repo_paths_by_os:
-      Debian: '~/.yadm/repo.git'
-      Ubuntu: '~/.local/share/yadm/repo.git'
-      MacOSX: '~/.local/share/yadm/repo.git'
-      default: '~/.yadm/repo.git'
+- name: 'Setup Dotfiles.'
+  remote_user: 'root'
+  block:
 
-- name: 'Set more YADM facts.'
-  ansible.builtin.set_fact:
-    dot_yadm_repo_path: "{{ dot_yadm_repo_paths_by_os[ansible_distribution] | default(ansible_distribution['default']) }}"
+    - name: 'Set up YADM.'
+      ansible.builtin.include_tasks: 'setup_yadm.yaml'
 
-- name: 'YADM bootstrap (root).'
-  ansible.builtin.command:
-    cmd: "yadm clone --bootstrap {{ dotfiles_repo_url }} -b main"
-    creates: "{{ dot_yadm_repo_path }}"
-  become: yes
+    - name: 'Set up the Bash prompt.'
+      ansible.builtin.include_tasks: 'setup_bash_prompt.yaml'
 
-- name: 'YADM bootstrap (normal user).'
-  ansible.builtin.command:
-    cmd: "yadm clone --bootstrap {{ dotfiles_repo_url }} -b main"
-    creates: "{{ dot_yadm_repo_path }}"
-
-- name: 'Update dotfiles (root).'
-  ansible.builtin.cron:
-    name: 'update-dotfiles'
-    special_time: 'daily'
-    job: |
-      /bin/bash -lc 'yadm pull' > /dev/null
-  ignore_errors: yes
-  become: yes
-
-- name: 'Update dotfiles (normal user).'
-  ansible.builtin.cron:
-    name: 'update-dotfiles'
-    special_time: 'daily'
-    job: |
-      /bin/bash -lc 'yadm pull' > /dev/null
-  ignore_errors: yes
-
-- name: 'Set up the Bash prompt.'
-  ansible.builtin.include_tasks: 'setup_bash_prompt.yaml'
-
-- name: 'Set up the Message-of-the-Day.'
-  ansible.builtin.include_tasks: 'setup_motd.yaml'
+    - name: 'Set up the Message-of-the-Day.'
+      ansible.builtin.include_tasks: 'setup_motd.yaml'

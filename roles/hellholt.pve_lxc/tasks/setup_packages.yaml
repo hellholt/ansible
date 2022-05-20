@@ -6,9 +6,6 @@
     - name: 'Gather facts.'
       ansible.builtin.setup:
 
-    - name: 'Set user and group facts.'
-      ansible.builtin.include_tasks: 'set_user_facts.yaml'
-
     - name: 'Set OS and distribution facts.'
       ansible.builtin.include_tasks: 'set_os_facts.yaml'
 
