@@ -21,18 +21,6 @@
         groups: 'sudo'
         create_home: yes
 
-    - name: 'Set SSH keys for user account.'
-      ansible.posix.authorized_key:
-        user: "{{ normal_user_name }}"
-        state: 'present'
-        key: "{{ pve_pubkey_item }}"
-      become: yes
-      become_user: "{{ normal_user_name }}"
-      loop: "{{ admin_ssh_public_keys }}"
-      loop_control:
-        index_var: 'pve_pubkey_index'
-        loop_var: 'pve_pubkey_item'
-
     - name: 'Create an SSH key for the normal user.'
       community.crypto.openssh_keypair:
         path: '~/.ssh/id_rsa'
@@ -44,6 +32,19 @@
         type: 'rsa'
       become: yes
       become_user: "{{ normal_user_name }}"
+      register: 'ssh_keypair'
+
+    - name: 'Set SSH keys for user account.'
+      ansible.posix.authorized_key:
+        user: "{{ normal_user_name }}"
+        state: 'present'
+        key: "{{ pve_pubkey_item }}"
+      become: yes
+      become_user: "{{ normal_user_name }}"
+      loop: "{{ admin_ssh_public_keys + [ ssh_keypair.public_key ] }}"
+      loop_control:
+        index_var: 'pve_pubkey_index'
+        loop_var: 'pve_pubkey_item'
 
     - name: 'Enable passwordless sudo.'
       ansible.builtin.copy:

@@ -12,14 +12,18 @@
         mode: 0755
 
     - name: 'YADM bootstrap (root).'
-      ansible.builtin.command:
-        cmd: "yadm clone --bootstrap {{ dotfiles_repo_url }} -b main"
+      ansible.builtin.shell:
+        cmd: |
+          yadm clone --bootstrap {{ dotfiles_repo_url }}
+          yadm reset --hard
         creates: "/root/{{ yadm_config_path }}"
       ignore_errors: yes
 
     - name: 'YADM bootstrap (normal user).'
-      ansible.builtin.command:
-        cmd: "yadm clone --bootstrap {{ dotfiles_repo_url }} -b main"
+      ansible.builtin.shell:
+        cmd: |
+          yadm clone --bootstrap {{ dotfiles_repo_url }}
+          yadm reset --hard
         creates: "{{ normal_user_home }}/{{ yadm_config_path }}"
       become: yes
       become_user: "{{ normal_user_name }}"
