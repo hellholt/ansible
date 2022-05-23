@@ -75,6 +75,6 @@
       --certificatesResolvers.{{ letsencrypt_personal_domain_resolver }}.acme.dnsChallenge
       --certificatesResolvers.{{ letsencrypt_personal_domain_resolver }}.acme.dnsChallenge.provider='route53'
     env:
-      aws_default_access_key_id: "{{ route53_access_key_id }}"
-      aws_default_secret_access_key: "{{ route53_secret_access_key }}"
+      AWS_ACCESS_KEY_ID: "{{ route53_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ route53_secret_access_key }}"
     container_default_behavior: 'no_defaults'
