@@ -10,5 +10,5 @@ atsign_segment="$(printf "\[$(tput sgr0)$(tput bold)\]@\[$(tput sgr0)\]")";
 hostname_segment="$(printf "\[$(tput sgr0)$(tput bold)\]${secondary_color}\h\[$(tput sgr0)\]")";
 colon_segment="$(printf "\[$(tput sgr0)$(tput bold)\]:\[$(tput sgr0)\]")";
 path_segment="$(printf "\[$(tput sgr0)$(tput bold)\]${tertiary_color}\w\[$(tput sgr0)\]")";
-suffix_segment="$(printf "\[$(tput sgr0)$(tput bold)\]\$\[$(tput sgr0)\] ")";
+suffix_segment="$(printf "\[$(tput sgr0)$(tput bold)\]\[$(tput sgr0)\]\n\$ ")";
 echo "$(printf "${emoji_segment}${username_segment}${atsign_segment}${hostname_segment}${colon_segment}${path_segment}${suffix_segment}")";
